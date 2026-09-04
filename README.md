@@ -37,6 +37,12 @@ pytest -q -m perf        # 性能断言：查询 P95 < 8s、紧急 P95 < 2s
 python scripts/generate_fixtures.py   # 重新生成 fixture 三件套（T0 实现后可用；要求同脚本同参数同输出）
 ```
 
+## Ralph loop
+
+- 人工在环：`./ralph-once.sh "<任务>"`
+- 自治循环：`./afk-ralph.sh "<任务>" [上限]`（默认 10 次迭代上限）
+- 完成信号：agent 在输出最后一行单独给出 promise 完成标记。注意：该标记必须独占一行才算数，写在别的内容里无效。
+
 ## 环境变量
 
 复制 `.env.example` 为 `.env`。测试用 fake/cassette 固定 LLM 行为，**离线跑测试不需要真实 key**；只有"录制 cassette"和"LLM 层真实准确率在线验证"（人工验收项）才需要。

@@ -31,11 +31,13 @@ $(cat progress.txt)
 fi
 
 echo "=== Ralph iteration: invoking claude ==="
-OUTPUT=$("$CLAUDE" -p "$PROMPT")
+# headless -p 无人值守：文件编辑默认会被权限弹窗拒绝（无人可批），
+# 故用 acceptEdits 自动批准编辑类权限；可用 PERM_MODE 覆盖。
+OUTPUT=$("$CLAUDE" -p --permission-mode "${PERM_MODE:-acceptEdits}" "$PROMPT" </dev/null)
 echo "$OUTPUT"
 
-# 提取 promise（本次迭代的可验证承诺）
-PROMISE=$(echo "$OUTPUT" | grep -o "<promise>.*</promise>" | sed 's/<\/\?promise>//g' || true)
+# 提取 promise：sigil 必须独占一行，防止匹配到散文/代码块里的字面量
+PROMISE=$(echo "$OUTPUT" | grep -oE '^<promise>[^<]*</promise>[[:space:]]*$' | sed 's/<\/\?promise>//g' | head -1 || true)
 
 if [ "$PROMISE" = "COMPLETE" ]; then
   echo ""
