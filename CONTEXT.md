@@ -36,6 +36,16 @@ _Avoid_: 多轮对话、上下文记忆
 结论的数据底子厚度，与用户无关、与区域危险程度无关。由样本量显著性档直接映射：≥100 → HIGH ⭐⭐⭐⭐⭐；30–99 → MODERATE ⭐⭐⭐☆☆；10–29 → LOW ⭐⭐☆☆☆；<10 时已触发 ⚪ 不评级，不再给可信度。
 _Avoid_: 置信度评分、准确率、可靠指数
 
+## 模型路由
+
+**生产模型（Production Model）**:
+线上环境调用的 LLM：DeepSeek `deepseek-chat`。承载全部生成型 Agent（意图/检索/建议/追问）。受 $5/日预算熔断与限流约束。
+_Avoid_: 线上模型、正式模型
+
+**开发模型（Dev Model）**:
+开发/测试环境调用的 LLM：DashScope（阿里云百炼）承载的 Qwen 系列。测试金标与 VCR cassette 以开发模型录制为 canonical；生产 DeepSeek 的 eval 兼容性经 eval 套件单独验证。
+_Avoid_: 测试模型、本地模型
+
 ## 检索与生成
 
 **混合检索（Hybrid Retrieval）**:

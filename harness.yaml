@@ -1,0 +1,23 @@
+# Harness 配置（方法论要求，Phase 0）
+
+harness: safepass-nyc
+version: 0.1.0
+
+verify: pytest tests/ -q
+
+loop:
+  entry: ./ralph-once.sh
+  afk: ./afk-ralph.sh
+  memory: progress.txt
+  completion_sigil: "<promise>COMPLETE</promise>"
+  budget: token-budget.json
+
+task_source:
+  # 每 Phase 一个 PRD.md；Ralph 任务从对应 Phase 的 PRD 取
+  pattern: docs/specs/<phase>-prd.md
+
+agent_files:
+  - CLAUDE.md
+  - docs/agents/issue-tracker.md
+  - docs/agents/triage-labels.md
+  - docs/agents/domain.md

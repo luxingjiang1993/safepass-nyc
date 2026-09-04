@@ -1,0 +1,6 @@
+# Progress Log
+
+Ralph 跨迭代记忆。每次 ./ralph-once.sh 未达标迭代，agent 的承诺追加/改写于此。
+ afk-ralph.sh 检测到 <promise>COMPLETE</promise> 后由人工归档本文件内容到 RALPH.md 迭代历史。
+
+（尚未开始迭代）
