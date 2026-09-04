@@ -36,6 +36,30 @@ _Avoid_: 多轮对话、上下文记忆
 结论的数据底子厚度，与用户无关、与区域危险程度无关。由样本量显著性档直接映射：≥100 → HIGH ⭐⭐⭐⭐⭐；30–99 → MODERATE ⭐⭐⭐☆☆；10–29 → LOW ⭐⭐☆☆☆；<10 时已触发 ⚪ 不评级，不再给可信度。
 _Avoid_: 置信度评分、准确率、可靠指数
 
+## 评估与质量
+
+**eval 套件（Eval Suite）**:
+Phase 2 新增的质量门禁，两层架构：L1 确定性输出（评级/越界/结构化字段）走代码断言，进 `pytest tests/` 现有基线；L2 生成质量（建议质量/检索相关性/幻觉）走 LLM-as-judge，改写在 `可用来参考的代码案例/CASE-openevals使用` 的 evaluator，独立 `tests/eval/` 目录，judge 用 dev 模型（DashScope）保证考官考生同源。
+_Avoid_: 测试集、质检系统
+
+**金标（Golden Set）**:
+50 条人工标注的基准查询集，3 维覆盖矩阵：查询形态（新查询/对比追问/细节追问/越界，越界占 20%）× 5 核心警区 × 数据场景（正常/低样本 ⚪/画像敏感，后两者合占 30%）。每条带 L1 期望断言和 L2 期望标签（must_mention/must_not_claim）。
+_Avoid_: 标准答案集、样例库
+
+**合成用户（Synthetic User）**:
+LLM 扮演的用户 persona，用于访谈前预检和金标输入扩充。产出只作开发参考，不替代真人访谈。
+_Avoid_: 模拟器、虚拟用户
+
+## 数据与成本
+
+**真实数据 adapter（Data Adapter）**:
+从 NYC Open Data（Socrata API）拉取 NYPD 犯罪数据的单向管道：`scripts/fetch_nypd.py` 手动/月更运行，产出落 `fixtures/nypd_real/`，运行时永不直连外部 API。入库前校验（缺字段/时间越界/警区不在清单）不合格即拒收。
+_Avoid_: 数据同步、ETL 管道
+
+**成本熔断（Cost Fuse）**:
+挂在 `safepass/llm_client.py` 接缝的日预算熔断器，配置在 `token-budget.json`（生产 $5/日）。超限当日剩余请求走无 LLM 降级模式（结构化数据照出、建议降级为模板文本），降级响应必须明示，不静默。
+_Avoid_: 预算告警、花费控制
+
 ## 模型路由
 
 **生产模型（Production Model）**:
