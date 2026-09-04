@@ -1,0 +1,96 @@
+{
+  "doc_count": 15,
+  "docs": [
+    {
+      "doc_id": "p109_emergency",
+      "path": "p109_emergency.md",
+      "precinct": 109,
+      "theme": "emergency"
+    },
+    {
+      "doc_id": "p109_overview",
+      "path": "p109_overview.md",
+      "precinct": 109,
+      "theme": "overview"
+    },
+    {
+      "doc_id": "p109_scam",
+      "path": "p109_scam.md",
+      "precinct": 109,
+      "theme": "scam"
+    },
+    {
+      "doc_id": "p19_emergency",
+      "path": "p19_emergency.md",
+      "precinct": 19,
+      "theme": "emergency"
+    },
+    {
+      "doc_id": "p19_overview",
+      "path": "p19_overview.md",
+      "precinct": 19,
+      "theme": "overview"
+    },
+    {
+      "doc_id": "p19_scam",
+      "path": "p19_scam.md",
+      "precinct": 19,
+      "theme": "scam"
+    },
+    {
+      "doc_id": "p5_emergency",
+      "path": "p5_emergency.md",
+      "precinct": 5,
+      "theme": "emergency"
+    },
+    {
+      "doc_id": "p5_overview",
+      "path": "p5_overview.md",
+      "precinct": 5,
+      "theme": "overview"
+    },
+    {
+      "doc_id": "p5_scam",
+      "path": "p5_scam.md",
+      "precinct": 5,
+      "theme": "scam"
+    },
+    {
+      "doc_id": "p84_emergency",
+      "path": "p84_emergency.md",
+      "precinct": 84,
+      "theme": "emergency"
+    },
+    {
+      "doc_id": "p84_overview",
+      "path": "p84_overview.md",
+      "precinct": 84,
+      "theme": "overview"
+    },
+    {
+      "doc_id": "p84_scam",
+      "path": "p84_scam.md",
+      "precinct": 84,
+      "theme": "scam"
+    },
+    {
+      "doc_id": "p90_emergency",
+      "path": "p90_emergency.md",
+      "precinct": 90,
+      "theme": "emergency"
+    },
+    {
+      "doc_id": "p90_overview",
+      "path": "p90_overview.md",
+      "precinct": 90,
+      "theme": "overview"
+    },
+    {
+      "doc_id": "p90_scam",
+      "path": "p90_scam.md",
+      "precinct": 90,
+      "theme": "scam"
+    }
+  ],
+  "embedding_model": "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
+}

@@ -1,0 +1,46 @@
+{
+  "interactions": [
+    {
+      "fingerprint": "dc7d6be62b875740539749ef81930ef998b83a511ba1342247962e8484789ffc",
+      "response": {
+        "content": "{\"route\": \"emergency_help\"}",
+        "model": "fake-cassette-recorder"
+      }
+    },
+    {
+      "fingerprint": "f8acde6c67fe9aff6b829ed31bd9efeb4ec85d1973ae71b3a0a920057007c71a",
+      "response": {
+        "content": "{\"route\": \"emergency_help\"}",
+        "model": "fake-cassette-recorder"
+      }
+    },
+    {
+      "fingerprint": "1ca5ec3d29efe45687f01cf0d6821f6a78c4776d18e7615da328a3a226b1ac8c",
+      "response": {
+        "content": "{\"route\": \"emergency_help\"}",
+        "model": "fake-cassette-recorder"
+      }
+    },
+    {
+      "fingerprint": "740984e482ce0be8d35af26c44e8117b1d6473b237352a97de51417c7064ec17",
+      "response": {
+        "content": "{\"route\": \"emergency_help\"}",
+        "model": "fake-cassette-recorder"
+      }
+    },
+    {
+      "fingerprint": "e14e6dd09af9e7910c1222967e3aadd98f96553d8332d961b74d3d2b4d87b1b4",
+      "response": {
+        "content": "{\"route\": \"emergency_help\"}",
+        "model": "fake-cassette-recorder"
+      }
+    },
+    {
+      "fingerprint": "c72e7d42f3e874c105c2b30e18d842a74b4f9586e26cc317ecb9bc8a10fb3031",
+      "response": {
+        "content": "{\"route\": \"emergency_help\"}",
+        "model": "fake-cassette-recorder"
+      }
+    }
+  ]
+}

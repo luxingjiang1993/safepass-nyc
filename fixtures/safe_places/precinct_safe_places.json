@@ -1,0 +1,258 @@
+{
+  "version": "SAFE_PLACES_V1",
+  "verified_at": "2026-09-04",
+  "guardrails": {
+    "rule_unverified": "电话或地址未核实的机构只列机构名（verified=false 的条目不得含 address/phone/hours）",
+    "rule_sources": "每条目的 source 必须非空且可追溯",
+    "rule_unrecorded": "无官方来源的机构不列入电话号码"
+  },
+  "precincts": {
+    "19": {
+      "precinct_name_zh": "上东区",
+      "venues": [
+        {
+          "type": "police_station",
+          "name": "NYPD 19th Precinct",
+          "name_zh": "纽约市警察局第19分局",
+          "address": "153 East 67th Street, New York, NY 10065",
+          "phone": "(212) 452-0600",
+          "hours": "24小时",
+          "source": "https://www.nyc.gov/site/nypd/bureaus/patrol/precincts/19th-precinct.page",
+          "verified": true
+        },
+        {
+          "type": "hospital",
+          "name": "Lenox Hill Hospital (Northwell Health)",
+          "name_zh": "Lenox Hill 医院",
+          "address": "100 East 77th Street, New York, NY 10075",
+          "phone": "(212) 434-2000",
+          "hours": "急诊24小时",
+          "source": "https://www.northwell.edu/find-a-care-location/lenox-hill-hospital",
+          "verified": true
+        },
+        {
+          "type": "convenience_store",
+          "name": "上东区 24 小时便利店（连锁店，具体门店与营业时间未经逐一核实）",
+          "source": "未核实：录入时无官方来源，按护栏只列机构类别名",
+          "verified": false
+        },
+        {
+          "type": "convenience_store",
+          "name": "Duane Reade / CVS 药店（上东区门店，24小时营业情况未经核实）",
+          "source": "未核实：录入时无官方来源，按护栏只列机构类别名",
+          "verified": false
+        }
+      ]
+    },
+    "109": {
+      "precinct_name_zh": "法拉盛",
+      "venues": [
+        {
+          "type": "police_station",
+          "name": "NYPD 109th Precinct",
+          "name_zh": "纽约市警察局第109分局",
+          "address": "37-05 Union Street, Flushing, NY 11354",
+          "phone": "(718) 321-2250",
+          "hours": "24小时",
+          "source": "https://www.nyc.gov/site/nypd/bureaus/patrol/precincts/109th-precinct.page",
+          "verified": true
+        },
+        {
+          "type": "hospital",
+          "name": "Flushing Hospital Medical Center",
+          "name_zh": "法拉盛医院",
+          "address": "4500 Parsons Boulevard, Flushing, NY 11355",
+          "phone": "(718) 670-5000",
+          "hours": "急诊24小时",
+          "source": "https://flushinghospital.org/contact-us/",
+          "verified": true
+        },
+        {
+          "type": "convenience_store",
+          "name": "法拉盛缅街一带 24 小时便利店（具体门店与营业时间未经逐一核实）",
+          "source": "未核实：录入时无官方来源，按护栏只列机构类别名",
+          "verified": false
+        },
+        {
+          "type": "convenience_store",
+          "name": "法拉盛华人超市/杂货店（部分营业至深夜，24小时情况未经核实）",
+          "source": "未核实：录入时无官方来源，按护栏只列机构类别名",
+          "verified": false
+        }
+      ]
+    },
+    "5": {
+      "precinct_name_zh": "唐人街",
+      "venues": [
+        {
+          "type": "police_station",
+          "name": "NYPD 5th Precinct",
+          "name_zh": "纽约市警察局第5分局",
+          "address": "19 Elizabeth Street, New York, NY 10013",
+          "phone": "(212) 334-0711",
+          "hours": "24小时",
+          "source": "https://www.nyc.gov/site/nypd/bureaus/patrol/precincts/5th-precinct.page",
+          "verified": true
+        },
+        {
+          "type": "hospital",
+          "name": "NYC Health + Hospitals / Bellevue",
+          "name_zh": "表维医院",
+          "address": "462 First Avenue, New York, NY 10016",
+          "phone": "(212) 562-4141",
+          "hours": "急诊24小时",
+          "source": "https://www.nychealthandhospitals.org/bellevue/",
+          "verified": true
+        },
+        {
+          "type": "convenience_store",
+          "name": "唐人街 24 小时便利店（勿街/坚尼路一带门店未经逐一核实）",
+          "source": "未核实：录入时无官方来源，按护栏只列机构类别名",
+          "verified": false
+        },
+        {
+          "type": "convenience_store",
+          "name": "唐人街药房/杂货店（24小时营业情况未经核实）",
+          "source": "未核实：录入时无官方来源，按护栏只列机构类别名",
+          "verified": false
+        }
+      ]
+    },
+    "90": {
+      "precinct_name_zh": "威廉斯堡",
+      "venues": [
+        {
+          "type": "police_station",
+          "name": "NYPD 90th Precinct",
+          "name_zh": "纽约市警察局第90分局",
+          "address": "211 Union Avenue, Brooklyn, NY 11211",
+          "phone": "(718) 963-5311",
+          "hours": "24小时",
+          "source": "https://www.nyc.gov/site/nypd/bureaus/patrol/precincts/90th-precinct.page",
+          "verified": true
+        },
+        {
+          "type": "hospital",
+          "name": "Wyckoff Heights Medical Center",
+          "name_zh": "Wyckoff Heights 医疗中心",
+          "address": "374 Stockholm Street, Brooklyn, NY 11237",
+          "phone": "(718) 963-7272",
+          "hours": "急诊24小时",
+          "source": "https://whmcny.org/contact-us/",
+          "verified": true
+        },
+        {
+          "type": "convenience_store",
+          "name": "威廉斯堡 Graham Avenue / Metropolitan Avenue 一带 24 小时便利店（未经逐一核实）",
+          "source": "未核实：录入时无官方来源，按护栏只列机构类别名",
+          "verified": false
+        },
+        {
+          "type": "convenience_store",
+          "name": "威廉斯堡连锁药店（24小时营业情况未经核实）",
+          "source": "未核实：录入时无官方来源，按护栏只列机构类别名",
+          "verified": false
+        }
+      ]
+    },
+    "84": {
+      "precinct_name_zh": "布鲁克林高地",
+      "venues": [
+        {
+          "type": "police_station",
+          "name": "NYPD 84th Precinct",
+          "name_zh": "纽约市警察局第84分局",
+          "address": "301 Gold Street, Brooklyn, NY 11201",
+          "phone": "(718) 875-6811",
+          "hours": "24小时",
+          "source": "https://www.nyc.gov/site/nypd/bureaus/patrol/precincts/84th-precinct.page",
+          "verified": true
+        },
+        {
+          "type": "hospital",
+          "name": "The Brooklyn Hospital Center",
+          "name_zh": "布鲁克林医院中心",
+          "address": "121 DeKalb Avenue, Brooklyn, NY 11201",
+          "phone": "(718) 250-8000",
+          "hours": "急诊24小时",
+          "source": "https://www.tbh.org/visitor-information/contact-us",
+          "verified": true
+        },
+        {
+          "type": "convenience_store",
+          "name": "布鲁克林 Heights / Downtown Brooklyn 一带 24 小时便利店（未经逐一核实）",
+          "source": "未核实：录入时无官方来源，按护栏只列机构类别名",
+          "verified": false
+        },
+        {
+          "type": "convenience_store",
+          "name": "Downtown Brooklyn 连锁药店（24小时营业情况未经核实）",
+          "source": "未核实：录入时无官方来源，按护栏只列机构类别名",
+          "verified": false
+        }
+      ]
+    }
+  },
+  "general": {
+    "venues": [
+      {
+        "type": "emergency_number",
+        "name": "911",
+        "name_zh": "紧急报警电话",
+        "phone": "911",
+        "hours": "24小时",
+        "source": "https://portal.311.nyc.gov/",
+        "verified": true
+      },
+      {
+        "type": "city_services_number",
+        "name": "311",
+        "name_zh": "纽约市非紧急市政服务",
+        "phone": "311",
+        "hours": "24小时",
+        "source": "https://portal.311.nyc.gov/",
+        "verified": true
+      },
+      {
+        "type": "police_station",
+        "name": "NYPD 19th Precinct（上东区）",
+        "address": "153 East 67th Street, New York, NY 10065",
+        "phone": "(212) 452-0600",
+        "source": "https://www.nyc.gov/site/nypd/bureaus/patrol/precincts/19th-precinct.page",
+        "verified": true
+      },
+      {
+        "type": "police_station",
+        "name": "NYPD 109th Precinct（法拉盛）",
+        "address": "37-05 Union Street, Flushing, NY 11354",
+        "phone": "(718) 321-2250",
+        "source": "https://www.nyc.gov/site/nypd/bureaus/patrol/precincts/109th-precinct.page",
+        "verified": true
+      },
+      {
+        "type": "police_station",
+        "name": "NYPD 5th Precinct（唐人街）",
+        "address": "19 Elizabeth Street, New York, NY 10013",
+        "phone": "(212) 334-0711",
+        "source": "https://www.nyc.gov/site/nypd/bureaus/patrol/precincts/5th-precinct.page",
+        "verified": true
+      },
+      {
+        "type": "police_station",
+        "name": "NYPD 90th Precinct（威廉斯堡）",
+        "address": "211 Union Avenue, Brooklyn, NY 11211",
+        "phone": "(718) 963-5311",
+        "source": "https://www.nyc.gov/site/nypd/bureaus/patrol/precincts/90th-precinct.page",
+        "verified": true
+      },
+      {
+        "type": "police_station",
+        "name": "NYPD 84th Precinct（布鲁克林高地）",
+        "address": "301 Gold Street, Brooklyn, NY 11201",
+        "phone": "(718) 875-6811",
+        "source": "https://www.nyc.gov/site/nypd/bureaus/patrol/precincts/84th-precinct.page",
+        "verified": true
+      }
+    ]
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "interactions": [
+    {
+      "fingerprint": "4c18a936c113bbdad4d594ca5a8947a1e3c3398faf688843b8b00dd5a609e80d",
+      "response": {
+        "content": "{\"route\": \"area_comparison\"}",
+        "model": "record-scripted"
+      }
+    }
+  ]
+}

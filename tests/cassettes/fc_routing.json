@@ -1,0 +1,39 @@
+{
+  "interactions": [
+    {
+      "fingerprint": "efb0059c4ef33b2dffa34b19d4474cc20f6c48f4f0a0e1c4fcb0f18b16f0fd4e",
+      "response": {
+        "content": "{\"route\": \"area_safety_query\"}",
+        "model": "fake-cassette-recorder"
+      }
+    },
+    {
+      "fingerprint": "be7fec7af6ad59b778c4c4554bb393634c8b6047fd59639367a32704e51a7c98",
+      "response": {
+        "content": "{\"route\": \"area_comparison\"}",
+        "model": "fake-cassette-recorder"
+      }
+    },
+    {
+      "fingerprint": "dff3ca47d4d893a580c257e1eafa1aa320d10970f0678621390d3fe2fe577d3f",
+      "response": {
+        "content": "{\"route\": \"emergency_help\"}",
+        "model": "fake-cassette-recorder"
+      }
+    },
+    {
+      "fingerprint": "b0a92377e5e6b88a9d7f82ef7631d74354f12120673b2331a248f2d6149c35ff",
+      "response": {
+        "content": "{\"route\": \"follow_up\"}",
+        "model": "fake-cassette-recorder"
+      }
+    },
+    {
+      "fingerprint": "af74a2c5f402e8d00a8cad94ef36ca58a36a636b3330e63f95e659e01d5c2074",
+      "response": {
+        "content": "{\"route\": \"degraded_response\", \"degraded_capability\": \"path\"}",
+        "model": "fake-cassette-recorder"
+      }
+    }
+  ]
+}

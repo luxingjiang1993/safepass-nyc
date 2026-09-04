@@ -1,0 +1,21 @@
+# SafePass NYC 依赖清单
+# 版本对齐 参考代码/RAG-cy/requirements.txt（D10 主要改写来源）
+# Python 要求 3.11–3.13（faiss-cpu 无 3.14 预编译 wheel）
+
+# --- 核心 ---
+pydantic==2.9.2            # 结构化响应契约 / Skill 输入输出契约
+openai==1.51.2             # 模型 SDK（FC 路由、JSON mode）
+python-dotenv==1.0.1       # .env 加载
+PyYAML==6.0.2              # 集中配置（config/app.yaml）
+
+# --- 检索（spec D11a：全部本地文件形态，无向量数据库服务）---
+faiss-cpu==1.9.0.post1     # 向量索引，本地索引文件
+rank-bm25==0.2.2           # BM25 关键词检索
+sentence-transformers>=3.0.0  # 本地 embedding 模型，不依赖 API
+
+# --- 数据与修复 ---
+pandas==2.2.3              # 数据集聚合
+json_repair==0.35.0        # 输出控制管线：解析失败修复
+
+# --- 测试 ---
+pytest>=8.0

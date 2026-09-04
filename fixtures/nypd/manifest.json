@@ -1,0 +1,76 @@
+{
+  "city_mean_per_100k": 144.6328,
+  "dataset_version": "MOCK_NYPD_V1",
+  "precincts": {
+    "109": {
+      "population": 50000,
+      "rate_per_100k": 188.0,
+      "ratio_to_city_mean": 1.299844,
+      "records": 94
+    },
+    "14": {
+      "population": 60000,
+      "rate_per_100k": 143.3333,
+      "ratio_to_city_mean": 0.991016,
+      "records": 86
+    },
+    "18": {
+      "population": 60000,
+      "rate_per_100k": 143.3333,
+      "ratio_to_city_mean": 0.991016,
+      "records": 86
+    },
+    "19": {
+      "population": 120000,
+      "rate_per_100k": 87.5,
+      "ratio_to_city_mean": 0.60498,
+      "records": 105
+    },
+    "20": {
+      "population": 20000,
+      "rate_per_100k": 120.0,
+      "ratio_to_city_mean": 0.829687,
+      "records": 24
+    },
+    "26": {
+      "population": 60000,
+      "rate_per_100k": 143.3333,
+      "ratio_to_city_mean": 0.991016,
+      "records": 86
+    },
+    "5": {
+      "population": 60000,
+      "rate_per_100k": 230.0,
+      "ratio_to_city_mean": 1.590234,
+      "records": 138
+    },
+    "61": {
+      "population": 200000,
+      "rate_per_100k": 234.0,
+      "ratio_to_city_mean": 1.617891,
+      "records": 468
+    },
+    "75": {
+      "population": 60000,
+      "rate_per_100k": 143.3333,
+      "ratio_to_city_mean": 0.991016,
+      "records": 86
+    },
+    "84": {
+      "population": 95000,
+      "rate_per_100k": 6.3158,
+      "ratio_to_city_mean": 0.043668,
+      "records": 6
+    },
+    "90": {
+      "population": 100000,
+      "rate_per_100k": 101.0,
+      "ratio_to_city_mean": 0.69832,
+      "records": 101
+    }
+  },
+  "seed": 20260904,
+  "total_records": 1280,
+  "window_end_exclusive": "2026-07-01",
+  "window_start": "2025-07-01"
+}

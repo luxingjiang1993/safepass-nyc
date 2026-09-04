@@ -1,0 +1,18 @@
+{
+  "interactions": [
+    {
+      "fingerprint": "efb0059c4ef33b2dffa34b19d4474cc20f6c48f4f0a0e1c4fcb0f18b16f0fd4e",
+      "response": {
+        "content": "{\"route\": \"area_safety_query\"}",
+        "model": "scripted"
+      }
+    },
+    {
+      "fingerprint": "0101131fcdb1c2bfc6fa0957671b95af3ffe621fddcafc00baa84a78439e27cf",
+      "response": {
+        "content": "{\"area\": \"上东区\", \"crowd\": null, \"time\": \"晚上\"}",
+        "model": "scripted"
+      }
+    }
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "interactions": [
+    {
+      "fingerprint": "73fce1fadb4a0f54a0e80a4261b4f8ece2a0f74df9096a2428dee3d1bbefeb25",
+      "response": {
+        "content": "{\"route\": \"follow_up\"}",
+        "model": "record-scripted"
+      }
+    }
+  ]
+}

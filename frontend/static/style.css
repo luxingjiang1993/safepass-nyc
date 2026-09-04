@@ -1,0 +1,258 @@
+/* SafePass NYC 前端样式（issue 11，结构层）。
+
+窄屏目标（PRD UX-007 结构层）：单列、max-width 自适应、按钮自动换行、
+条形图用百分比宽度——任何视口下无横向滚动。安全评级不靠颜色传达：
+图标 + 文字并存（色盲可区分，UX-008 结构层）；图表数值永远以文字呈现。
+*/
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: -apple-system, "PingFang SC", "Microsoft YaHei", "Noto Sans CJK SC", sans-serif;
+  line-height: 1.6;
+  color: #222;
+  background: #fafafa;
+}
+
+.page {
+  max-width: 40rem;
+  margin: 0 auto;
+  padding: 1rem 1rem 2rem;
+}
+
+/* --- 首页 --- */
+.hero h1 { margin-bottom: 0; }
+.tagline { margin-top: 0.25rem; color: #666; }
+.greeting p { margin: 0.4rem 0; }
+
+.query-form {
+  display: flex;
+  gap: 0.5rem;
+  margin: 1rem 0;
+}
+.query-form input {
+  flex: 1 1 auto;
+  min-width: 0; /* 窄屏下输入框可收缩，不撑出横向滚动 */
+  padding: 0.6rem;
+  border: 1px solid #bbb;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+}
+.query-form button {
+  flex: 0 0 auto;
+  padding: 0.6rem 1.2rem;
+  border: none;
+  border-radius: 0.5rem;
+  background: #2b5ea7;
+  color: #fff;
+  font-size: 1rem;
+}
+
+.quick h2 { font-size: 1rem; color: #555; }
+.quick-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+.quick-btn {
+  flex: 1 1 calc(50% - 0.5rem); /* 窄屏两列，宽屏自动舒展 */
+  min-width: 8rem;
+  padding: 0.7rem 0.5rem;
+  text-align: center;
+  text-decoration: none;
+  color: #1a3a66;
+  background: #e8f0fb;
+  border: 1px solid #b9cdec;
+  border-radius: 0.6rem;
+}
+
+/* --- 结果页通用 --- */
+.back { display: inline-block; margin-bottom: 0.5rem; color: #2b5ea7; text-decoration: none; }
+
+.result-head h1 { margin: 0.2rem 0; }
+.rating { font-size: 1.15rem; font-weight: 700; margin: 0.2rem 0; }
+.precinct, .sample, .basis { color: #555; margin: 0.2rem 0; }
+.stars { letter-spacing: 0.1em; }
+
+section, details {
+  margin: 1rem 0;
+  padding: 0.75rem 1rem;
+  background: #fff;
+  border: 1px solid #e2e2e2;
+  border-radius: 0.6rem;
+}
+section h2, details summary { font-size: 1.05rem; margin: 0.2rem 0 0.5rem; }
+details summary { cursor: pointer; font-weight: 600; }
+ul, ol { padding-left: 1.3rem; margin: 0.3rem 0; }
+
+/* --- 图表（纯 CSS 横向条形；数值文字并排，不依赖长度或颜色） --- */
+.bars { margin: 0.5rem 0; }
+.bar-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0.35rem 0;
+}
+.bar-label {
+  flex: 0 0 5.5rem;
+  text-align: right;
+  font-size: 0.9rem;
+  color: #444;
+}
+.bar-track {
+  flex: 1 1 auto;
+  height: 1rem;
+  background: #eee;
+  border-radius: 0.3rem;
+  overflow: hidden;
+}
+.bar-fill {
+  display: block;
+  height: 100%;
+  background: #7a9cc4; /* 中性色：图表不承载评级语义 */
+}
+.bar-value {
+  flex: 0 0 2.5rem;
+  font-variant-numeric: tabular-nums;
+}
+
+/* --- 对比 --- */
+.compare-grid { display: grid; gap: 0.75rem; }
+@media (min-width: 30rem) {
+  .compare-grid { grid-template-columns: 1fr 1fr; }
+}
+.area-card { margin: 0; }
+.decision-aid { font-weight: 600; }
+
+/* --- 降级 / 紧急 / 防线 --- */
+.degraded-message p, .guardrail-message p { margin: 0.3rem 0; }
+.phrase { font-style: italic; }
+
+/* --- 紧急模式（issue 12，PRD §6.2 紧急线框）：红色极简整页 --- */
+/* 红色主题由 body.theme-emergency 承载；语义信息仍靠文字（图标+文字并存）。 */
+body.theme-emergency {
+  background: #2b0507;
+  color: #fff;
+}
+body.theme-emergency .page { max-width: 34rem; }
+body.theme-emergency section,
+body.theme-emergency details,
+body.theme-emergency .result-head {
+  background: #3d0a0d;
+  border-color: #6b1a1f;
+  color: #fff;
+}
+body.theme-emergency a { color: #ffd9db; }
+body.theme-emergency .disclaimer { color: #e0a9ac; border-top-color: #6b1a1f; }
+
+.call-911-big {
+  margin: 1rem 0;
+  text-align: center;
+}
+.call-911-big a {
+  display: block;
+  padding: 1.1rem 0.5rem;
+  font-size: 1.6rem;
+  font-weight: 800;
+  text-decoration: none;
+  color: #fff;
+  background: #c0161f;
+  border: 2px solid #ff6b72;
+  border-radius: 0.8rem;
+}
+.call-911-note, .emergency-lead { color: #f2c4c6; margin: 0.4rem 0; }
+.emergency-jump { text-align: center; margin: 0.6rem 0; }
+.emergency-jump a {
+  display: block;
+  padding: 0.6rem 0.5rem;
+  text-decoration: none;
+  color: #ffd9db;
+  border: 1px solid #8a2b31;
+  border-radius: 0.6rem;
+}
+body.theme-emergency .verified { color: #9fd69f; }
+body.theme-emergency .comfort {
+  background: #43161a;
+  border: 1px dashed #8a2b31;
+  border-radius: 0.6rem;
+  padding: 0.75rem 1rem;
+}
+body.theme-emergency .phrase-block { border-left: 0.3rem solid #c0161f; }
+.phrase-zh { color: #f2c4c6; margin: 0.2rem 0; }
+body.theme-emergency .emergency-venues small,
+body.theme-emergency .emergency-contacts small { color: #e0a9ac; }
+
+/* --- 画像侧边栏（issue 12，PRD §6.2 首页线框） --- */
+.profile-aside {
+  margin: 1rem 0;
+  padding: 0.75rem 1rem;
+  background: #f4f7ee;
+  border: 1px solid #d4ddc2;
+  border-radius: 0.6rem;
+}
+.profile-aside h2 { font-size: 1.05rem; margin: 0.2rem 0 0.5rem; }
+.profile-notice { color: #4a5a2a; font-size: 0.9rem; margin: 0.3rem 0 0.6rem; }
+.profile-form { display: grid; gap: 0.5rem; }
+.profile-field { display: grid; font-size: 0.9rem; color: #444; }
+.profile-field select {
+  padding: 0.45rem;
+  border: 1px solid #bbb;
+  border-radius: 0.4rem;
+  font-size: 0.95rem;
+  background: #fff;
+}
+.profile-scene {
+  margin: 0;
+  padding: 0.5rem 0.75rem;
+  border: 1px dashed #c3cfa8;
+  border-radius: 0.4rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 0.9rem;
+}
+.profile-scene legend { font-size: 0.9rem; color: #444; padding: 0 0.3rem; }
+.profile-form > button,
+.profile-clear button {
+  padding: 0.55rem 1rem;
+  border: none;
+  border-radius: 0.5rem;
+  background: #5a7a2a;
+  color: #fff;
+  font-size: 0.95rem;
+}
+.profile-clear { margin-top: 0.5rem; }
+.profile-clear button { background: #8a8a8a; }
+
+/* --- 固定提示（issue 12）：查询内人群信息的当次作用域提示 --- */
+.pin-hint {
+  background: #fff8e6;
+  border: 1px solid #e8d48a;
+  border-radius: 0.6rem;
+}
+.pin-hint form { margin: 0.3rem 0 0; }
+.pin-hint button {
+  padding: 0.4rem 0.9rem;
+  border: 1px solid #c8a832;
+  border-radius: 0.4rem;
+  background: #fff;
+  color: #7a6410;
+  font-size: 0.9rem;
+}
+
+/* --- 横切 --- */
+.disclaimer {
+  margin-top: 1.5rem;
+  padding-top: 0.75rem;
+  border-top: 1px dashed #ccc;
+  color: #777;
+  font-size: 0.9rem;
+}
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}

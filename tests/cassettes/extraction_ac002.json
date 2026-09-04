@@ -1,0 +1,18 @@
+{
+  "interactions": [
+    {
+      "fingerprint": "740caa29825fa2e01fa71d129d0d5ea7fe15bf309fc1bedd0dbbcd3cd46f3236",
+      "response": {
+        "content": "{\"route\": \"area_safety_query\"}",
+        "model": "scripted"
+      }
+    },
+    {
+      "fingerprint": "08c28fc751646c8dd405f8b75c28ee3dd748a391e6abf896222ec742a4d96852",
+      "response": {
+        "content": "{\"area\": \"Upper East Side\", \"crowd\": \"女生\", \"time\": \"晚上10点\"}",
+        "model": "scripted"
+      }
+    }
+  ]
+}

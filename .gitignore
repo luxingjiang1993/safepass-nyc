@@ -1,0 +1,14 @@
+# Python
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+*.egg-info/
+
+# 密钥与本地配置
+.env
+.claude/settings.local.json
+
+# OS
+.DS_Store
+Thumbs.db
