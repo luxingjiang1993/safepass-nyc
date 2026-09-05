@@ -6,7 +6,7 @@
 
 **Status:** ready-for-agent　**执行方式:** /implement　**里程碑:** M1 eval 套件（spec v2）
 
-- [ ] `tests/eval/` 套件可独立运行，groundedness / 幻觉 / 建议相关性三类 evaluator 就位（改写来源逐组件标注）
-- [ ] judge 走 cassette 离线回放；judge 模型 + 提示词版本锁定进 config
-- [ ] 50 条金标 L2 标签逐条产出判定结果
-- [ ] 人工前置：录制 cassette 需一次性真实 DashScope key（测试回放不需要）
+- [x] `tests/eval/` 套件可独立运行，groundedness / 幻觉 / 建议相关性三类 evaluator 就位（改写来源逐组件标注）— commit `a83d270`：safepass/evaluators.py + tests/eval/（14 测），改写自 CASE-openevals使用
+- [x] judge 走 cassette 离线回放；judge 模型 + 提示词版本锁定进 config — config/app.yaml `eval:`（qwen-turbo / 三模板 v4 / pass_threshold）；回放 FailIfCalled 守零真实调用
+- [x] 50 条金标 L2 标签逐条产出判定结果 — tests/cassettes/l2_judge.json（150 交互）+ fixtures/eval/l2_results_v1.json；首录 groundedness_mean=0.925 / relevance_mean=0.992 / hallucination_rate=0.04
+- [x] 人工前置：录制 cassette 需一次性真实 DashScope key（测试回放不需要）— scripts/record_l2_cassette.py 已跑通；回放零 key
