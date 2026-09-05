@@ -79,7 +79,7 @@ def test_interview_script_fixture_loads():
         assert q.question.strip(), f"题面为空：{q.id}"
 
 
-def test_precheck_runs_all_personas_and_stamps_label(tmp_path):
+def test_precheck_runs_all_personas_and_stamps_label():
     """勾选 1+2：预检可运行（fake），全部产出带配置里的"开发参考"标注。"""
     cfg = config_loader.load_config()
     script = _tiny_script(cfg)

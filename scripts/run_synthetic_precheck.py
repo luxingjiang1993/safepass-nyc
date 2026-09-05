@@ -2,7 +2,8 @@
 
 真实 DashScope 调用（模型/接入点 = config synthetic_user 节锁定，dev 路由
 Qwen）让 LLM 扮演三类目标用户 persona，逐题预戳访谈脚本草稿，预检报告
-落盘 fixtures/eval/synthetic_precheck_v1.json（配置 output_path）。
+落盘 docs/user-research/synthetic_precheck_v1.json（配置 output_path，
+与 fixtures/ 测试资产隔离，永不混入金标数据目录）。
 
 前置（人工一次性）：环境变量 DASHSCOPE_API_KEY。缺失时明确失败（非零退出 +
 提示），不静默。全部产出带"开发参考"标注——合成用户永不冒充真人证据。
@@ -32,17 +33,22 @@ class DashScopeSyntheticUser:
 
     显式 http_client：本仓库 openai==1.51.2 与 httpx>=0.28 的 proxies 参数
     不兼容（venv 实测 TypeError），自建 httpx.Client 绕开 SDK 默认构造
-    （scripts/record_l2_cassette.py 同款先例）。
+    （scripts/record_l2_cassette.py 同款先例）。key 守卫在构造函数
+    （与 record_l2_cassette.py 的 DashScopeJudge 同款，同职脚本同一位置）。
     """
 
-    def __init__(self, cfg: config_loader.AppConfig, api_key: str):
+    def __init__(self, cfg: config_loader.AppConfig):
+        api_key = os.environ.get("DASHSCOPE_API_KEY")
+        if not api_key:
+            raise SystemExit(
+                "缺少 DASHSCOPE_API_KEY 环境变量（一次性真实 key；预检非测试路径，"
+                "测试走 fake 离线，不需要 key）"
+            )
         self._model = cfg.synthetic_user.model
-        # 超时写死 120s（与 scripts/record_l2_cassette.py 同款）：本脚本不依赖
-        # 生产接线配置（票 12 的 llm 节），保持 dev-only 自洽。
         self._client = OpenAI(
             api_key=api_key,
             base_url=cfg.synthetic_user.base_url,
-            http_client=httpx.Client(timeout=120),
+            http_client=httpx.Client(timeout=cfg.llm.request_timeout_seconds),
         )
 
     def chat(self, messages, *, model=None, **kwargs):
@@ -56,15 +62,8 @@ class DashScopeSyntheticUser:
 
 def main() -> None:
     cfg = config_loader.load_config()
-    api_key = os.environ.get("DASHSCOPE_API_KEY")
-    if not api_key:
-        raise SystemExit(
-            "缺少 DASHSCOPE_API_KEY 环境变量（一次性真实 key；预检非测试路径，"
-            "测试走 fake 离线，不需要 key）"
-        )
-
     script = synthetic_user.load_interview_script(cfg)
-    client = DashScopeSyntheticUser(cfg, api_key)
+    client = DashScopeSyntheticUser(cfg)
     report = synthetic_user.run_precheck(client, script, cfg)
 
     out = Path(cfg.synthetic_user.output_path)

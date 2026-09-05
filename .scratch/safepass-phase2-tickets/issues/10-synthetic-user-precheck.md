@@ -6,7 +6,7 @@
 
 **Status:** ready-for-agent　**执行方式:** /implement　**里程碑:** M3 信任 + 用户（spec v2）
 
-- [ ] 合成用户脚本可运行，persona 提示词 + 输出 schema 齐备
-- [ ] 产出带"开发参考"标注
-- [ ] 测试走 fake/cassette，离线可跑
-- [ ] 人工前置：运行需 DashScope key（dev）
+- [x] 合成用户脚本可运行，persona 提示词 + 输出 schema 齐备
+- [x] 产出带"开发参考"标注
+- [x] 测试走 fake/cassette，离线可跑
+- [x] 人工前置：运行需 DashScope key（dev）

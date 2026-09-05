@@ -324,7 +324,10 @@ synthetic_user:
   model: "qwen-turbo"        # dev 路由（CLAUDE.md 模型路由：dev/test = DashScope Qwen）
   base_url: "https://dashscope.aliyuncs.com/compatible-mode/v1"
   interview_script: "fixtures/eval/interview_script_v1.json"   # 被预戳的访谈脚本草稿
-  output_path: "fixtures/eval/synthetic_precheck_v1.json"      # 预检报告落盘
+  # 预检报告落盘：docs/user-research/ 而非 fixtures/（测试资产目录）——
+  # 合成产出与金标数据物理隔离，防误当 fixture 复用（story 26 防线；
+  # 该目录同时是票 11 真人访谈发现的归宿，证据链同源）。
+  output_path: "docs/user-research/synthetic_precheck_v1.json"
   dev_reference_label: "开发参考"   # 标注单一事实源：报告头 + 每条回答都盖此章
   reply_max_chars: 2000       # 单条回答字数上界（结构校验，防跑题失控）
 

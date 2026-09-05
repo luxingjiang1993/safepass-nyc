@@ -126,6 +126,18 @@ def validate_reply_length(reply: SyntheticReply, cfg: config_loader.AppConfig) -
         )
 
 
+def make_reply_length_validator(cfg: config_loader.AppConfig):
+    """回答字数校验器工厂（与 output_pipeline.make_*_validator 同款惯例）。
+
+    每次预检构造一次，不在逐题循环里重建闭包。
+    """
+
+    def _validate(reply: SyntheticReply) -> None:
+        validate_reply_length(reply, cfg)
+
+    return _validate
+
+
 def _make_messages(persona: Persona, question: InterviewQuestion) -> list[dict[str, str]]:
     """persona 背景进 system 消息；题面 + JSON 输出契约进 user 消息（管线契约）。"""
     return [
@@ -159,6 +171,7 @@ def run_persona(
     返回逐题回答列表，每条已盖 dev_reference_label 标注章。
     """
     label = cfg.synthetic_user.dev_reference_label
+    validators = [make_reply_length_validator(cfg)]
     answers: list[dict[str, Any]] = []
     for question in questions:
         reply: SyntheticReply = run_pipeline(
@@ -166,7 +179,7 @@ def run_persona(
             _make_messages(persona, question),
             SyntheticReply,
             cfg,
-            validators=[lambda obj: validate_reply_length(obj, cfg)],
+            validators=validators,
             model=cfg.synthetic_user.model,
         )
         answers.append(
