@@ -194,7 +194,7 @@ def render_home(cfg: config_loader.AppConfig, profile: dict[str, Any] | None = N
   <p>不管是租房、通勤还是晚上回家，<br>有安全方面的疑问都可以问我～</p>
 </section>
 <form class="query-form" action="/query" method="get">
-  <input type="text" name="q" placeholder="比如：上东区晚上安全吗？我是女生" aria-label="输入你的安全问题">
+  <input type="text" name="q" placeholder="比如：上东区晚上安全吗？我是女生" aria-label="输入你的安全问题" required>
   <button type="submit">查询</button>
 </form>
 <section class="quick">
@@ -577,6 +577,23 @@ def render_guardrail(result: contracts.GuardrailResult) -> str:
 {alt_block}
 {_disclaimer(result.disclaimer)}"""
     return _page("SafePass NYC", body)
+
+
+# ---------------------------------------------------------------- 错误态（404，票 09）
+
+def render_not_found() -> str:
+    """404 错误页（票 09）：完整页面——明确状态码 + 友好文案 + 回家路径。
+
+    错误态不打断成裸文本：与全站同一样式体系（style.css），视觉与
+    语气跟问候/降级页一致（诚实、温暖、给出路）。
+    """
+    body = """<header class="error-head">
+  <p class="error-code">404</p>
+  <h1>咦，这里好像没有页面 🧭</h1>
+  <p class="error-copy">链接可能写错了，或者页面已经搬家了。回到首页就能继续查询～</p>
+</header>
+<p class="error-home"><a href="/">🏠 回到首页</a></p>"""
+    return _page("页面不存在 — SafePass NYC", body)
 
 
 # ---------------------------------------------------------------- 判别联合分发

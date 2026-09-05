@@ -150,6 +150,10 @@ def make_handler(store: SessionStore | None = None):
         def _send_css(self) -> None:
             self._send((_STATIC_DIR / "style.css").read_bytes(), "text/css; charset=utf-8")
 
+        def _send_not_found(self) -> None:
+            """404 错误态（票 09）：渲染层完整页面（文案 + 视觉 + 回家路径）。"""
+            self._send_html(render.render_not_found(), HTTPStatus.NOT_FOUND)
+
         def _send_redirect(self, location: str, set_cookie: str | None = None) -> None:
             """PRG：303 See Other 重定向，表单提交后回到页面视图。"""
             self.send_response(HTTPStatus.SEE_OTHER)
@@ -193,7 +197,7 @@ def make_handler(store: SessionStore | None = None):
             if parsed.path == "/query":
                 self._handle_query(parsed)
                 return
-            self._send_html("Not Found", HTTPStatus.NOT_FOUND)
+            self._send_not_found()
 
         def do_POST(self) -> None:  # noqa: N802（stdlib 命名）
             parsed = urlparse(self.path)
@@ -203,7 +207,7 @@ def make_handler(store: SessionStore | None = None):
             if parsed.path == "/profile/clear":
                 self._handle_profile_clear()
                 return
-            self._send_html("Not Found", HTTPStatus.NOT_FOUND)
+            self._send_not_found()
 
         def _redirect_target(self) -> str:
             """PRG 回跳目标：优先回到来源页（同主机、站内路径），否则首页。

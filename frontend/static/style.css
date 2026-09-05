@@ -240,6 +240,32 @@ body.theme-emergency .emergency-contacts small { color: #e0a9ac; }
   font-size: 0.9rem;
 }
 
+/* --- 错误页 404（票 09）：错误态不打断成裸文本，语气与降级页一致 --- */
+.error-head { text-align: center; }
+.error-code { font-size: 3rem; font-weight: 800; color: #bbb; margin: 0.2rem 0; }
+.error-copy { color: #555; margin: 0.3rem 0; }
+.error-home { text-align: center; }
+.error-home a {
+  display: block;
+  padding: 0.8rem 0.5rem;
+  text-decoration: none;
+  color: #1a3a66;
+  background: #e8f0fb;
+  border: 1px solid #b9cdec;
+  border-radius: 0.6rem;
+}
+
+/* --- 长链接断行（票 09）：窄屏下 URL 不撑出横向滚动 --- */
+.sources li, .community li, .community a, .venues a { overflow-wrap: anywhere; }
+
+/* --- 窄屏打磨（票 09）：30rem 以下显式收紧，保持单列无横向滚动 --- */
+@media (max-width: 30rem) {
+  .page { padding: 0.75rem 0.6rem 1.5rem; }
+  .bar-label { flex: 0 0 4.5rem; font-size: 0.85rem; }
+  .call-911-big a { padding: 1rem 0.5rem; font-size: 1.4rem; }
+  .error-code { font-size: 2.2rem; }
+}
+
 /* --- 横切 --- */
 .disclaimer {
   margin-top: 1.5rem;
