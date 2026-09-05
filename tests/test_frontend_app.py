@@ -275,3 +275,31 @@ class TestProfileRoute:
             referer="https://evil.example.org/phish",
         )
         assert resp.getheader("Location") == "/"
+
+
+# ---------------------------------------------------------------- 隐私页 + 免责页（票 08）
+
+class TestLegalPages:
+    def test_privacy_route_200_and_defense_wording(self, server):
+        resp = get(server, "/privacy")
+        assert resp.status == 200
+        body = resp.body  # type: ignore[attr-defined]
+        assert "画像仅在本次会话生效，关闭页面即删除" in body
+        assert "评级" in body  # ADR-0002 口径披露
+
+    def test_disclaimer_route_200_with_data_and_emergency(self, server):
+        resp = get(server, "/disclaimer")
+        assert resp.status == 200
+        body = resp.body  # type: ignore[attr-defined]
+        assert "本分析仅供参考，不替代专业安保建议。" in body
+        assert "911" in body and "311" in body
+        # 通用安全场所清单（五警局静态表）逐字段透出
+        assert "NYPD" in body
+
+    def test_legal_pages_write_nothing_to_disk(self, server):
+        # 公开页面是纯渲染：config/fixtures/cassette 目录逐字节不变
+        watched = (REPO_ROOT / "config", REPO_ROOT / "fixtures", REPO_ROOT / "tests" / "cassettes")
+        before = _snapshot_tree(*watched)
+        get(server, "/privacy")
+        get(server, "/disclaimer")
+        assert _snapshot_tree(*watched) == before

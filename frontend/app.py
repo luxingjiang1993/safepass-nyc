@@ -5,6 +5,8 @@
     GET  /query?q=...        → safepass.pipeline.execute_query 唯一接缝（spec D1）
                                → render.render_result 渲染判别联合
     GET  /static/style.css   → 静态样式
+    GET  /privacy            → render.render_privacy（隐私说明，公开页，票 08）
+    GET  /disclaimer         → render.render_disclaimer_page（数据口径与免责，票 08）
     POST /profile            → 画像表单写入会话（进程内 SessionStore，PRG 303）
     POST /profile/clear      → 清除会话画像（PRG 303）
 
@@ -33,7 +35,7 @@ from pathlib import Path
 from typing import Any
 from urllib.parse import ParseResult, parse_qs, urlparse
 
-from safepass import config_loader, pipeline
+from safepass import config_loader, degraded, pipeline
 from safepass.session_state import SessionState
 from frontend import render
 
@@ -193,6 +195,16 @@ def make_handler(store: SessionStore | None = None):
                 return
             if parsed.path == "/static/style.css":
                 self._send_css()
+                return
+            if parsed.path == "/privacy":
+                self._send_html(render.render_privacy(config_loader.get_config()))
+                return
+            if parsed.path == "/disclaimer":
+                self._send_html(
+                    render.render_disclaimer_page(
+                        config_loader.get_config(), degraded.load_general_venues()
+                    )
+                )
                 return
             if parsed.path == "/query":
                 self._handle_query(parsed)

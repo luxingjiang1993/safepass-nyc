@@ -83,7 +83,12 @@ def _page(title: str, body: str, body_class: str = "") -> str:
 
 
 def _disclaimer(text: str) -> str:
-    return f'<footer class="disclaimer">⚠️ {_esc(text)}</footer>'
+    # 公开页面入口挂页脚（信任里程碑 M3）：隐私说明 + 数据口径与免责
+    return (
+        f'<footer class="disclaimer">⚠️ {_esc(text)}'
+        f'<nav class="legal-links"><a href="/privacy">隐私说明</a>'
+        f' · <a href="/disclaimer">数据口径与免责声明</a></nav></footer>'
+    )
 
 
 def _back_link() -> str:
@@ -594,6 +599,77 @@ def render_not_found() -> str:
 </header>
 <p class="error-home"><a href="/">🏠 回到首页</a></p>"""
     return _page("页面不存在 — SafePass NYC", body)
+
+
+# ---------------------------------------------------------------- 隐私页 + 免责页（票 08）
+
+def render_privacy(cfg: config_loader.AppConfig) -> str:
+    """隐私说明页（公开，纯渲染，不采集画像）。
+
+    口径与既有画像防线逐字一致：profile.notice（会话级、关闭即删除）、
+    零持久化（只写进程内存，不落盘）、零上传、会话随服务进程消失；
+    ADR-0002 如实披露——画像只用于建议排序与时间提示，永不参与评级。
+    """
+    body = f"""{_back_link()}
+<header class="result-head"><h1>🔒 隐私说明</h1></header>
+<section class="legal-section"><h2>你的画像存在哪里</h2>
+  <ul>
+    <li>画像{_esc(cfg.profile.notice)}——我们只把它保存在本次会话的服务器内存里。</li>
+    <li>零持久化：画像不写入任何磁盘文件，也没有任何数据库。</li>
+    <li>零上传：画像不会发送给任何第三方服务。</li>
+    <li>会话随服务进程消失：服务重启后，所有画像与会话记录即刻清空。</li>
+  </ul>
+</section>
+<section class="legal-section"><h2>画像会如何被使用</h2>
+  <ul>
+    <li>画像只用于贴心建议的排序与时间提示的个性化表述（ADR-0002）。</li>
+    <li>画像不参与、不改变安全评级——评级永远只由 NYPD 公开数据按相对阈值计算。</li>
+    <li>你可以随时点侧边栏的「清除画像」，或干脆关闭页面。</li>
+  </ul>
+</section>
+<section class="legal-section"><h2>Cookie</h2>
+  <p>本站唯一的 cookie 是一个随机会话标识（HttpOnly），只用于关联你的会话画像与上轮查询结果，不含其他个人信息。</p>
+</section>
+{_disclaimer(cfg.disclaimer)}"""
+    return _page("隐私说明 — SafePass NYC", body)
+
+
+def render_disclaimer_page(
+    cfg: config_loader.AppConfig,
+    venue_dicts: list[dict[str, Any]],
+) -> str:
+    """数据口径与免责声明页（公开，纯渲染）：数据来源/统计口径/免责话术/
+    紧急资源。免责话术逐字来自集中配置 disclaimer（与全部响应形态横切字段
+    一致）；数据口径逐字来自 data_source 配置与全市基准，不硬编码字面量；
+    紧急资源清单来自既有 degraded.load_general_venues（静态表同源），
+    此处只做 Venue 逐字段校验（纯函数，渲染前最后一道防线）。
+    """
+    venues = [contracts.Venue.model_validate(v) for v in venue_dicts]
+    venue_list = (
+        f'<section class="legal-section"><h2>🚨 紧急资源</h2>\n'
+        f'  <ul>\n{_emergency_venue_list(venues)}\n  </ul>\n</section>'
+        if venues else ""
+    )
+    body = f"""{_back_link()}
+<header class="result-head"><h1>📋 数据口径与免责声明</h1></header>
+<section class="legal-section"><h2>数据口径</h2>
+  <ul>
+    <li>数据来源：纽约市警察局（NYPD）公开投诉记录，经 NYC 开放数据平台获取（数据集 {_esc(cfg.data_source.nypd_dataset_id)}）。</li>
+    <li>统计口径：按警区聚合的犯罪率（每 10 万人），与全市均值比较得出四级评级（ADR-0001）。</li>
+    <li>全市基准：每 10 万人 {_esc(cfg.city_mean_per_100k)} 起（随数据快照更新）。</li>
+    <li>历史数据不代表未来风险；样本量不足时会明确标注可信度（⚪ 数据不足），绝不硬给结论。</li>
+  </ul>
+</section>
+<section class="legal-section"><h2>免责声明</h2>
+  <ul>
+    <li>{_esc(cfg.disclaimer)}</li>
+    <li>本产品的评级与建议不构成法律、安保或置业决策依据，重大决定请咨询专业人士。</li>
+    <li>如遇紧急情况请立即拨打 911；非紧急市政协助请拨 311。</li>
+  </ul>
+</section>
+{venue_list}
+{_disclaimer(cfg.disclaimer)}"""
+    return _page("数据口径与免责声明 — SafePass NYC", body)
 
 
 # ---------------------------------------------------------------- 判别联合分发

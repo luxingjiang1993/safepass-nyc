@@ -274,6 +274,18 @@ body.theme-emergency .emergency-contacts small { color: #e0a9ac; }
   color: #777;
   font-size: 0.9rem;
 }
+.legal-links {
+  margin-top: 0.35rem;
+}
+.legal-links a {
+  color: #777;
+}
+.legal-section {
+  margin-bottom: 1.25rem;
+}
+.legal-section li {
+  margin: 0.35rem 0;
+}
 .sr-only {
   position: absolute;
   width: 1px;

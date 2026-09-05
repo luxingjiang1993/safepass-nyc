@@ -501,3 +501,67 @@ class TestDispatcher:
         html = render.render_result(result, CFG)
         assert "武器" in html
         assert "本分析仅供参考，不替代专业安保建议。" in html
+
+
+# ---------------------------------------------------------------- 隐私页 + 免责页（票 08）
+
+class TestPrivacyPage:
+    def test_notice_consistent_with_sidebar_defense(self):
+        # 口径与既有画像防线一致：页面声明逐字来自集中配置 profile.notice
+        html = render.render_privacy(CFG)
+        assert CFG.profile.notice in html
+
+    def test_zero_upload_and_zero_persistence_wording(self):
+        html = render.render_privacy(CFG)
+        assert "上传" in html
+        assert "内存" in html  # 只写进程内存，不落盘
+        assert "进程" in html  # 会话随服务进程消失
+
+    def test_profile_never_changes_rating_adr_0002(self):
+        # ADR-0002：画像只影响建议层，永不参与评级——隐私页如实披露
+        html = render.render_privacy(CFG)
+        assert "评级" in html
+        assert "建议" in html
+
+    def test_no_profile_form_on_privacy_page(self):
+        # 公开说明页不采集画像（无表单），保持纯说明
+        html = render.render_privacy(CFG)
+        assert 'action="/profile"' not in html
+
+
+class TestDisclaimerPage:
+    def test_disclaimer_consistent_with_contract_wording(self):
+        html = render.render_disclaimer_page(CFG, [VENUE])
+        assert CFG.disclaimer in html  # 免责口径与全部响应形态横切字段逐字一致
+
+    def test_data_source_dataset_id_from_config(self):
+        # 数据口径：NYPD 公开数据集 ID 逐字来自集中配置，不硬编码
+        html = render.render_disclaimer_page(CFG, [VENUE])
+        assert CFG.data_source.nypd_dataset_id in html
+        assert "NYPD" in html
+
+    def test_city_mean_baseline_from_config(self):
+        html = render.render_disclaimer_page(CFG, [VENUE])
+        assert f"{CFG.city_mean_per_100k}" in html
+
+    def test_emergency_resources_911_311_and_venues(self):
+        html = render.render_disclaimer_page(CFG, [VENUE])
+        assert "911" in html and "311" in html
+        assert "19th Precinct" in html  # 紧急资源清单逐字段透出
+
+    def test_no_profile_form_on_disclaimer_page(self):
+        html = render.render_disclaimer_page(CFG, [VENUE])
+        assert 'action="/profile"' not in html
+
+
+class TestLegalFooterLinks:
+    def test_home_footer_links_to_legal_pages(self):
+        # 公开页面入口挂在既有免责页脚（信任里程碑 M3：隐私/免责可达）
+        html = render.render_home(CFG)
+        assert 'href="/privacy"' in html
+        assert 'href="/disclaimer"' in html
+
+    def test_legal_links_also_on_result_pages(self):
+        html = render.render_result(make_safety(), CFG)
+        assert 'href="/privacy"' in html
+        assert 'href="/disclaimer"' in html
