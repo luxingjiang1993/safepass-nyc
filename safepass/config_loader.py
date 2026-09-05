@@ -193,6 +193,7 @@ class DataSourceConfig:
     nypd_dataset_id: str
     output_dir: str
     recorded_response: str
+    runtime_dataset_path: str
     request_timeout_seconds: int
     page_limit: int
     page_limit_max: int
@@ -244,6 +245,7 @@ class AppConfig:
     confidence_explanations: dict[str, str]
     covered_precincts: frozenset[int]
     excluded_precincts: frozenset[int]
+    precinct_populations: dict[int, int]
     city_mean_per_100k: float | None
     max_retries: int
     disclaimer: str
@@ -321,6 +323,21 @@ def load_config(path: str | Path | None = None) -> AppConfig:
         raise ConfigError("coverage.precincts 不能为空")
     if covered & excluded:
         raise ConfigError("coverage.precincts 与 excluded_precincts 不得相交")
+
+    # 警区常住人口估算（票 07 / M2）：真实数据无人口字段，运行时按警区号 join；
+    # 键必须恰好覆盖 covered（多配少配都是配置损坏，明确失败不兜底）。
+    populations_raw = _require(coverage, "precinct_populations", "coverage")
+    if not isinstance(populations_raw, dict) or not populations_raw:
+        raise ConfigError("coverage.precinct_populations 必须是非空映射（警区 → 人口估算）")
+    precinct_populations = {int(p): int(v) for p, v in populations_raw.items()}
+    if any(v <= 0 for v in precinct_populations.values()):
+        raise ConfigError("coverage.precinct_populations 的人口估算必须为正")
+    if set(precinct_populations) != set(covered):
+        raise ConfigError(
+            "coverage.precinct_populations 的键必须恰好等于 coverage.precincts"
+            f"（多配 {sorted(set(precinct_populations) - set(covered))}，"
+            f"少配 {sorted(set(covered) - set(precinct_populations))}）"
+        )
 
     # 全市均值：T0 fixture 生成后填入；此前为 None（评级引擎在 T2 强制要求非空）
     city_mean_raw = data.get("city_mean_per_100k")
@@ -519,6 +536,7 @@ def load_config(path: str | Path | None = None) -> AppConfig:
         nypd_dataset_id=str(_require(data_source_raw, "nypd_dataset_id", "data_source")),
         output_dir=str(_require(data_source_raw, "output_dir", "data_source")),
         recorded_response=str(_require(data_source_raw, "recorded_response", "data_source")),
+        runtime_dataset_path=str(_require(data_source_raw, "runtime_dataset_path", "data_source")),
         request_timeout_seconds=int(
             _require(data_source_raw, "request_timeout_seconds", "data_source")
         ),
@@ -530,6 +548,7 @@ def load_config(path: str | Path | None = None) -> AppConfig:
         "nypd_dataset_id",
         "output_dir",
         "recorded_response",
+        "runtime_dataset_path",
     ):
         if not getattr(data_source, field_name).strip():
             raise ConfigError(f"data_source.{field_name} 不得为空（adapter 来源/落盘路径）")
@@ -606,6 +625,7 @@ def load_config(path: str | Path | None = None) -> AppConfig:
         confidence_explanations=dict(explanations),
         covered_precincts=covered,
         excluded_precincts=excluded,
+        precinct_populations=precinct_populations,
         city_mean_per_100k=city_mean,
         max_retries=max_retries,
         disclaimer=disclaimer,

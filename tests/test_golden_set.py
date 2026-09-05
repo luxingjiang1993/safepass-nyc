@@ -30,6 +30,9 @@ from safepass.session_state import SessionState
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 GOLDEN_PATH = REPO_ROOT / "fixtures" / "eval" / "golden_set_v1.json"
+# 金标期望建立在 mock 数据集之上（票 07：mock 保留为测试资产）——
+# 权威复算显式钉 mock CSV，与管线同一数据路径（评级锚定数据集复算均值）。
+NYPD_CSV = REPO_ROOT / "fixtures" / "nypd" / "mock_nypd.csv"
 
 GOLDEN: dict[str, Any] = json.loads(GOLDEN_PATH.read_text(encoding="utf-8"))
 ENTRIES: list[dict[str, Any]] = GOLDEN["entries"]
@@ -58,8 +61,9 @@ def _ids_where(pred) -> list[str]:
 
 def _rate(precinct: int) -> rating_engine.RatingResult:
     """权威复算：fixture 数据集聚合 + 评级引擎（与管线同一数据路径）。"""
-    stats = data_agent.aggregate_precinct(data_agent.load_dataset(), precinct)
-    return rating_engine.rate_precinct(stats, config_loader.load_config())
+    records = data_agent.load_dataset(NYPD_CSV)
+    stats = data_agent.aggregate_precinct(records, precinct)
+    return rating_engine.rate_precinct(stats, data_agent.rating_config(records, config_loader.load_config()))
 
 
 class _RouteStub:

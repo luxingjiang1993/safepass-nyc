@@ -165,12 +165,26 @@ def test_dataset_out_of_coverage_precincts_present_for_degraded_tests():
 
 
 def test_config_city_mean_matches_dataset():
+    """config 全市均值必须与「当前生产数据集」复算一致（评级可复现性约束）。
+
+    票 07 数据路径切换后，锚点从 mock 数据集改为 config data_source
+    .runtime_dataset_path（fixtures/nypd_real）：mock 的均值锚定由
+    test_manifest_consistent_with_csv 继续负责，两套数据各归各的 manifest。
+    真实 CSV 无人口字段，复算人口取 config coverage.precinct_populations
+    （与 data_agent 运行时 join 同一事实源）。
+    """
     cfg = config_loader.load_config()
-    rows = _load_rows()
-    _counts, _pops, mean, _ratios = _recompute(rows)
-    assert cfg.city_mean_per_100k is not None, "T0 应回填 config/app.yaml 的 city_mean_per_100k"
+    runtime_csv = REPO_ROOT / cfg.data_source.runtime_dataset_path
+    counts: dict[int, int] = {}
+    with open(runtime_csv, newline="", encoding="utf-8") as f:
+        for r in csv.DictReader(f):
+            p = int(r["precinct"])
+            counts[p] = counts.get(p, 0) + 1
+    mean = sum(counts.values()) / sum(cfg.precinct_populations[p] for p in counts) * 100_000
+    assert cfg.city_mean_per_100k is not None, "票 07 应按真实数据回填 config/app.yaml 的 city_mean_per_100k"
     assert cfg.city_mean_per_100k == pytest.approx(mean, abs=1e-3), (
-        f"config 全市均值 {cfg.city_mean_per_100k} 与数据集复算 {mean:.4f} 不一致"
+        f"config 全市均值 {cfg.city_mean_per_100k} 与真实数据集复算 {mean:.4f} 不一致"
+        "（月更数据后须运行 scripts/recompute_city_mean.py --update-config）"
     )
 
 

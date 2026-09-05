@@ -96,8 +96,10 @@ def _precinct_evidence(precinct: int, cfg: config_loader.AppConfig) -> dict[str,
     （top5 类型/昼夜分布）、情报装配（community_info）——judge 逐条核对时
     不因证据缺字段而把真实声明误判为无依据。
     """
-    stats = data_agent.aggregate_precinct(data_agent.load_dataset(), precinct)
-    rated = rating_engine.rate_precinct(stats, cfg)
+    records = data_agent.load_dataset()
+    stats = data_agent.aggregate_precinct(records, precinct)
+    rating_cfg = data_agent.rating_config(records, cfg)
+    rated = rating_engine.rate_precinct(stats, rating_cfg)
     return {
         "precinct": stats.precinct,
         "population": stats.population,
@@ -112,7 +114,7 @@ def _precinct_evidence(precinct: int, cfg: config_loader.AppConfig) -> dict[str,
         "ratio_to_city_mean": (
             None if rated.confidence is None else round(rated.ratio_to_city_mean, 4)
         ),
-        "city_mean_per_100k": cfg.city_mean_per_100k,
+        "city_mean_per_100k": rating_cfg.city_mean_per_100k,
         "time_range": data_agent.load_time_range(),
         "sources": sorted(stats.sources),
         "community_info": intel_agent.build_community_info(precinct, cfg),

@@ -75,9 +75,11 @@ def _cassette_client(path: Path) -> tuple[_CassetteClient, _FailIfCalled]:
 
 
 def _expected_rating(precinct: int) -> rating_engine.RatingResult:
-    """Host 侧真实评级：数据 Agent 聚合 + 评级引擎（与追问集承接断言的权威）。"""
-    stats = data_agent.aggregate_precinct(data_agent.load_dataset(NYPD_CSV), precinct)
-    return rating_engine.rate_precinct(stats, config_loader.load_config())
+    """Host 侧真实评级：数据 Agent 聚合 + 评级引擎（与追问集承接断言的权威；
+    与管线同一数据路径——rating_config 锚定数据集复算均值，票 07）。"""
+    records = data_agent.load_dataset(NYPD_CSV)
+    stats = data_agent.aggregate_precinct(records, precinct)
+    return rating_engine.rate_precinct(stats, data_agent.rating_config(records, config_loader.load_config()))
 
 
 def _stats(precinct: int) -> data_agent.PrecinctStats:

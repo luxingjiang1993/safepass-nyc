@@ -95,18 +95,25 @@ def test_rating_matches_independent_recomputation_every_precinct():
 
 
 def test_all_four_rating_branches_covered_by_fixture():
-    """fixture（T0 设计义务）必须把 🟢🟡🔴⚪ 四档全部呈现，否则本集不算真覆盖。"""
+    """fixture（T0 设计义务）必须把 🟢🟡🔴⚪ 四档全部呈现，否则本集不算真覆盖。
+
+    评级带以数据集自身复算均值为锚（票 07：rating_config，与管线同一数据路径）——
+    四档覆盖是 fixture 的设计性质，不随 config 全市均值的回填对象变化。
+    """
     cfg = _base_cfg()
-    stats_by_precinct = data_agent.aggregate_dataset(data_agent.load_dataset(NYPD_CSV))
-    ratings = {rating_engine.rate_precinct(s, cfg).rating for s in stats_by_precinct.values()}
+    records = data_agent.load_dataset(NYPD_CSV)
+    stats_by_precinct = data_agent.aggregate_dataset(records)
+    rating_cfg = data_agent.rating_config(records, cfg)
+    ratings = {rating_engine.rate_precinct(s, rating_cfg).rating for s in stats_by_precinct.values()}
     insufficient = next(t.rating for t in cfg.sample_size_tiers if t.rating is not None)
     assert {"green", "yellow", "red", insufficient} <= ratings, f"fixture 评级档不全：{ratings}"
 
 
 def test_confidence_tiers_all_present():
     cfg = _base_cfg()
-    stats_by_precinct = data_agent.aggregate_dataset(data_agent.load_dataset(NYPD_CSV))
-    results = [rating_engine.rate_precinct(s, cfg) for s in stats_by_precinct.values()]
+    records = data_agent.load_dataset(NYPD_CSV)
+    rating_cfg = data_agent.rating_config(records, cfg)
+    results = [rating_engine.rate_precinct(s, rating_cfg) for s in data_agent.aggregate_dataset(records).values()]
     confidences = {r.confidence for r in results if r.confidence is not None}
     assert {t.confidence for t in cfg.sample_size_tiers if t.confidence is not None} <= confidences
 

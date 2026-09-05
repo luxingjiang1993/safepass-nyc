@@ -31,11 +31,27 @@ coverage:
   precincts: [19, 109, 5, 90, 84]
   # 中城跨 14/18 两个警区，无法按警区建模，明确不在覆盖清单（spec D4 / Out of Scope）
   excluded_precincts: [14, 18]
+  # 警区常住人口估算（per-100k 分母）：真实 NYPD 数据无人口字段（adapter 诚实护栏，
+  # 绝不逐条编造），运行时按警区号从本表 join——单一事实源只活在本文件。
+  # 口径：沿用 fixtures/nypd/manifest.json 的 mock 元数据值，mock 与真实数据同一
+  # 人口口径，保证两数据集比率可比；更换估算值后须运行
+  # scripts/recompute_city_mean.py --update-config 重算回填 city_mean_per_100k。
+  # 键必须恰好覆盖 precincts 清单（config_loader 强制校验）。
+  precinct_populations:
+    5: 60000
+    19: 120000
+    84: 95000
+    90: 100000
+    109: 50000
 
-# 全市均值（per-100k）：由 fixture 生成脚本（T0）确定后填入，
-# 必须与模拟 NYPD 数据全集一致，保证评级可复算集跨机器复跑
-# 值 = fixtures/nypd/manifest.json 的 city_mean_per_100k（scripts/generate_fixtures.py 确定性生成）
-city_mean_per_100k: 144.6328
+# 全市均值（per-100k）：单一公式 Σcount/Σpop × 1e5（Σpop 取 precinct_populations 口径），
+# 本值 = 真实数据集（data_source.runtime_dataset_path）按该公式的复算结果，
+# 由 scripts/recompute_city_mean.py 确定性产出（月更数据后重跑）。
+# 运行时评级不读本值——degraded.assess_area 就加载数据集复算（评级可复现性约束，
+# 数据集 + 阈值唯一决定评级）；本值是生产数据集的落盘锚点 + 无数据集上下文时
+# （直接调 rate_precinct 的合成测试）的兜底。两者由
+# tests/test_real_data_switch.py 锁定一致。
+city_mean_per_100k: 2769.4118
 
 output_pipeline:
   max_retries: 3          # 有限重试上界（输出控制管线）
@@ -260,6 +276,10 @@ data_source:
   request_timeout_seconds: 30
   page_limit: 50000                # Socrata 单次请求行数
   page_limit_max: 50000            # Socrata 单次请求行数硬上限（平台约束，校验 page_limit 用）
+  # 运行时（生产）数据集路径（票 07 / M2 数据路径切换）：mock 数据集保留为测试资产，
+  # 测试世界经 SAFEPASS_DATASET_PATH 环境变量钉到 fixtures/nypd/mock_nypd.csv
+  # （tests/conftest.py），解析顺序：显式传参 > 环境变量 > 本键。
+  runtime_dataset_path: "fixtures/nypd_real/real_nypd.csv"
 
 # ============================================================================
 # 成本三件套（票 06 / M2）：请求级限流 + 成本估算 + 降级明示话术。

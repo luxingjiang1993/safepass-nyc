@@ -62,11 +62,16 @@ def assess_area(
     records: Iterable[data_agent.CrimeRecord],
     cfg: config_loader.AppConfig,
 ) -> AreaAssessment | None:
-    """评估单一解析区域：仅当在覆盖内时返回（越界/跨警区 → None，不编造）。"""
+    """评估单一解析区域：仅当在覆盖内时返回（越界/跨警区 → None，不编造）。
+
+    评级锚定数据集就地复算全市均值（票 07：data_agent.rating_config，
+    月更数据后零阈值改动；config city_mean 仅作无数据集上下文时的兜底）。
+    """
     if not resolved.in_coverage(cfg):
         return None
+    records = tuple(records)
     stats = data_agent.aggregate_precinct(records, resolved.precincts[0])
-    rated = rating_engine.rate_precinct(stats, cfg)
+    rated = rating_engine.rate_precinct(stats, data_agent.rating_config(records, cfg))
     alternative = contracts.AlternativeInfo(
         precinct=stats.precinct,
         area=resolved.canonical_name,
