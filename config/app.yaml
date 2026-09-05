@@ -305,6 +305,21 @@ cost_control:
 
 
 # ============================================================================
+# 合成用户预检（票 10 / M3，spec v2「合成用户」节）：LLM 扮演用户 persona，
+# 真人访谈前低成本戳访谈脚本、扩充金标输入。dev-only，走输出控制管线模式；
+# 运行需一次性 DASHSCOPE_API_KEY（人工前置，scripts/run_synthetic_precheck.py）。
+# 全部产出必须带 dev_reference_label 标注——合成用户永不冒充真人证据。
+# ============================================================================
+synthetic_user:
+  model: "qwen-turbo"        # dev 路由（CLAUDE.md 模型路由：dev/test = DashScope Qwen）
+  base_url: "https://dashscope.aliyuncs.com/compatible-mode/v1"
+  interview_script: "fixtures/eval/interview_script_v1.json"   # 被预戳的访谈脚本草稿
+  output_path: "fixtures/eval/synthetic_precheck_v1.json"      # 预检报告落盘
+  dev_reference_label: "开发参考"   # 标注单一事实源：报告头 + 每条回答都盖此章
+  reply_max_chars: 2000       # 单条回答字数上界（结构校验，防跑题失控）
+
+
+# ============================================================================
 # L2 LLM-as-judge 评估套件（issue 03 / M1，spec v2「L2」节）：
 # judge = dev 模型（DashScope Qwen，考官考生同源）；judge 调用走 cassette
 # 离线回放（tests/cassettes/l2_judge.json，录制入口 scripts/record_l2_cassette.py，

@@ -221,6 +221,26 @@ class CostControlConfig:
 
 
 @dataclass(frozen=True)
+class SyntheticUserConfig:
+    """合成用户预检配置（票 10 / M3，spec v2「合成用户」节）。
+
+    dev-only 工具：LLM 扮演目标用户 persona 预戳访谈脚本。model/base_url 锁定
+    dev 路由（DashScope Qwen）；interview_script 是被预戳的访谈脚本草稿路径；
+    output_path 是预检报告落盘路径；dev_reference_label 是"永不冒充真人证据"
+    标注的单一事实源（报告头 + 每条回答都盖此章）；reply_max_chars 是单条
+    回答的字数结构校验上界。重试上界不在此处——单一事实源是
+    output_pipeline.max_retries。
+    """
+
+    model: str
+    base_url: str
+    interview_script: str
+    output_path: str
+    dev_reference_label: str
+    reply_max_chars: int
+
+
+@dataclass(frozen=True)
 class EvalConfig:
     """L2 LLM-as-judge 评估套件配置（issue 03 / M1，spec v2「L2」节）。
 
@@ -259,6 +279,7 @@ class AppConfig:
     profile: ProfileConfig
     intel: IntelConfig
     data_source: DataSourceConfig
+    synthetic_user: SyntheticUserConfig
     cost_control: CostControlConfig
     eval: EvalConfig
 
@@ -597,6 +618,23 @@ def load_config(path: str | Path | None = None) -> AppConfig:
     if not cost_control.report_path.strip():
         raise ConfigError("cost_control.report_path 不得为空（成本 JSONL 上报落盘）")
 
+    synthetic_raw = _require(data, "synthetic_user", "root")
+    synthetic_user = SyntheticUserConfig(
+        model=str(_require(synthetic_raw, "model", "synthetic_user")),
+        base_url=str(_require(synthetic_raw, "base_url", "synthetic_user")),
+        interview_script=str(_require(synthetic_raw, "interview_script", "synthetic_user")),
+        output_path=str(_require(synthetic_raw, "output_path", "synthetic_user")),
+        dev_reference_label=str(_require(synthetic_raw, "dev_reference_label", "synthetic_user")),
+        reply_max_chars=int(_require(synthetic_raw, "reply_max_chars", "synthetic_user")),
+    )
+    for field_name in ("model", "base_url", "interview_script", "output_path"):
+        if not getattr(synthetic_user, field_name).strip():
+            raise ConfigError(f"synthetic_user.{field_name} 不得为空（合成用户预检）")
+    if not synthetic_user.dev_reference_label.strip():
+        raise ConfigError("synthetic_user.dev_reference_label 不得为空（永不冒充真人证据的标注）")
+    if synthetic_user.reply_max_chars <= 0:
+        raise ConfigError("synthetic_user.reply_max_chars 必须为正（回答字数结构校验上界）")
+
     eval_raw = _require(data, "eval", "root")
     prompt_versions_raw = _require(eval_raw, "prompt_versions", "eval")
     if not isinstance(prompt_versions_raw, dict) or not prompt_versions_raw:
@@ -639,6 +677,7 @@ def load_config(path: str | Path | None = None) -> AppConfig:
         profile=profile,
         intel=intel,
         data_source=data_source,
+        synthetic_user=synthetic_user,
         cost_control=cost_control,
         eval=eval_cfg,
     )

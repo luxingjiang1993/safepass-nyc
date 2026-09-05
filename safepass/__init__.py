@@ -13,6 +13,7 @@
     rating_engine     纯函数评级 + 可信度映射（零 LLM、零画像）
     intel_agent       混合检索（FAISS + BM25，RRF top-3）
     skills            建议生成等 Skill（提示词模板 + Pydantic 契约 + 业务校验）
+    synthetic_user    合成用户预检（票 10，dev-only，产出带"开发参考"标注）
     output_pipeline   输出控制管线（生成→解析/修复→校验→有限重试）
     pipeline          管线编排与唯一接缝
 """
