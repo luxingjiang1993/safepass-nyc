@@ -21,7 +21,12 @@
 参数透传——画像只作用于建议排序与时间提示（ADR-0002），永不进入评级。
 
 本层默认不注入 llm_client（llm_client=None）：走确定性路径（静态意图标记 +
-D12 后置 + 区域解析），离线可跑；生产 LLM 接入属后续切片。
+D12 后置 + 区域解析），离线可跑。生产接线（票 12 / M4）：main() 经
+safepass.llm_wiring.build_llm_client_from_env 从 env（LLM_API_KEY/
+LLM_BASE_URL/LLM_MODEL）构造真实客户端——产出必经票 06 的 BudgetFusedClient
+熔断包装（单注入点，不可绕过）；env 缺失时工厂返回 None，服务仍以确定性
+路径运行。make_handler/create_server 的 llm_client 参数可注入 fake（测试）
+或工厂产出（生产）。
 """
 
 from __future__ import annotations
@@ -35,7 +40,8 @@ from pathlib import Path
 from typing import Any
 from urllib.parse import ParseResult, parse_qs, urlparse
 
-from safepass import config_loader, degraded, pipeline
+from safepass import config_loader, degraded, llm_wiring, pipeline
+from safepass.llm_client import LLMClient
 from safepass.session_state import SessionState
 from frontend import render
 
@@ -120,8 +126,8 @@ def _form_profile(fields: dict[str, list[str]]) -> dict[str, Any]:
     return profile
 
 
-def make_handler(store: SessionStore | None = None):
-    """构造请求处理类（store 可注入，便于测试与多实例隔离）。"""
+def make_handler(store: SessionStore | None = None, llm_client: LLMClient | None = None):
+    """构造请求处理类（store/llm_client 可注入，便于测试与生产接线隔离）。"""
     sessions = store if store is not None else SessionStore()
 
     class SafePassHandler(BaseHTTPRequestHandler):
@@ -268,7 +274,7 @@ def make_handler(store: SessionStore | None = None):
                 query,
                 profile=sessions.get_profile(sid),
                 session_state=sessions.get(sid),
-                llm_client=None,  # 确定性路径：静态意图标记 + D12 后置（离线可跑）
+                llm_client=llm_client,  # 默认 None = 确定性路径；生产经 env 接线（票 12）
             )
             sessions.adopt_result(sid, result)
             self._send_html(
@@ -285,15 +291,24 @@ def create_server(
     host: str = "127.0.0.1",
     port: int = 8000,
     store: SessionStore | None = None,
+    llm_client: LLMClient | None = None,
 ) -> ThreadingHTTPServer:
-    """创建线程化 HTTP 服务（port=0 由系统分配端口，测试用）。"""
-    return ThreadingHTTPServer((host, port), make_handler(store))
+    """创建线程化 HTTP 服务（port=0 由系统分配端口，测试用）。
+
+    llm_client 默认 None（确定性路径离线可跑）；生产由 main() 经
+    llm_wiring.build_llm_client_from_env 从 env 接线后注入。
+    """
+    return ThreadingHTTPServer((host, port), make_handler(store, llm_client))
 
 
 def main() -> None:
-    server = create_server()
+    # 生产接线（票 12 / M4）：env 三变量齐全 → 真实客户端（必经熔断器包装）；
+    # 任一缺失 → None，服务走确定性路径（不静默失败，启动日志明示形态）。
+    llm_client = llm_wiring.build_llm_client_from_env(config_loader.get_config())
+    server = create_server(llm_client=llm_client)
     host, port = server.server_address
-    print(f"SafePass NYC 前端：http://{host}:{port}（Ctrl+C 停止）")
+    mode = "生产 LLM 已接线（经成本熔断器）" if llm_client is not None else "确定性路径（未注入 LLM）"
+    print(f"SafePass NYC 前端：http://{host}:{port}（{mode}，Ctrl+C 停止）")
     try:
         server.serve_forever()
     except KeyboardInterrupt:

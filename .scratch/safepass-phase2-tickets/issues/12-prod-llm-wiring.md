@@ -6,6 +6,6 @@
 
 **Status:** ready-for-agent　**执行方式:** /implement　**里程碑:** M4 部署（spec v2）
 
-- [ ] env 注入路径有测试（fake key 注入验证接线，不烧真钱）
-- [ ] 注入客户端必经熔断器（单注入点，不可绕过）
-- [ ] dev/test 行为不变：fake/cassette 离线全绿
+- [x] env 注入路径有测试（fake key 注入验证接线，不烧真钱）
+- [x] 注入客户端必经熔断器（单注入点，不可绕过）
+- [x] dev/test 行为不变：fake/cassette 离线全绿

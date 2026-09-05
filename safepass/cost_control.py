@@ -98,6 +98,11 @@ class BudgetFusedClient:
         # 限流窗口是进程级内存态（天然瞬时限流语义）；日累计从上报文件求和
         self._window: deque[float] = deque()
 
+    @property
+    def inner(self) -> LLMClient:
+        """被包装的真实客户端（只读；票 12 接线测试据此断言"必经熔断器"结构）。"""
+        return self._inner
+
     # -- 配置接线 -----------------------------------------------------------
 
     @classmethod

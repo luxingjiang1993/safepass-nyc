@@ -221,6 +221,18 @@ class CostControlConfig:
 
 
 @dataclass(frozen=True)
+class LLMConfig:
+    """生产模型接线配置（票 12 / M4）：OpenAI 兼容端点客户端的请求超时。
+
+    接入点/模型名/密钥不进配置——生产经 env（LLM_API_KEY/LLM_BASE_URL/
+    LLM_MODEL）注入（spec v2「生产模型接线」）；客户端构造的唯一注入点在
+    safepass/llm_wiring.py，产出必经 BudgetFusedClient 包装（票 06）。
+    """
+
+    request_timeout_seconds: float
+
+
+@dataclass(frozen=True)
 class SyntheticUserConfig:
     """合成用户预检配置（票 10 / M3，spec v2「合成用户」节）。
 
@@ -279,8 +291,9 @@ class AppConfig:
     profile: ProfileConfig
     intel: IntelConfig
     data_source: DataSourceConfig
-    synthetic_user: SyntheticUserConfig
     cost_control: CostControlConfig
+    synthetic_user: SyntheticUserConfig
+    llm: LLMConfig
     eval: EvalConfig
 
 
@@ -635,6 +648,11 @@ def load_config(path: str | Path | None = None) -> AppConfig:
     if synthetic_user.reply_max_chars <= 0:
         raise ConfigError("synthetic_user.reply_max_chars 必须为正（回答字数结构校验上界）")
 
+    llm_raw = _require(data, "llm", "root")
+    llm = LLMConfig(request_timeout_seconds=float(_require(llm_raw, "request_timeout_seconds", "llm")))
+    if llm.request_timeout_seconds <= 0:
+        raise ConfigError("llm.request_timeout_seconds 必须为正")
+
     eval_raw = _require(data, "eval", "root")
     prompt_versions_raw = _require(eval_raw, "prompt_versions", "eval")
     if not isinstance(prompt_versions_raw, dict) or not prompt_versions_raw:
@@ -677,8 +695,9 @@ def load_config(path: str | Path | None = None) -> AppConfig:
         profile=profile,
         intel=intel,
         data_source=data_source,
-        synthetic_user=synthetic_user,
         cost_control=cost_control,
+        synthetic_user=synthetic_user,
+        llm=llm,
         eval=eval_cfg,
     )
 

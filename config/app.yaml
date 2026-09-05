@@ -305,6 +305,16 @@ cost_control:
 
 
 # ============================================================================
+# 生产模型接线（票 12 / M4，spec v2「生产模型接线」）：OpenAI 兼容端点客户端
+# 的请求超时（秒）。接入点与模型名不进配置——生产经 env 注入
+# （LLM_API_KEY / LLM_BASE_URL / LLM_MODEL，dev/test 用 DashScope Qwen 走
+# cassette，见 eval 节），客户端构造的唯一注入点在 safepass/llm_wiring.py，
+# 且产出必经票 06 的 BudgetFusedClient 包装（不可绕过）。
+# ============================================================================
+llm:
+  request_timeout_seconds: 120
+
+# ============================================================================
 # 合成用户预检（票 10 / M3，spec v2「合成用户」节）：LLM 扮演用户 persona，
 # 真人访谈前低成本戳访谈脚本、扩充金标输入。dev-only，走输出控制管线模式；
 # 运行需一次性 DASHSCOPE_API_KEY（人工前置，scripts/run_synthetic_precheck.py）。
