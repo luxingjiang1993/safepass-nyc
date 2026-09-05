@@ -10,7 +10,7 @@
 
 **前置条件:** Socrata 网络可达（需 VPN）。
 
-- [ ] 真实数据入库完成，manifest 来源标注齐
-- [ ] city_mean 重算回填，评级可复算集跨机器复跑仍绿
-- [ ] prod 数据路径切换（config 数据目录）
-- [ ] 唯一判定：`pytest tests/ -q` 全绿
+- [x] 真实数据入库完成，manifest 来源标注齐
+- [x] city_mean 重算回填，评级可复算集跨机器复跑仍绿
+- [x] prod 数据路径切换（config 数据目录）
+- [x] 唯一判定：`pytest tests/ -q` 全绿
