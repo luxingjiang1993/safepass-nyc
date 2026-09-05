@@ -62,6 +62,7 @@ from safepass import (
     comparison,
     config_loader,
     contracts,
+    cost_control,
     data_agent,
     degraded,
     emergency,
@@ -97,6 +98,18 @@ def execute_query(
     """
     cfg = config_loader.get_config()
 
+    # --- 票 06 日预算熔断：熔断中的客户端视同未注入（全链路确定性降级） ---
+    # 降级不静默：结构化数据照出（评级/图表/community_info 本就零 LLM），
+    # 建议走配置模板文本，响应带 llm_degraded 明示标记 + degradation_notice。
+    llm_degraded = False
+    try:
+        fused_blocked = cost_control.is_fused_blocked(llm_client)
+    except cost_control.CostControlError:
+        fused_blocked = True  # 预算文件损坏：fail-safe 视同熔断（LLM 降级，其余照常出）
+    if fused_blocked:
+        llm_client = None
+        llm_degraded = True
+
     # --- T5 紧急检测第一层（spec D7）：关键词静态表优先于一切 LLM 调用 ---
     # 命中即进无 LLM 静态分支：EmergencyResult 由静态模板 + 警区静态表组装。
     if emergency.is_emergency(query_text, cfg):
@@ -105,7 +118,14 @@ def execute_query(
         )
 
     resolved = addressing.resolve_areas(query_text, cfg)
-    decision = routing.route_query(query_text, llm_client, cfg)
+    try:
+        decision = routing.route_query(query_text, llm_client, cfg)
+    except cost_control.CostControlError:
+        # 查询中途限流/熔断（路由 LLM 调用被拦）：路由退确定性默认
+        # area_safety_query——与未注入客户端同一事实源，D12 后置兜底终局权威。
+        decision = routing.RouteDecision(route=routing.ROUTE_AREA_SAFETY)
+        llm_client = None
+        llm_degraded = True
 
     # T5 紧急检测第二层（FC 路由兜底）：路由判定后同样不再生成自由文本，
     # 与第一层共用同一个静态组装入口。位置先于负例守卫与 D12：紧急响应对
@@ -140,7 +160,7 @@ def execute_query(
             if plan.target is None or session_state is None:  # 细分不变量，防御不可达
                 raise ValueError("对比追问细分缺少承接目标或会话状态（followup.classify 不变量被破坏）")
             base = followup.base_resolved(session_state.last)
-            return _build_comparison_with_fallback(base, (base, plan.target), cfg)
+            return _build_comparison_with_fallback(base, (base, plan.target), cfg, llm_degraded)
         if plan.kind == followup.KIND_DETAIL:
             if session_state is None:  # 细分不变量，防御不可达
                 raise ValueError("细节追问细分缺少会话状态（followup.classify 不变量被破坏）")
@@ -150,12 +170,13 @@ def execute_query(
                 base,
                 records,
                 cfg,
+                query_text=query_text,
                 dimensions=plan.dimensions,
-                # 追问轮的三维提取走确定性 fallback（零额外 LLM 调用）：
-                # 承接维度与提取同源（followup 标记表），LLM 提取层只服务
-                # 直接查询（AC-002），追问响应更快、cassette 面更小。
-                extracted=extraction.extract(query_text, None, cfg),
+                # 追问轮的三维提取走确定性 fallback（extraction_client=None，
+                # 零额外 LLM 调用）：承接维度与提取同源（followup 标记表），
+                # LLM 提取层只服务直接查询（AC-002），追问响应更快、cassette 面更小。
                 profile=profile,
+                llm_degraded=llm_degraded,
             )
         # 换地点/换话题：重置，落入下方新查询统一流程（resolved 可能为空或有区域）
         session_state = None
@@ -169,14 +190,14 @@ def execute_query(
         and resolved[0].precincts[0] not in {s.precinct for s in session_state.areas}
     ):
         base = followup.base_resolved(session_state.last)
-        return _build_comparison_with_fallback(base, (base, resolved[0]), cfg)
+        return _build_comparison_with_fallback(base, (base, resolved[0]), cfg, llm_degraded)
 
     # --- D12 越界判定确定性后置（spec D12）：FC 路由之后、数据查询之前 ---
     # 解析出警区 ∉ 覆盖清单（含跨警区无法建模）→ 无条件 DegradedResult，
     # 即使 LLM 误路由到 area_safety_query 也被强制改写。
     out_of_coverage = next((r for r in resolved if not r.in_coverage(cfg)), None)
     if out_of_coverage is not None:
-        return _single_side_ooc_degraded(out_of_coverage, resolved, cfg)
+        return _single_side_ooc_degraded(out_of_coverage, resolved, cfg, llm_degraded)
 
     # --- 降级意图（path/trend）：零路径级/趋势级结论，替代信息给真实评级 ---
     # 未识别区域也不逃出契约：降级形态照常产出，替代信息为 None（spec D3）。
@@ -186,31 +207,45 @@ def execute_query(
         assessment = (
             degraded.assess_area(primary, records, cfg) if primary is not None else None
         )
-        return degraded.build_degraded_result(
-            decision.degraded_capability,
-            primary,
-            None if assessment is None else assessment.alternative,
+        return _mark_llm_degraded(
+            degraded.build_degraded_result(
+                decision.degraded_capability,
+                primary,
+                None if assessment is None else assessment.alternative,
+                cfg,
+                data_sources=() if assessment is None else assessment.sources,
+            ),
+            llm_degraded,
             cfg,
-            data_sources=() if assessment is None else assessment.sources,
         )
 
     if not resolved:
         # 未能识别任何已知区域：诚实降级（不编造、不抛异常逃出契约）
-        return degraded.build_degraded_result(
-            contracts.CAPABILITY_OUT_OF_COVERAGE, None, None, cfg
+        return _mark_llm_degraded(
+            degraded.build_degraded_result(
+                contracts.CAPABILITY_OUT_OF_COVERAGE, None, None, cfg
+            ),
+            llm_degraded,
+            cfg,
         )
 
     # --- 覆盖区内：数据查询（聚合 + 评级） ---
     records = data_agent.load_dataset()
     if len(resolved) >= 2:
         # 双（多）覆盖区对比：终局权威在数据（F3-1），不要求 LLM 路由确认
-        return comparison.build_comparison_result(tuple(resolved), records, cfg)
+        return _mark_llm_degraded(
+            comparison.build_comparison_result(tuple(resolved), records, cfg),
+            llm_degraded,
+            cfg,
+        )
     return _build_safety_result(
         resolved[0],
         records,
         cfg,
-        extracted=extraction.extract(query_text, extraction_client, cfg),
+        query_text=query_text,
+        extraction_client=extraction_client,
         profile=profile,
+        llm_degraded=llm_degraded,
     )
 
 
@@ -218,6 +253,7 @@ def _single_side_ooc_degraded(
     primary: addressing.ResolvedArea,
     covered_candidates: tuple[addressing.ResolvedArea, ...],
     cfg: config_loader.AppConfig,
+    llm_degraded: bool = False,
 ) -> contracts.DegradedResult:
     """F3-5/D12 单边越界降级的统一装配：越界侧只有 out_of_coverage 说明，
     覆盖侧（candidates 中首个覆盖内区域）的真实评级作替代信息，无对比结论。"""
@@ -226,12 +262,16 @@ def _single_side_ooc_degraded(
         (a for r in covered_candidates if (a := degraded.assess_area(r, records, cfg)) is not None),
         None,
     )
-    return degraded.build_degraded_result(
-        contracts.CAPABILITY_OUT_OF_COVERAGE,
-        primary,
-        None if assessment is None else assessment.alternative,
+    return _mark_llm_degraded(
+        degraded.build_degraded_result(
+            contracts.CAPABILITY_OUT_OF_COVERAGE,
+            primary,
+            None if assessment is None else assessment.alternative,
+            cfg,
+            data_sources=() if assessment is None else assessment.sources,
+        ),
+        llm_degraded,
         cfg,
-        data_sources=() if assessment is None else assessment.sources,
     )
 
 
@@ -239,14 +279,37 @@ def _build_comparison_with_fallback(
     covered_base: addressing.ResolvedArea,
     pair: tuple[addressing.ResolvedArea, addressing.ResolvedArea],
     cfg: config_loader.AppConfig,
+    llm_degraded: bool = False,
 ) -> contracts.ResponseContract:
     """追问/直问对比的统一出口：目标越界 → F3-5 单边越界降级；
     双覆盖内 → ComparisonResult（pair 顺序 = [基准, 目标]，承接语义稳定）。"""
     target = pair[1]
     if not target.in_coverage(cfg):
-        return _single_side_ooc_degraded(target, (covered_base,), cfg)
+        return _single_side_ooc_degraded(target, (covered_base,), cfg, llm_degraded)
     records = data_agent.load_dataset()
-    return comparison.build_comparison_result(pair, records, cfg)
+    return _mark_llm_degraded(
+        comparison.build_comparison_result(pair, records, cfg),
+        llm_degraded,
+        cfg,
+    )
+
+
+def _mark_llm_degraded(
+    result: contracts.ResponseContract,
+    llm_degraded: bool,
+    cfg: config_loader.AppConfig,
+) -> contracts.ResponseContract:
+    """票 06 降级明示：数据契约（safety/comparison/degraded）被打上
+    llm_degraded 标记并携带 config 降级话术——明示降级不静默，数据字段
+    不受影响。Emergency/Guardrail 形态刻意不标：其内容本就走静态模板
+    （零 LLM 依赖），不存在"LLM 被降级"的语义。"""
+    if llm_degraded and isinstance(
+        result,
+        (contracts.SafetyQueryResult, contracts.ComparisonResult, contracts.DegradedResult),
+    ):
+        result.llm_degraded = True
+        result.degradation_notice = cfg.cost_control.degraded_notice
+    return result
 
 
 def _profile_text(profile: dict[str, Any] | None) -> str:
@@ -294,17 +357,28 @@ def _build_safety_result(
     records: tuple[data_agent.CrimeRecord, ...],
     cfg: config_loader.AppConfig,
     *,
+    query_text: str,
     dimensions: tuple[followup.Dimension, ...] = (),
-    extracted: extraction.ExtractionContract | None = None,
+    extraction_client: LLMClient | None = None,
     profile: dict[str, Any] | None = None,
+    llm_degraded: bool = False,
 ) -> contracts.SafetyQueryResult:
     """覆盖区内单区查询的契约：评级/可信度/样本量/图表/三维提取/诚实缺口。
 
-    dimensions = 细节追问叠加的人群/时间维度（F8-2）；
-    extracted = AC-002 三维提取（区域/人群/时间），未注入客户端时由确定性
-    fallback 产出；profile = 会话画像，只作用于建议排序与时间提示（spec D5）。
+    dimensions = 细节追问叠加的人群/时间维度（F8-2）；extraction_client =
+    AC-002 三维提取的注入客户端（None 时由确定性 fallback 产出）；
+    profile = 会话画像，只作用于建议排序与时间提示（spec D5）；
+    llm_degraded = 票 06 熔断/限流降级标记：提取调用被成本控制拦截时
+    退确定性 fallback 并置位（降级不静默）。
     """
     profile_text = _profile_text(profile)
+    try:
+        extracted = extraction.extract(query_text, extraction_client, cfg)
+    except cost_control.CostControlError:
+        # 查询中途熔断/限流：三维提取退确定性 fallback（零额外 LLM 调用），
+        # 与未注入客户端同一事实源；响应带明示降级标记。
+        extracted = extraction.extract(query_text, None, cfg)
+        llm_degraded = True
     assessment = degraded.assess_area(resolved, records, cfg)
     if assessment is None:  # 防御：调用方已做覆盖判定，不可达
         raise ValueError(f"区域 {resolved.area!r} 不在覆盖内，无法产出安全查询契约")
@@ -363,4 +437,4 @@ def _build_safety_result(
             guardrails.make_no_panic_validator(cfg),
         ),
     )
-    return result
+    return _mark_llm_degraded(result, llm_degraded, cfg)

@@ -97,6 +97,8 @@ class DegradedResult(BaseModel):
     alternative_info: AlternativeInfo | None = None
     reselection_invitation: str
     general_suggestions: list[str] = Field(default_factory=list)
+    llm_degraded: bool = False  # 票 06：LLM 熔断/限流降级明示（不静默；替代信息不受影响）
+    degradation_notice: str | None = None  # 降级时非空（config cost_control.degraded_notice）
     emergency_resources: list[Venue] = Field(default_factory=list)
     disclaimer: str = Field(min_length=1)
     sources: list[str] = Field(default_factory=list)
@@ -141,6 +143,8 @@ class SafetyQueryResult(BaseModel):
     dimensions: list[dict] = Field(default_factory=list)
     suggestions: list[str] = Field(default_factory=list)
     unknowns: list[str] = Field(default_factory=list)
+    llm_degraded: bool = False  # 票 06：LLM 熔断/限流降级明示（不静默；评级/数据字段不受影响）
+    degradation_notice: str | None = None  # 降级时非空（config cost_control.degraded_notice）
     sources: list[str]
     time_range: str
     charts: Charts | None
@@ -175,6 +179,8 @@ class ComparisonResult(BaseModel):
     areas: list[AreaSummary] = Field(default_factory=list)
     dimensions: list[dict] = Field(default_factory=list)
     decision_aid: str | None = None  # F3-4 决策辅助话术（结构可断言，话术人工）
+    llm_degraded: bool = False  # 票 06：LLM 熔断/限流降级明示（不静默；数据字段不受影响）
+    degradation_notice: str | None = None  # 降级时非空（config cost_control.degraded_notice）
     sources: list[str] = Field(default_factory=list)
     disclaimer: str = Field(min_length=1)
 

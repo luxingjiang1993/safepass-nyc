@@ -262,6 +262,29 @@ data_source:
   page_limit_max: 50000            # Socrata 单次请求行数硬上限（平台约束，校验 page_limit 用）
 
 # ============================================================================
+# 成本三件套（票 06 / M2）：请求级限流 + 成本估算 + 降级明示话术。
+# 窗口/阈值/估算系数/单价等字面量只出现在本节；日预算本身在
+# token-budget.json（daily_cost_budget_usd，生产 = 5），由
+# safepass/cost_control 读取。单价为估算值（USD / 1K tokens），以供应商
+# 官网为准定期校准；未列出的模型按 default 条目估算。
+# ============================================================================
+cost_control:
+  rate_limit:
+    window_seconds: 60        # 滑动窗口（秒）；每包装器实例一个窗口（生产单实例接线）
+    max_requests: 20          # 窗口内最大 LLM 调用数
+  estimation:
+    # 中文为主的查询按 ~2 字/token 保守高估（Qwen/DeepSeek 中文实际约 1-1.5 字/token），
+    # 保证估算是上界近似：宁可高估不低估，熔断提前于破产。
+    chars_per_token: 2
+    prices_per_1k_tokens:
+      deepseek-chat: { input: 0.00027, output: 0.0011 }   # prod 路由（≈$0.27/$1.10 per 1M）
+      qwen-turbo: { input: 0.00005, output: 0.0002 }      # dev/test 路由（DashScope 估算）
+      default: { input: 0.001, output: 0.003 }            # 未列出模型的兜底估算
+  degraded_notice: "今日 AI 生成预算已用尽，本回复改由确定性数据与模板生成；安全评级与统计数据不受影响。"
+  report_path: "logs/cost_report.jsonl"
+
+
+# ============================================================================
 # L2 LLM-as-judge 评估套件（issue 03 / M1，spec v2「L2」节）：
 # judge = dev 模型（DashScope Qwen，考官考生同源）；judge 调用走 cassette
 # 离线回放（tests/cassettes/l2_judge.json，录制入口 scripts/record_l2_cassette.py，

@@ -199,6 +199,27 @@ class DataSourceConfig:
 
 
 @dataclass(frozen=True)
+class CostControlConfig:
+    """成本三件套配置（票 06 / M2）：限流窗口 + 成本估算 + 降级话术。
+
+    rate_limit：请求级限流滑动窗口（每包装器实例一个窗口；生产单实例接线，
+    窗口/阈值只活在配置）；
+    estimation：无 token 计数时的确定性成本近似（chars_per_token 系数 +
+    各模型 USD/1K tokens 估算单价；default 条目兜底未列出模型）；
+    degraded_notice：熔断降级时响应必须携带的明示话术（不静默）；
+    report_path：成本 JSONL 上报落盘路径。日预算本身不在此处——
+    单一事实源是 token-budget.json 的 daily_cost_budget_usd。
+    """
+
+    rate_window_seconds: float
+    rate_max_requests: int
+    chars_per_token: int
+    prices_per_1k_tokens: dict[str, dict[str, float]]
+    degraded_notice: str
+    report_path: str
+
+
+@dataclass(frozen=True)
 class EvalConfig:
     """L2 LLM-as-judge 评估套件配置（issue 03 / M1，spec v2「L2」节）。
 
@@ -236,6 +257,7 @@ class AppConfig:
     profile: ProfileConfig
     intel: IntelConfig
     data_source: DataSourceConfig
+    cost_control: CostControlConfig
     eval: EvalConfig
 
 
@@ -516,6 +538,46 @@ def load_config(path: str | Path | None = None) -> AppConfig:
     if not (0 < data_source.page_limit <= data_source.page_limit_max):
         raise ConfigError("data_source.page_limit 必须在 (0, page_limit_max]（Socrata 平台硬上限）")
 
+    cost_raw = _require(data, "cost_control", "root")
+    rate_raw = _require(cost_raw, "rate_limit", "cost_control")
+    estimation_raw = _require(cost_raw, "estimation", "cost_control")
+    prices_raw = _require(estimation_raw, "prices_per_1k_tokens", "cost_control.estimation")
+    if not isinstance(prices_raw, dict) or not prices_raw:
+        raise ConfigError("cost_control.estimation.prices_per_1k_tokens 必须是非空映射")
+    prices: dict[str, dict[str, float]] = {}
+    for model_name, price in prices_raw.items():
+        if not isinstance(price, dict):
+            raise ConfigError(f"cost_control 单价条目必须是映射：{model_name!r}")
+        entry = {str(k): float(v) for k, v in price.items()}
+        for side in ("input", "output"):
+            if side not in entry:
+                raise ConfigError(
+                    f"cost_control 单价条目缺少 {side!r} 键：{model_name!r}（缺键=免费，禁止）"
+                )
+        prices[str(model_name)] = entry
+    if any(p < 0 for entry in prices.values() for p in entry.values()):
+        raise ConfigError("cost_control 估算单价不得为负")
+    if "default" not in prices:
+        raise ConfigError("cost_control.estimation.prices_per_1k_tokens 必须含 default 兜底条目")
+    cost_control = CostControlConfig(
+        rate_window_seconds=float(_require(rate_raw, "window_seconds", "cost_control.rate_limit")),
+        rate_max_requests=int(_require(rate_raw, "max_requests", "cost_control.rate_limit")),
+        chars_per_token=int(_require(estimation_raw, "chars_per_token", "cost_control.estimation")),
+        prices_per_1k_tokens=prices,
+        degraded_notice=str(_require(cost_raw, "degraded_notice", "cost_control")),
+        report_path=str(_require(cost_raw, "report_path", "cost_control")),
+    )
+    if cost_control.rate_window_seconds <= 0:
+        raise ConfigError("cost_control.rate_limit.window_seconds 必须为正")
+    if cost_control.rate_max_requests <= 0:
+        raise ConfigError("cost_control.rate_limit.max_requests 必须为正")
+    if cost_control.chars_per_token <= 0:
+        raise ConfigError("cost_control.estimation.chars_per_token 必须为正")
+    if not cost_control.degraded_notice.strip():
+        raise ConfigError("cost_control.degraded_notice 不得为空（降级明示，不静默）")
+    if not cost_control.report_path.strip():
+        raise ConfigError("cost_control.report_path 不得为空（成本 JSONL 上报落盘）")
+
     eval_raw = _require(data, "eval", "root")
     prompt_versions_raw = _require(eval_raw, "prompt_versions", "eval")
     if not isinstance(prompt_versions_raw, dict) or not prompt_versions_raw:
@@ -557,6 +619,7 @@ def load_config(path: str | Path | None = None) -> AppConfig:
         profile=profile,
         intel=intel,
         data_source=data_source,
+        cost_control=cost_control,
         eval=eval_cfg,
     )
 

@@ -2,6 +2,6 @@
   "$schema_note": "Ralph / Harness 预算配置。afk-ralph.sh 读取 max_iterations 作为熔断上限。",
   "max_iterations": 10,
   "daily_token_budget": null,
-  "daily_cost_budget_usd": null,
-  "_phase2": "Phase 2 落 $5/日生产熔断（DeepSeek）时，把 daily_cost_budget_usd 设为 5 并实现 llm_client 侧熔断上报；dev DashScope 预算另定。"
+  "daily_cost_budget_usd": 5,
+  "_phase2": "票 06 已落地：daily_cost_budget_usd=5（生产 DeepSeek 日熔断），熔断/限流/上报在 safepass/cost_control.py；dev DashScope 预算另定。"
 }
