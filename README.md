@@ -29,6 +29,19 @@ pip install -r requirements.txt
 
 首次安装 `sentence-transformers` 会连带安装 PyTorch（体积较大），属正常；embedding 模型在首次构建索引时本地下载，之后离线可用。
 
+## 质量基线（M1 eval 套件，spec v2）
+
+三项指标随 eval 套件产出，README 只作投影，单一事实源 = 套件工件（改动指标须重跑套件并同步本表，漂移由 `tests/test_readme_baselines.py` 守住）：
+
+| 指标 | 基线 | 口径（分子/分母） | 复算 |
+|------|------|------|------|
+| 路由准确率（L1） | 100%（50/50） | 命中期望路由分支的金标条目数 / 金标条目总数（契约类型/警区/越界降级分支与金标 expect 逐条一致） | `pytest tests/test_golden_set.py -q` 全绿即 100% |
+| groundedness（L2） | 0.925 | 50 条金标逐条 groundedness judge 分数之和 / 50（分母 = 金标条目数） | `pytest tests/eval -q` cassette 回放，工件 `fixtures/eval/l2_results_v1.json` |
+| 幻觉率（L2） | 0.040 | hallucinated=true 的条目数 / 50（二元判定，judge = qwen-turbo，prompt 版本锁定进 config） | 同上 |
+
+- L2 套件离线可跑（judge 走 cassette 回放，零真实 API）；录制工件 `fixtures/eval/l2_results_v1.json` 由 `python scripts/record_l2_cassette.py` 一次性产出（需真实 `DASHSCOPE_API_KEY`）。
+- 人工验收尾巴（不阻塞基线）：DeepSeek 生产模型（`deepseek-chat`）兼容性验证需真实 key + 网络，跑同一 L2 套件后在此登记结果。状态：**待登记**。
+
 ## 常用命令
 
 ```bash
