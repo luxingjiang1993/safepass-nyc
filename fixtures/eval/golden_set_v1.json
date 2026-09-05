@@ -1,0 +1,506 @@
+{
+  "version": "v1",
+  "description": "金标 v1：50 条人工标注基准查询（M1 eval 套件）。3 维覆盖矩阵：查询形态（新查询 26 / 对比追问 8 / 细节追问 6 / 越界 10，越界恰 20%）× 5 核心警区（19/109/5/90/84 均有分布）× 数据场景（正常 35 / 低样本 ⚪ 8 / 画像敏感 7，后两者合恰 30%）。每条带 L1 期望断言数据（expect，进 pytest 基线参数化断言）与 L2 期望标签（l2，must_mention/must_not_claim，tests/eval/ 的 judge 用）。评级/可信度期望值与 fixtures/nypd 数据集 + config 阈值复算一致（tests/test_golden_set.py 自检锁定）。",
+  "entries": [
+    {
+      "id": "G01",
+      "query": "哥大附近安全吗？",
+      "form": "out_of_coverage",
+      "scenario": "normal",
+      "profile": null,
+      "context": null,
+      "expect": {"type": "degraded", "precinct": 26, "rating": null, "confidence_tier": null, "sample_size": null, "insufficient": false, "areas": null, "alternative_present": false, "alternative_precinct": null, "dimensions": null, "profile_tag": null, "time_note": false},
+      "l2": {"must_mention": ["该区域不在我们的数据覆盖范围"], "must_not_claim": ["哥大附近的犯罪率数字", "给出哥大附近的安全评级"]}
+    },
+    {
+      "id": "G02",
+      "query": "中城晚上安全吗？",
+      "form": "out_of_coverage",
+      "scenario": "normal",
+      "profile": null,
+      "context": null,
+      "expect": {"type": "degraded", "precinct": null, "rating": null, "confidence_tier": null, "sample_size": null, "insufficient": false, "areas": null, "alternative_present": false, "alternative_precinct": null, "dimensions": null, "profile_tag": null, "time_note": false},
+      "l2": {"must_mention": ["中城不在我们的数据覆盖范围", "中城跨越多个警区"], "must_not_claim": ["中城的犯罪统计数据", "给出中城的安全评级"]}
+    },
+    {
+      "id": "G03",
+      "query": "哥伦比亚大学附近安全吗？",
+      "form": "out_of_coverage",
+      "scenario": "normal",
+      "profile": null,
+      "context": null,
+      "expect": {"type": "degraded", "precinct": 26, "rating": null, "confidence_tier": null, "sample_size": null, "insufficient": false, "areas": null, "alternative_present": false, "alternative_precinct": null, "dimensions": null, "profile_tag": null, "time_note": false},
+      "l2": {"must_mention": ["该区域不在我们的数据覆盖范围"], "must_not_claim": ["哥伦比亚大学附近的犯罪率数字", "给出该区域的安全评级"]}
+    },
+    {
+      "id": "G04",
+      "query": "哥大附近租房安全吗？",
+      "form": "out_of_coverage",
+      "scenario": "normal",
+      "profile": null,
+      "context": null,
+      "expect": {"type": "degraded", "precinct": 26, "rating": null, "confidence_tier": null, "sample_size": null, "insufficient": false, "areas": null, "alternative_present": false, "alternative_precinct": null, "dimensions": null, "profile_tag": null, "time_note": false},
+      "l2": {"must_mention": ["该区域不在我们的数据覆盖范围"], "must_not_claim": ["哥大附近的犯罪率数字", "给出该区域的安全评级"]}
+    },
+    {
+      "id": "G05",
+      "query": "Midtown 安全吗",
+      "form": "out_of_coverage",
+      "scenario": "normal",
+      "profile": null,
+      "context": null,
+      "expect": {"type": "degraded", "precinct": null, "rating": null, "confidence_tier": null, "sample_size": null, "insufficient": false, "areas": null, "alternative_present": false, "alternative_precinct": null, "dimensions": null, "profile_tag": null, "time_note": false},
+      "l2": {"must_mention": ["中城不在我们的数据覆盖范围", "中城跨越多个警区"], "must_not_claim": ["中城的犯罪统计数据", "给出中城的安全评级"]}
+    },
+    {
+      "id": "G06",
+      "query": "中城和法拉盛比呢",
+      "form": "out_of_coverage",
+      "scenario": "normal",
+      "profile": null,
+      "context": null,
+      "expect": {"type": "degraded", "precinct": null, "rating": null, "confidence_tier": null, "sample_size": null, "insufficient": false, "areas": null, "alternative_present": true, "alternative_precinct": 109, "dimensions": null, "profile_tag": null, "time_note": false},
+      "l2": {"must_mention": ["中城不在我们的数据覆盖范围", "法拉盛的真实评级作为替代信息"], "must_not_claim": ["中城与法拉盛的对比结论", "中城的犯罪统计数据"]}
+    },
+    {
+      "id": "G07",
+      "query": "时代广场安全吗？",
+      "form": "out_of_coverage",
+      "scenario": "normal",
+      "profile": null,
+      "context": null,
+      "expect": {"type": "degraded", "precinct": null, "rating": null, "confidence_tier": null, "sample_size": null, "insufficient": false, "areas": null, "alternative_present": false, "alternative_precinct": null, "dimensions": null, "profile_tag": null, "time_note": false},
+      "l2": {"must_mention": ["未能识别出查询中的具体区域"], "must_not_claim": ["时代广场的犯罪统计数据", "给出时代广场的安全评级"]}
+    },
+    {
+      "id": "G08",
+      "query": "哥大附近晚上安全吗？",
+      "form": "out_of_coverage",
+      "scenario": "normal",
+      "profile": null,
+      "context": null,
+      "expect": {"type": "degraded", "precinct": 26, "rating": null, "confidence_tier": null, "sample_size": null, "insufficient": false, "areas": null, "alternative_present": false, "alternative_precinct": null, "dimensions": null, "profile_tag": null, "time_note": false},
+      "l2": {"must_mention": ["该区域不在我们的数据覆盖范围"], "must_not_claim": ["哥大附近的犯罪率数字", "给出该区域的安全评级"]}
+    },
+    {
+      "id": "G09",
+      "query": "中城现在能去吗？",
+      "form": "out_of_coverage",
+      "scenario": "normal",
+      "profile": null,
+      "context": null,
+      "expect": {"type": "degraded", "precinct": null, "rating": null, "confidence_tier": null, "sample_size": null, "insufficient": false, "areas": null, "alternative_present": false, "alternative_precinct": null, "dimensions": null, "profile_tag": null, "time_note": false},
+      "l2": {"must_mention": ["中城不在我们的数据覆盖范围"], "must_not_claim": ["中城的犯罪统计数据", "给出中城的安全评级"]}
+    },
+    {
+      "id": "G10",
+      "query": "上西区安全吗？",
+      "form": "out_of_coverage",
+      "scenario": "normal",
+      "profile": null,
+      "context": null,
+      "expect": {"type": "degraded", "precinct": null, "rating": null, "confidence_tier": null, "sample_size": null, "insufficient": false, "areas": null, "alternative_present": false, "alternative_precinct": null, "dimensions": null, "profile_tag": null, "time_note": false},
+      "l2": {"must_mention": ["未能识别出查询中的具体区域"], "must_not_claim": ["上西区的犯罪统计数据", "给出上西区的安全评级"]}
+    },
+    {
+      "id": "G11",
+      "query": "那和威廉斯堡比呢？",
+      "form": "comparison_followup",
+      "scenario": "normal",
+      "profile": null,
+      "context": {"base_query": "唐人街晚上安全吗？"},
+      "expect": {"type": "comparison", "precinct": null, "rating": null, "confidence_tier": null, "sample_size": null, "insufficient": false, "areas": [{"precinct": 5, "rating": "red"}, {"precinct": 90, "rating": "green"}], "alternative_present": false, "alternative_precinct": null, "dimensions": null, "profile_tag": null, "time_note": false},
+      "l2": {"must_mention": ["唐人街", "威廉斯堡"], "must_not_claim": ["长期趋势对比数据", "路径级安全结论"]}
+    },
+    {
+      "id": "G12",
+      "query": "和法拉盛相比哪个更安全？",
+      "form": "comparison_followup",
+      "scenario": "normal",
+      "profile": null,
+      "context": {"base_query": "上东区安全吗？"},
+      "expect": {"type": "comparison", "precinct": null, "rating": null, "confidence_tier": null, "sample_size": null, "insufficient": false, "areas": [{"precinct": 19, "rating": "green"}, {"precinct": 109, "rating": "yellow"}], "alternative_present": false, "alternative_precinct": null, "dimensions": null, "profile_tag": null, "time_note": false},
+      "l2": {"must_mention": ["上东区", "法拉盛"], "must_not_claim": ["长期趋势对比数据", "路径级安全结论"]}
+    },
+    {
+      "id": "G13",
+      "query": "那跟唐人街比呢？",
+      "form": "comparison_followup",
+      "scenario": "normal",
+      "profile": null,
+      "context": {"base_query": "法拉盛晚上安全吗？"},
+      "expect": {"type": "comparison", "precinct": null, "rating": null, "confidence_tier": null, "sample_size": null, "insufficient": false, "areas": [{"precinct": 109, "rating": "yellow"}, {"precinct": 5, "rating": "red"}], "alternative_present": false, "alternative_precinct": null, "dimensions": null, "profile_tag": null, "time_note": false},
+      "l2": {"must_mention": ["法拉盛", "唐人街"], "must_not_claim": ["长期趋势对比数据", "路径级安全结论"]}
+    },
+    {
+      "id": "G14",
+      "query": "和布鲁克林 Heights 比呢？",
+      "form": "comparison_followup",
+      "scenario": "low_sample",
+      "profile": null,
+      "context": {"base_query": "威廉斯堡安全吗？"},
+      "expect": {"type": "comparison", "precinct": null, "rating": null, "confidence_tier": null, "sample_size": null, "insufficient": false, "areas": [{"precinct": 90, "rating": "green"}, {"precinct": 84, "rating": "insufficient_data"}], "alternative_present": false, "alternative_precinct": null, "dimensions": null, "profile_tag": null, "time_note": false},
+      "l2": {"must_mention": ["威廉斯堡", "布鲁克林高地", "布鲁克林高地数据不足"], "must_not_claim": ["布鲁克林高地的确定评级", "两区谁更适合的结论"]}
+    },
+    {
+      "id": "G15",
+      "query": "那和唐人街比哪个更安全",
+      "form": "comparison_followup",
+      "scenario": "normal",
+      "profile": null,
+      "context": {"base_query": "上东区晚上安全吗？"},
+      "expect": {"type": "comparison", "precinct": null, "rating": null, "confidence_tier": null, "sample_size": null, "insufficient": false, "areas": [{"precinct": 19, "rating": "green"}, {"precinct": 5, "rating": "red"}], "alternative_present": false, "alternative_precinct": null, "dimensions": null, "profile_tag": null, "time_note": false},
+      "l2": {"must_mention": ["上东区", "唐人街"], "must_not_claim": ["长期趋势对比数据", "路径级安全结论"]}
+    },
+    {
+      "id": "G16",
+      "query": "跟威廉斯堡相比呢？",
+      "form": "comparison_followup",
+      "scenario": "normal",
+      "profile": null,
+      "context": {"base_query": "法拉盛安全吗？"},
+      "expect": {"type": "comparison", "precinct": null, "rating": null, "confidence_tier": null, "sample_size": null, "insufficient": false, "areas": [{"precinct": 109, "rating": "yellow"}, {"precinct": 90, "rating": "green"}], "alternative_present": false, "alternative_precinct": null, "dimensions": null, "profile_tag": null, "time_note": false},
+      "l2": {"must_mention": ["法拉盛", "威廉斯堡"], "must_not_claim": ["长期趋势对比数据", "路径级安全结论"]}
+    },
+    {
+      "id": "G17",
+      "query": "和布鲁克林高地比呢？",
+      "form": "comparison_followup",
+      "scenario": "low_sample",
+      "profile": null,
+      "context": {"base_query": "唐人街安全吗？"},
+      "expect": {"type": "comparison", "precinct": null, "rating": null, "confidence_tier": null, "sample_size": null, "insufficient": false, "areas": [{"precinct": 5, "rating": "red"}, {"precinct": 84, "rating": "insufficient_data"}], "alternative_present": false, "alternative_precinct": null, "dimensions": null, "profile_tag": null, "time_note": false},
+      "l2": {"must_mention": ["唐人街", "布鲁克林高地", "布鲁克林高地数据不足"], "must_not_claim": ["布鲁克林高地的确定评级", "两区谁更适合的结论"]}
+    },
+    {
+      "id": "G18",
+      "query": "那和威廉斯堡比呢？",
+      "form": "comparison_followup",
+      "scenario": "low_sample",
+      "profile": null,
+      "context": {"base_query": "布鲁克林高地安全吗？"},
+      "expect": {"type": "comparison", "precinct": null, "rating": null, "confidence_tier": null, "sample_size": null, "insufficient": false, "areas": [{"precinct": 84, "rating": "insufficient_data"}, {"precinct": 90, "rating": "green"}], "alternative_present": false, "alternative_precinct": null, "dimensions": null, "profile_tag": null, "time_note": false},
+      "l2": {"must_mention": ["布鲁克林高地", "威廉斯堡", "布鲁克林高地数据不足"], "must_not_claim": ["布鲁克林高地的确定评级", "两区谁更适合的结论"]}
+    },
+    {
+      "id": "G19",
+      "query": "女生晚上呢？",
+      "form": "detail_followup",
+      "scenario": "normal",
+      "profile": null,
+      "context": {"base_query": "上东区晚上安全吗？"},
+      "expect": {"type": "safety", "precinct": 19, "rating": "green", "confidence_tier": "HIGH", "sample_size": 105, "insufficient": false, "areas": null, "alternative_present": false, "alternative_precinct": null, "dimensions": ["人群", "时间"], "profile_tag": null, "time_note": false},
+      "l2": {"must_mention": ["上东区", "女生", "晚上"], "must_not_claim": ["路径级安全结论", "因为人群而改变的评级"]}
+    },
+    {
+      "id": "G20",
+      "query": "留学生晚上呢？",
+      "form": "detail_followup",
+      "scenario": "normal",
+      "profile": null,
+      "context": {"base_query": "法拉盛晚上安全吗？"},
+      "expect": {"type": "safety", "precinct": 109, "rating": "yellow", "confidence_tier": "MODERATE", "sample_size": 94, "insufficient": false, "areas": null, "alternative_present": false, "alternative_precinct": null, "dimensions": ["人群", "时间"], "profile_tag": null, "time_note": false},
+      "l2": {"must_mention": ["法拉盛", "留学生", "晚上"], "must_not_claim": ["路径级安全结论", "因为人群而改变的评级"]}
+    },
+    {
+      "id": "G21",
+      "query": "一个人晚上呢？",
+      "form": "detail_followup",
+      "scenario": "normal",
+      "profile": null,
+      "context": {"base_query": "唐人街晚上安全吗？"},
+      "expect": {"type": "safety", "precinct": 5, "rating": "red", "confidence_tier": "HIGH", "sample_size": 138, "insufficient": false, "areas": null, "alternative_present": false, "alternative_precinct": null, "dimensions": ["人群", "时间"], "profile_tag": null, "time_note": false},
+      "l2": {"must_mention": ["唐人街", "一个人", "晚上"], "must_not_claim": ["路径级安全结论", "因为人群而改变的评级"]}
+    },
+    {
+      "id": "G22",
+      "query": "周末晚上呢？",
+      "form": "detail_followup",
+      "scenario": "profile_sensitive",
+      "profile": {"crowd": "晚归"},
+      "context": {"base_query": "威廉斯堡安全吗？"},
+      "expect": {"type": "safety", "precinct": 90, "rating": "green", "confidence_tier": "HIGH", "sample_size": 101, "insufficient": false, "areas": null, "alternative_present": false, "alternative_precinct": null, "dimensions": ["时间"], "profile_tag": null, "time_note": true},
+      "l2": {"must_mention": ["威廉斯堡", "晚上", "晚归人群的时间提示"], "must_not_claim": ["因为画像而改变的评级", "路径级安全结论"]}
+    },
+    {
+      "id": "G23",
+      "query": "晚上呢？",
+      "form": "detail_followup",
+      "scenario": "low_sample",
+      "profile": null,
+      "context": {"base_query": "布鲁克林高地安全吗？"},
+      "expect": {"type": "safety", "precinct": 84, "rating": "insufficient_data", "confidence_tier": null, "sample_size": 6, "insufficient": true, "areas": null, "alternative_present": false, "alternative_precinct": null, "dimensions": ["时间"], "profile_tag": null, "time_note": false},
+      "l2": {"must_mention": ["布鲁克林高地", "数据不足"], "must_not_claim": ["布鲁克林高地的确定评级", "具体犯罪率数字"]}
+    },
+    {
+      "id": "G24",
+      "query": "带娃周末呢？",
+      "form": "detail_followup",
+      "scenario": "profile_sensitive",
+      "profile": {"crowd": "带娃"},
+      "context": {"base_query": "唐人街安全吗？"},
+      "expect": {"type": "safety", "precinct": 5, "rating": "red", "confidence_tier": "HIGH", "sample_size": 138, "insufficient": false, "areas": null, "alternative_present": false, "alternative_precinct": null, "dimensions": ["人群", "时间"], "profile_tag": "带娃", "time_note": false},
+      "l2": {"must_mention": ["唐人街", "带娃", "周末"], "must_not_claim": ["因为画像而改变的评级", "路径级安全结论"]}
+    },
+    {
+      "id": "G25",
+      "query": "上东区晚上安全吗？",
+      "form": "new_query",
+      "scenario": "normal",
+      "profile": null,
+      "context": null,
+      "expect": {"type": "safety", "precinct": 19, "rating": "green", "confidence_tier": "HIGH", "sample_size": 105, "insufficient": false, "areas": null, "alternative_present": false, "alternative_precinct": null, "dimensions": null, "profile_tag": null, "time_note": false},
+      "l2": {"must_mention": ["上东区"], "must_not_claim": ["路径级安全结论", "绝对安全"]}
+    },
+    {
+      "id": "G26",
+      "query": "Upper East Side 安全吗",
+      "form": "new_query",
+      "scenario": "normal",
+      "profile": null,
+      "context": null,
+      "expect": {"type": "safety", "precinct": 19, "rating": "green", "confidence_tier": "HIGH", "sample_size": 105, "insufficient": false, "areas": null, "alternative_present": false, "alternative_precinct": null, "dimensions": null, "profile_tag": null, "time_note": false},
+      "l2": {"must_mention": ["上东区"], "must_not_claim": ["路径级安全结论", "绝对安全"]}
+    },
+    {
+      "id": "G27",
+      "query": "上东区安全吗",
+      "form": "new_query",
+      "scenario": "profile_sensitive",
+      "profile": {"crowd": "晚归"},
+      "context": null,
+      "expect": {"type": "safety", "precinct": 19, "rating": "green", "confidence_tier": "HIGH", "sample_size": 105, "insufficient": false, "areas": null, "alternative_present": false, "alternative_precinct": null, "dimensions": null, "profile_tag": null, "time_note": true},
+      "l2": {"must_mention": ["上东区", "晚归人群的时间提示"], "must_not_claim": ["因为画像而改变的评级", "绝对安全"]}
+    },
+    {
+      "id": "G28",
+      "query": "上东区周末白天安全吗",
+      "form": "new_query",
+      "scenario": "normal",
+      "profile": null,
+      "context": null,
+      "expect": {"type": "safety", "precinct": 19, "rating": "green", "confidence_tier": "HIGH", "sample_size": 105, "insufficient": false, "areas": null, "alternative_present": false, "alternative_precinct": null, "dimensions": null, "profile_tag": null, "time_note": false},
+      "l2": {"must_mention": ["上东区"], "must_not_claim": ["路径级安全结论", "绝对安全"]}
+    },
+    {
+      "id": "G29",
+      "query": "上东区凌晨安全吗",
+      "form": "new_query",
+      "scenario": "normal",
+      "profile": null,
+      "context": null,
+      "expect": {"type": "safety", "precinct": 19, "rating": "green", "confidence_tier": "HIGH", "sample_size": 105, "insufficient": false, "areas": null, "alternative_present": false, "alternative_precinct": null, "dimensions": null, "profile_tag": null, "time_note": false},
+      "l2": {"must_mention": ["上东区"], "must_not_claim": ["路径级安全结论", "绝对安全"]}
+    },
+    {
+      "id": "G30",
+      "query": "UES 安全吗",
+      "form": "new_query",
+      "scenario": "normal",
+      "profile": null,
+      "context": null,
+      "expect": {"type": "safety", "precinct": 19, "rating": "green", "confidence_tier": "HIGH", "sample_size": 105, "insufficient": false, "areas": null, "alternative_present": false, "alternative_precinct": null, "dimensions": null, "profile_tag": null, "time_note": false},
+      "l2": {"must_mention": ["上东区"], "must_not_claim": ["路径级安全结论", "绝对安全"]}
+    },
+    {
+      "id": "G31",
+      "query": "法拉盛晚上安全吗？",
+      "form": "new_query",
+      "scenario": "normal",
+      "profile": null,
+      "context": null,
+      "expect": {"type": "safety", "precinct": 109, "rating": "yellow", "confidence_tier": "MODERATE", "sample_size": 94, "insufficient": false, "areas": null, "alternative_present": false, "alternative_precinct": null, "dimensions": null, "profile_tag": null, "time_note": false},
+      "l2": {"must_mention": ["法拉盛"], "must_not_claim": ["路径级安全结论", "绝对安全"]}
+    },
+    {
+      "id": "G32",
+      "query": "Flushing 安全吗",
+      "form": "new_query",
+      "scenario": "normal",
+      "profile": null,
+      "context": null,
+      "expect": {"type": "safety", "precinct": 109, "rating": "yellow", "confidence_tier": "MODERATE", "sample_size": 94, "insufficient": false, "areas": null, "alternative_present": false, "alternative_precinct": null, "dimensions": null, "profile_tag": null, "time_note": false},
+      "l2": {"must_mention": ["法拉盛"], "must_not_claim": ["路径级安全结论", "绝对安全"]}
+    },
+    {
+      "id": "G33",
+      "query": "法拉盛安全吗",
+      "form": "new_query",
+      "scenario": "profile_sensitive",
+      "profile": {"crowd": "留学生"},
+      "context": null,
+      "expect": {"type": "safety", "precinct": 109, "rating": "yellow", "confidence_tier": "MODERATE", "sample_size": 94, "insufficient": false, "areas": null, "alternative_present": false, "alternative_precinct": null, "dimensions": null, "profile_tag": "留学生", "time_note": false},
+      "l2": {"must_mention": ["法拉盛", "留学生相关建议"], "must_not_claim": ["因为画像而改变的评级", "绝对安全"]}
+    },
+    {
+      "id": "G34",
+      "query": "法拉盛地铁站附近安全吗",
+      "form": "new_query",
+      "scenario": "normal",
+      "profile": null,
+      "context": null,
+      "expect": {"type": "safety", "precinct": 109, "rating": "yellow", "confidence_tier": "MODERATE", "sample_size": 94, "insufficient": false, "areas": null, "alternative_present": false, "alternative_precinct": null, "dimensions": null, "profile_tag": null, "time_note": false},
+      "l2": {"must_mention": ["法拉盛"], "must_not_claim": ["路径级安全结论", "绝对安全"]}
+    },
+    {
+      "id": "G35",
+      "query": "法拉盛傍晚安全吗",
+      "form": "new_query",
+      "scenario": "normal",
+      "profile": null,
+      "context": null,
+      "expect": {"type": "safety", "precinct": 109, "rating": "yellow", "confidence_tier": "MODERATE", "sample_size": 94, "insufficient": false, "areas": null, "alternative_present": false, "alternative_precinct": null, "dimensions": null, "profile_tag": null, "time_note": false},
+      "l2": {"must_mention": ["法拉盛"], "must_not_claim": ["路径级安全结论", "绝对安全"]}
+    },
+    {
+      "id": "G36",
+      "query": "唐人街晚上安全吗？",
+      "form": "new_query",
+      "scenario": "normal",
+      "profile": null,
+      "context": null,
+      "expect": {"type": "safety", "precinct": 5, "rating": "red", "confidence_tier": "HIGH", "sample_size": 138, "insufficient": false, "areas": null, "alternative_present": false, "alternative_precinct": null, "dimensions": null, "profile_tag": null, "time_note": false},
+      "l2": {"must_mention": ["唐人街"], "must_not_claim": ["路径级安全结论", "绝对安全"]}
+    },
+    {
+      "id": "G37",
+      "query": "Chinatown 安全吗",
+      "form": "new_query",
+      "scenario": "normal",
+      "profile": null,
+      "context": null,
+      "expect": {"type": "safety", "precinct": 5, "rating": "red", "confidence_tier": "HIGH", "sample_size": 138, "insufficient": false, "areas": null, "alternative_present": false, "alternative_precinct": null, "dimensions": null, "profile_tag": null, "time_note": false},
+      "l2": {"must_mention": ["唐人街"], "must_not_claim": ["路径级安全结论", "绝对安全"]}
+    },
+    {
+      "id": "G38",
+      "query": "华埠安全吗",
+      "form": "new_query",
+      "scenario": "profile_sensitive",
+      "profile": {"crowd": "带娃"},
+      "context": null,
+      "expect": {"type": "safety", "precinct": 5, "rating": "red", "confidence_tier": "HIGH", "sample_size": 138, "insufficient": false, "areas": null, "alternative_present": false, "alternative_precinct": null, "dimensions": null, "profile_tag": "带娃", "time_note": false},
+      "l2": {"must_mention": ["唐人街", "带娃出行相关建议"], "must_not_claim": ["因为画像而改变的评级", "绝对安全"]}
+    },
+    {
+      "id": "G39",
+      "query": "唐人街安全吗",
+      "form": "new_query",
+      "scenario": "profile_sensitive",
+      "profile": {"crowd": "老人"},
+      "context": null,
+      "expect": {"type": "safety", "precinct": 5, "rating": "red", "confidence_tier": "HIGH", "sample_size": 138, "insufficient": false, "areas": null, "alternative_present": false, "alternative_precinct": null, "dimensions": null, "profile_tag": "老人", "time_note": false},
+      "l2": {"must_mention": ["唐人街", "老人出行相关建议"], "must_not_claim": ["因为画像而改变的评级", "绝对安全"]}
+    },
+    {
+      "id": "G40",
+      "query": "唐人街凌晨两点安全吗",
+      "form": "new_query",
+      "scenario": "normal",
+      "profile": null,
+      "context": null,
+      "expect": {"type": "safety", "precinct": 5, "rating": "red", "confidence_tier": "HIGH", "sample_size": 138, "insufficient": false, "areas": null, "alternative_present": false, "alternative_precinct": null, "dimensions": null, "profile_tag": null, "time_note": false},
+      "l2": {"must_mention": ["唐人街"], "must_not_claim": ["路径级安全结论", "绝对安全"]}
+    },
+    {
+      "id": "G41",
+      "query": "威廉斯堡晚上安全吗？",
+      "form": "new_query",
+      "scenario": "normal",
+      "profile": null,
+      "context": null,
+      "expect": {"type": "safety", "precinct": 90, "rating": "green", "confidence_tier": "HIGH", "sample_size": 101, "insufficient": false, "areas": null, "alternative_present": false, "alternative_precinct": null, "dimensions": null, "profile_tag": null, "time_note": false},
+      "l2": {"must_mention": ["威廉斯堡"], "must_not_claim": ["路径级安全结论", "绝对安全"]}
+    },
+    {
+      "id": "G42",
+      "query": "Williamsburg 安全吗",
+      "form": "new_query",
+      "scenario": "normal",
+      "profile": null,
+      "context": null,
+      "expect": {"type": "safety", "precinct": 90, "rating": "green", "confidence_tier": "HIGH", "sample_size": 101, "insufficient": false, "areas": null, "alternative_present": false, "alternative_precinct": null, "dimensions": null, "profile_tag": null, "time_note": false},
+      "l2": {"must_mention": ["威廉斯堡"], "must_not_claim": ["路径级安全结论", "绝对安全"]}
+    },
+    {
+      "id": "G43",
+      "query": "威廉斯堡安全吗",
+      "form": "new_query",
+      "scenario": "profile_sensitive",
+      "profile": {"crowd": "晚归"},
+      "context": null,
+      "expect": {"type": "safety", "precinct": 90, "rating": "green", "confidence_tier": "HIGH", "sample_size": 101, "insufficient": false, "areas": null, "alternative_present": false, "alternative_precinct": null, "dimensions": null, "profile_tag": null, "time_note": true},
+      "l2": {"must_mention": ["威廉斯堡", "晚归人群的时间提示"], "must_not_claim": ["因为画像而改变的评级", "绝对安全"]}
+    },
+    {
+      "id": "G44",
+      "query": "威廉斯堡周末安全吗",
+      "form": "new_query",
+      "scenario": "normal",
+      "profile": null,
+      "context": null,
+      "expect": {"type": "safety", "precinct": 90, "rating": "green", "confidence_tier": "HIGH", "sample_size": 101, "insufficient": false, "areas": null, "alternative_present": false, "alternative_precinct": null, "dimensions": null, "profile_tag": null, "time_note": false},
+      "l2": {"must_mention": ["威廉斯堡"], "must_not_claim": ["路径级安全结论", "绝对安全"]}
+    },
+    {
+      "id": "G45",
+      "query": "布鲁克林高地安全吗？",
+      "form": "new_query",
+      "scenario": "low_sample",
+      "profile": null,
+      "context": null,
+      "expect": {"type": "safety", "precinct": 84, "rating": "insufficient_data", "confidence_tier": null, "sample_size": 6, "insufficient": true, "areas": null, "alternative_present": false, "alternative_precinct": null, "dimensions": null, "profile_tag": null, "time_note": false},
+      "l2": {"must_mention": ["布鲁克林高地", "数据不足"], "must_not_claim": ["布鲁克林高地的确定评级", "具体犯罪率数字"]}
+    },
+    {
+      "id": "G46",
+      "query": "Brooklyn Heights 安全吗",
+      "form": "new_query",
+      "scenario": "low_sample",
+      "profile": null,
+      "context": null,
+      "expect": {"type": "safety", "precinct": 84, "rating": "insufficient_data", "confidence_tier": null, "sample_size": 6, "insufficient": true, "areas": null, "alternative_present": false, "alternative_precinct": null, "dimensions": null, "profile_tag": null, "time_note": false},
+      "l2": {"must_mention": ["布鲁克林高地", "数据不足"], "must_not_claim": ["布鲁克林高地的确定评级", "具体犯罪率数字"]}
+    },
+    {
+      "id": "G47",
+      "query": "布鲁克林 Heights 晚上安全吗",
+      "form": "new_query",
+      "scenario": "low_sample",
+      "profile": null,
+      "context": null,
+      "expect": {"type": "safety", "precinct": 84, "rating": "insufficient_data", "confidence_tier": null, "sample_size": 6, "insufficient": true, "areas": null, "alternative_present": false, "alternative_precinct": null, "dimensions": null, "profile_tag": null, "time_note": false},
+      "l2": {"must_mention": ["布鲁克林高地", "数据不足"], "must_not_claim": ["布鲁克林高地的确定评级", "具体犯罪率数字"]}
+    },
+    {
+      "id": "G48",
+      "query": "布鲁克林高地周末安全吗",
+      "form": "new_query",
+      "scenario": "low_sample",
+      "profile": null,
+      "context": null,
+      "expect": {"type": "safety", "precinct": 84, "rating": "insufficient_data", "confidence_tier": null, "sample_size": 6, "insufficient": true, "areas": null, "alternative_present": false, "alternative_precinct": null, "dimensions": null, "profile_tag": null, "time_note": false},
+      "l2": {"must_mention": ["布鲁克林高地", "数据不足"], "must_not_claim": ["布鲁克林高地的确定评级", "具体犯罪率数字"]}
+    },
+    {
+      "id": "G49",
+      "query": "唐人街和威廉斯堡哪个更安全？",
+      "form": "new_query",
+      "scenario": "normal",
+      "profile": null,
+      "context": null,
+      "expect": {"type": "comparison", "precinct": null, "rating": null, "confidence_tier": null, "sample_size": null, "insufficient": false, "areas": [{"precinct": 5, "rating": "red"}, {"precinct": 90, "rating": "green"}], "alternative_present": false, "alternative_precinct": null, "dimensions": null, "profile_tag": null, "time_note": false},
+      "l2": {"must_mention": ["唐人街", "威廉斯堡"], "must_not_claim": ["长期趋势对比数据", "路径级安全结论"]}
+    },
+    {
+      "id": "G50",
+      "query": "法拉盛还是上东区更安全",
+      "form": "new_query",
+      "scenario": "normal",
+      "profile": null,
+      "context": null,
+      "expect": {"type": "comparison", "precinct": null, "rating": null, "confidence_tier": null, "sample_size": null, "insufficient": false, "areas": [{"precinct": 109, "rating": "yellow"}, {"precinct": 19, "rating": "green"}], "alternative_present": false, "alternative_precinct": null, "dimensions": null, "profile_tag": null, "time_note": false},
+      "l2": {"must_mention": ["法拉盛", "上东区"], "must_not_claim": ["长期趋势对比数据", "路径级安全结论"]}
+    }
+  ]
+}
