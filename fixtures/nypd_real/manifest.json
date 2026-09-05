@@ -1,0 +1,20 @@
+{
+  "dataset_id": "qgea-i56i",
+  "source_url": "https://data.cityofnewyork.us/resource/qgea-i56i.json",
+  "fetched_at": "2026-09-05T16:57:09",
+  "window_start": "2025-09-05",
+  "window_end_exclusive": "2026-09-05",
+  "precincts": [
+    5,
+    19,
+    84,
+    90,
+    109
+  ],
+  "fetched_count": 11770,
+  "accepted_count": 11770,
+  "rejected_count": 0,
+  "rejection_counts": {},
+  "rejected_report": "rejected.csv",
+  "provenance": "NYC Open Data (Socrata) dataset qgea-i56i; adapter 单向管道 scripts/fetch_nypd.py；运行时零外部调用"
+}

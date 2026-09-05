@@ -247,6 +247,21 @@ intel:
   unverified_label: "未核实到"
 
 # ============================================================================
+# 真实数据 adapter（issue 05 / M2，spec v2）：Socrata 单向管道配置。
+# 运行方式：手动/月更离线脚本 scripts/fetch_nypd.py；运行时（产品代码）
+# 永不直连外部 API。数据集 ID 以下载前核验的门户页面实际 URL 为准
+# （resource-manifest §D 下载前核验规则）。
+# ============================================================================
+data_source:
+  socrata_base_url: "https://data.cityofnewyork.us/resource"
+  nypd_dataset_id: "qgea-i56i"     # D1 NYPD Complaint Data Historic
+  output_dir: "fixtures/nypd_real"
+  recorded_response: "tests/fixtures/socrata_response.json"
+  request_timeout_seconds: 30
+  page_limit: 50000                # Socrata 单次请求行数
+  page_limit_max: 50000            # Socrata 单次请求行数硬上限（平台约束，校验 page_limit 用）
+
+# ============================================================================
 # L2 LLM-as-judge 评估套件（issue 03 / M1，spec v2「L2」节）：
 # judge = dev 模型（DashScope Qwen，考官考生同源）；judge 调用走 cassette
 # 离线回放（tests/cassettes/l2_judge.json，录制入口 scripts/record_l2_cassette.py，

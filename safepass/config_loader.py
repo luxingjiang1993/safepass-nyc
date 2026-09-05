@@ -16,8 +16,10 @@ from typing import Any
 
 import yaml
 
-# config/app.yaml 相对本文件：safepass/config_loader.py -> 项目根/config/app.yaml
-DEFAULT_CONFIG_PATH = Path(__file__).resolve().parent.parent / "config" / "app.yaml"
+# 项目根：safepass/config_loader.py -> 项目根
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
+# config/app.yaml 相对项目根
+DEFAULT_CONFIG_PATH = PROJECT_ROOT / "config" / "app.yaml"
 
 
 class ConfigError(RuntimeError):
@@ -177,6 +179,26 @@ class IntelConfig:
 
 
 @dataclass(frozen=True)
+class DataSourceConfig:
+    """真实数据 adapter 配置（issue 05 / M2，spec v2）：Socrata 单向管道。
+
+    socrata_base_url / nypd_dataset_id：来源接入点（数据集 ID 以门户页面实际
+    URL 为准，resource-manifest §D 核验规则）；output_dir：入库产物目录；
+    recorded_response：Socrata 响应录制 fixture（测试离线回放，零真实调用）；
+    request_timeout_seconds / page_limit：脚本级请求参数（page_limit 上限
+    为 Socrata 单次请求的平台约束，单一事实源 = page_limit_max）。
+    """
+
+    socrata_base_url: str
+    nypd_dataset_id: str
+    output_dir: str
+    recorded_response: str
+    request_timeout_seconds: int
+    page_limit: int
+    page_limit_max: int
+
+
+@dataclass(frozen=True)
 class EvalConfig:
     """L2 LLM-as-judge 评估套件配置（issue 03 / M1，spec v2「L2」节）。
 
@@ -213,6 +235,7 @@ class AppConfig:
     guardrails: GuardrailsConfig
     profile: ProfileConfig
     intel: IntelConfig
+    data_source: DataSourceConfig
     eval: EvalConfig
 
 
@@ -468,6 +491,31 @@ def load_config(path: str | Path | None = None) -> AppConfig:
     if not intel.unverified_label.strip():
         raise ConfigError("intel.unverified_label 不得为空（F7-3 未记载项统一标注）")
 
+    data_source_raw = _require(data, "data_source", "root")
+    data_source = DataSourceConfig(
+        socrata_base_url=str(_require(data_source_raw, "socrata_base_url", "data_source")),
+        nypd_dataset_id=str(_require(data_source_raw, "nypd_dataset_id", "data_source")),
+        output_dir=str(_require(data_source_raw, "output_dir", "data_source")),
+        recorded_response=str(_require(data_source_raw, "recorded_response", "data_source")),
+        request_timeout_seconds=int(
+            _require(data_source_raw, "request_timeout_seconds", "data_source")
+        ),
+        page_limit=int(_require(data_source_raw, "page_limit", "data_source")),
+        page_limit_max=int(_require(data_source_raw, "page_limit_max", "data_source")),
+    )
+    for field_name in (
+        "socrata_base_url",
+        "nypd_dataset_id",
+        "output_dir",
+        "recorded_response",
+    ):
+        if not getattr(data_source, field_name).strip():
+            raise ConfigError(f"data_source.{field_name} 不得为空（adapter 来源/落盘路径）")
+    if data_source.request_timeout_seconds <= 0:
+        raise ConfigError("data_source.request_timeout_seconds 必须为正")
+    if not (0 < data_source.page_limit <= data_source.page_limit_max):
+        raise ConfigError("data_source.page_limit 必须在 (0, page_limit_max]（Socrata 平台硬上限）")
+
     eval_raw = _require(data, "eval", "root")
     prompt_versions_raw = _require(eval_raw, "prompt_versions", "eval")
     if not isinstance(prompt_versions_raw, dict) or not prompt_versions_raw:
@@ -508,6 +556,7 @@ def load_config(path: str | Path | None = None) -> AppConfig:
         guardrails=guardrails,
         profile=profile,
         intel=intel,
+        data_source=data_source,
         eval=eval_cfg,
     )
 

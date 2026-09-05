@@ -70,7 +70,7 @@
 
 | # | 数据集 | 链接 | MVP 用途 | 状态 |
 |---|--------|------|---------|------|
-| D1 | NYPD Complaint Data Historic | `https://data.cityofnewyork.us/Public-Safety/NYPD-Complaint-Data-Historic/qgea-i56i`（Socrata API: `https://data.cityofnewyork.us/resource/qgea-i56i.json`） | C1 字段结构规范（犯罪类型/警区/时间戳字段命名对齐） | ☐ |
+| D1 | NYPD Complaint Data Historic | `https://data.cityofnewyork.us/Public-Safety/NYPD-Complaint-Data-Historic/qgea-i56i`（Socrata API: `https://data.cityofnewyork.us/resource/qgea-i56i.json`） | C1 字段结构规范（犯罪类型/警区/时间戳字段命名对齐）；Phase 2 票 05 起经 adapter 真实入库 | ✅ 已接入（2026-09-05，见 §G） |
 | D2 | NYPD Complaint Data Current (YTD) | `https://data.cityofnewyork.us/Public-Safety/NYPD-Complaint-Data-Current-Year-to-Date-/5uac-w243`（ID 待下载前核验） | 同上，现行年度格式 | ☐ |
 | D3 | NYPD 警局列表（precinct 地址电话） | `https://www.nyc.gov/site/nypd/bureaus/patrol/precincts-landing.page` | C2 警局条目官方来源（19/109/5/90/84 各警局页） | ☐ |
 | D4 | NYPD Hate Crimes | 门户搜索 `https://data.cityofnewyork.us/browse?q=NYPD%20Hate%20Crimes`（数据集 ID 未核验，以门户搜索结果为准，勿硬记 ID） | C3 仇恨犯罪记载的结构参考 | ☐ |
@@ -115,6 +115,8 @@
 | C3 知识文档 15 篇 | 人工撰写 | §C3 目录 + 护栏 | `fixtures/knowledge/*.md` | ✅ 已撰写 | 2026-09-04 |
 | C3 检索索引 | 生成 | FAISS+BM25 构建脚本 `scripts/build_index.py` | `fixtures/index/` | ✅ 已生成 | 2026-09-04 |
 | D1 字段规范参考 | 下载 | §D 链接 | `data/reference/nypd_complaint_schema.txt` | ☐ 未开始 | |
+| D1 真实 NYPD 数据集 | 下载 | Socrata adapter `scripts/fetch_nypd.py`（单向管道，手动/月更） | `fixtures/nypd_real/`（real_nypd.csv + manifest.json + rejected.csv；窗口 2025-09-05 至 2026-09-05，5 覆盖警区 11,770 条） | ✅ 已入库 | 2026-09-05 |
+| D1 Socrata 响应录制 | 录制 | `scripts/fetch_nypd.py --record-fixture`（真实网络一次性；字段投影 7 列，值原样） | `tests/fixtures/socrata_response.json`（2.8MB，测试离线回放） | ✅ 已录制 | 2026-09-05 |
 
 **变更日志**
 
@@ -122,3 +124,4 @@
 |------|------|
 | 2026-09-04 | 初版（v1.0）：B–G 六节，T0 三件套与外部源全部登记 |
 | 2026-09-04 | §G 登记 T0 完成：三件套落盘 `fixtures/`（nypd / safe_places / knowledge / index），自检集 `tests/test_fixtures.py` 32 项全绿；config 的 city_mean_per_100k 已回填 144.6328 |
+| 2026-09-05 | §G 登记 D1 真实入库（票 05 / M2）：adapter 单向管道落盘 `fixtures/nypd_real/`（来源标注齐，真实数据无 population 字段、不编造）；Socrata 响应录制 fixture 供测试离线回放 |
