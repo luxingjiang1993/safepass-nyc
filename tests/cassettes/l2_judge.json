@@ -1,0 +1,1054 @@
+{
+  "interactions": [
+    {
+      "fingerprint": "4b3f5f7b890ac0e6be03b8f761e15e58f71cb1848cf3abbba6b7ab6e2e9f932f",
+      "response": {
+        "content": "{\"score\": 1.0, \"reason\": \"回答中未出现任何犯罪数据性结论（如安全评级、案件数、犯罪率等），所有事实性陈述均符合证据内容。警区号识别与「不在覆盖范围」说明属于合规内容，通用建议、紧急资源和覆盖区域重选邀请也符合规则要求。\"}",
+        "model": "qwen-turbo"
+      }
+    },
+    {
+      "fingerprint": "04e80f95508275036d783b8a42361d50a9047e4bfb56c852ae5a0024cec8ae97",
+      "response": {
+        "content": "{\"hallucinated\": false, \"reason\": \"回答中未出现禁止声明中的断言，且明确说明该区域不在数据覆盖范围内，符合判定规则。\"}",
+        "model": "qwen-turbo"
+      }
+    },
+    {
+      "fingerprint": "246f4f30fd1a0f3585980fc983f9dfec3fc32907872a13c874b961f8b2cf998c",
+      "response": {
+        "content": "{\"score\": 1.0, \"reason\": \"回答直接回应了用户查询，明确指出「该区域不在我们的数据覆盖范围」，并提供了相关建议和可选覆盖区域，符合判定规则。\"}",
+        "model": "qwen-turbo"
+      }
+    },
+    {
+      "fingerprint": "d4e0d30587eb39327cb71fb0d7449c26f3539cf9edcb8006dfa07fe1b146a549",
+      "response": {
+        "content": "{\"score\": 1.0, \"reason\": \"回答中未出现任何犯罪数据性结论（如安全评级、案件数、犯罪率等），所有陈述均符合【证据】的降级状态说明。警区号识别与「不在覆盖范围」说明属于合规内容，通用建议、紧急资源和覆盖区域重选邀请也符合规则允许范围。因此，所有事实性陈述均被【证据】支持或不构成事实性声明。\"}",
+        "model": "qwen-turbo"
+      }
+    },
+    {
+      "fingerprint": "4603e2e26d99eb8fffb76a61bdd858ddf64b849d4a0a8fadeb607b314f83ac9a",
+      "response": {
+        "content": "{\"hallucinated\": false, \"reason\": \"回答中未出现禁止声明中的断言，且符合证据标注的降级/越界情况。回答明确说明了「中城」不在数据覆盖范围内，并提到其跨越多个警区，符合 must_mention 的要求，未提供任何犯罪数据性结论，因此不构成幻觉。\"}",
+        "model": "qwen-turbo"
+      }
+    },
+    {
+      "fingerprint": "856e36b8b00a091c5027b371185e28775d642ea6ae6d72af68a1e0485737fca9",
+      "response": {
+        "content": "{\"score\": 1.0, \"reason\": \"回答直接回应了用户查询，明确指出中城不在数据覆盖范围内，并说明其跨越多个警区。同时提供了诚实说明和通用建议，符合判定规则。所有必须覆盖的关键信息均被涵盖。\"}",
+        "model": "qwen-turbo"
+      }
+    },
+    {
+      "fingerprint": "eaff1e6d2acd5b06deeb902482c9f753f6ad8d5fc910043c1753c66a5daca89c",
+      "response": {
+        "content": "{\"score\": 1.0, \"reason\": \"回答中未出现任何事实性陈述（如安全评级、案件数、犯罪率等），所有内容均为合规的说明性话术、通用建议、紧急资源和替代区域邀请。根据判定规则，证据标注为降级/越界时，回答中允许出现警区号识别与「不在覆盖范围」说明，以及通用建议、紧急资源、覆盖区域重选邀请和免责声明，这些内容均符合规则要求，未出现与证据矛盾的声明。\"}",
+        "model": "qwen-turbo"
+      }
+    },
+    {
+      "fingerprint": "89e4c257a4cee166f1a569c0d6dbac1c91fba2627e47a06b8e098a5584810fe4",
+      "response": {
+        "content": "{\"hallucinated\": false, \"reason\": \"回答中未出现禁止声明中的断言，且明确说明该区域不在数据覆盖范围内，符合判定规则。\"}",
+        "model": "qwen-turbo"
+      }
+    },
+    {
+      "fingerprint": "3ecc04596e621f6a98d0f18623dafe872af6f8f8a4160adcc7b4b66594abf870",
+      "response": {
+        "content": "{\"score\": 1.0, \"reason\": \"回答直接回应了用户查询，明确说明了哥伦比亚大学附近不在数据覆盖范围内，并提供了相关建议和可选区域，符合判定规则。\"}",
+        "model": "qwen-turbo"
+      }
+    },
+    {
+      "fingerprint": "2f3fa45526763822b93968ea315bb524ee66a52ca96c79c567f57c8c897e1aa6",
+      "response": {
+        "content": "{\"score\": 1.0, \"reason\": \"回答中未出现任何犯罪数据性结论（如安全评级、案件数、犯罪率等），仅包含合规的说明性话术、替代区域推荐、通用建议和紧急资源信息，均符合证据中的降级状态描述。警区号识别与「不在覆盖范围」说明属于允许内容，未违反判定规则。\"}",
+        "model": "qwen-turbo"
+      }
+    },
+    {
+      "fingerprint": "443bba625697cd5ae8e967b9fcc18b05fc19f69f95058fc8ac40d8df1e61a5af",
+      "response": {
+        "content": "{\"hallucinated\": false, \"reason\": \"回答中未出现禁止声明中的断言，且明确说明该区域不在数据覆盖范围内，符合判定规则。\"}",
+        "model": "qwen-turbo"
+      }
+    },
+    {
+      "fingerprint": "4d894421e798b0b13b44096c368a80dc0c8a307253e7680087f879d6d1b8fe73",
+      "response": {
+        "content": "{\"score\": 1.0, \"reason\": \"回答直接回应了用户查询，明确说明了该区域不在数据覆盖范围内，并提供了相关建议和可选覆盖区域，符合判定规则。\"}",
+        "model": "qwen-turbo"
+      }
+    },
+    {
+      "fingerprint": "4ad66f3de4e12fbca4ba9a3171ab25b87ce770b61b52f18c14006bec45a20880",
+      "response": {
+        "content": "{\"score\": 1.0, \"reason\": \"回答中未出现任何犯罪数据性结论（如安全评级、案件数、犯罪率等），仅包含合规的说明性话术、警区号识别、覆盖区域重选邀请、通用建议和紧急资源信息，均符合证据中的降级状态描述。所有事实性陈述均未超出证据允许的范围，因此全部支持。\"}",
+        "model": "qwen-turbo"
+      }
+    },
+    {
+      "fingerprint": "ff65143c5882d471afc17f4a8ad7bb687d623640dc7824f5fc597ebcc944862f",
+      "response": {
+        "content": "{\"hallucinated\": false, \"reason\": \"回答中未出现禁止声明中的断言，且明确说明了「Midtown」不在数据覆盖范围内，并提及了其跨越多个警区，符合 must_mention 要求，未提供任何犯罪数据性结论，因此不构成幻觉。\"}",
+        "model": "qwen-turbo"
+      }
+    },
+    {
+      "fingerprint": "0354718e8c92f6bf7db2ea2f2f65e5454feb13796aa6ce6f5089edfeb68c0770",
+      "response": {
+        "content": "{\"score\": 1.0, \"reason\": \"回答直接回应了用户查询，明确指出中城不在数据覆盖范围内，并说明其跨越多个警区。同时提供了诚实说明和通用建议，符合判定规则。所有必须覆盖的关键信息均被涵盖。\"}",
+        "model": "qwen-turbo"
+      }
+    },
+    {
+      "fingerprint": "917c8c59e4d0ad21af7ffd4ca9f613cf0435a9110090b1f51b94d52e9098f815",
+      "response": {
+        "content": "{\"score\": 0.0, \"reason\": \"1. 回答中提到的『法拉盛』的警区号为109，与证据中的precinct字段一致，但证据显示该区域属于降级/越界查询，系统无该区域犯罪数据，因此回答中出现的『rating: yellow』、『day_night: {day: 58, night: 36}』、『sample_size: 94』等事实性陈述均无证据支持，构成矛盾。2. 回答中未提及中城的具体警区号或数据情况，但声明『中城跨越多个警区（14/18），无法按警区建模，不在我们的数据覆盖范围内』，此为合规说明，不扣分。3. 回答中包含的通用建议、紧急资源、重选邀请等内容符合规则第4条，不扣分。4. 回答中所有犯罪数据性结论（如评级、样本量、昼夜分布等）均与证据矛盾，因此整体评分0.0。\"}",
+        "model": "qwen-turbo"
+      }
+    },
+    {
+      "fingerprint": "1b9a4f69c0a4efdec39583ecb1f4c8977629c888e6765a9ee226fe1361b5ac0a",
+      "response": {
+        "content": "{\"hallucinated\": false, \"reason\": \"回答中未出现禁止声明中的断言，且未提供中城与法拉盛的对比结论或中城的犯罪统计数据，符合规则。\"}",
+        "model": "qwen-turbo"
+      }
+    },
+    {
+      "fingerprint": "c849f7079c5c469feb4a6ed5cba347bef1aae917cba29086dc78d22229f7c2b9",
+      "response": {
+        "content": "{\"score\": 1.0, \"reason\": \"回答直接回应了用户查询，明确指出中城不在数据覆盖范围内，并提供了法拉盛的真实评级作为替代信息，符合必须覆盖的关键信息要求。\"}",
+        "model": "qwen-turbo"
+      }
+    },
+    {
+      "fingerprint": "01cf928a03089618c1b6e4dae0554cfb8fbff87b3dcc20fc64e7ea3671aa4ce5",
+      "response": {
+        "content": "{\"score\": 1.0, \"reason\": \"回答中未出现任何事实性陈述（如安全评级、案件数、犯罪率等），所有内容均符合判定规则。回答中包含的警区号识别与「不在覆盖范围」说明属于合规内容，且未出现任何与证据矛盾的犯罪数据性结论。通用建议、紧急资源、覆盖区域重选邀请和免责声明均被允许存在，不构成矛盾。\"}",
+        "model": "qwen-turbo"
+      }
+    },
+    {
+      "fingerprint": "b19d78cc4d9ce15be1c754e8511a5871fdc3d8358afd6ce7969d8bfaa6655446",
+      "response": {
+        "content": "{\"hallucinated\": false, \"reason\": \"回答中未出现禁止声明中的任何断言，且符合证据标注的降级/越界情况，仅说明无法提供安全分析，并提供了替代信息和建议，未涉及时代广场的犯罪数据或安全评级。\"}",
+        "model": "qwen-turbo"
+      }
+    },
+    {
+      "fingerprint": "b153c8bf1bb90e57168d1819824eedf18dcb80fea119abde8471be4b49802f3c",
+      "response": {
+        "content": "{\"score\": 1.0, \"reason\": \"回答直接回应了用户查询，明确指出未能识别出时代广场的具体区域，无法提供安全分析，并提供了相关建议和覆盖区域选项，符合判定规则。\"}",
+        "model": "qwen-turbo"
+      }
+    },
+    {
+      "fingerprint": "4fb2e9b5306db8dcd06dea7c1e7ebd2a1e5f6abcc1e10eac8d52ce11fcf060ae",
+      "response": {
+        "content": "{\"score\": 1.0, \"reason\": \"回答中未出现任何与证据矛盾的事实性陈述。所有内容均符合判定规则，包括警区号识别、不在覆盖范围说明、通用建议、紧急资源、覆盖区域重选邀请等，均属于允许范围内。\"}",
+        "model": "qwen-turbo"
+      }
+    },
+    {
+      "fingerprint": "476c59b2e93ad8227b86d681d2eade17fb900a777a1258d3710ba935a0496a39",
+      "response": {
+        "content": "{\"hallucinated\": false, \"reason\": \"回答中未出现禁止声明中的任何具体断言，且明确说明该区域不在数据覆盖范围内，符合判定规则。\"}",
+        "model": "qwen-turbo"
+      }
+    },
+    {
+      "fingerprint": "7fd9629945bbbc0ea8f092e4f63fe61fa110af13ece957f4cd1c9fbd6a8ea8f6",
+      "response": {
+        "content": "{\"score\": 0.8, \"reason\": \"回答直接回应了用户查询，说明了哥大附近不在数据覆盖范围内，并提供了通用建议和紧急资源。但未明确提到‘该区域不在我们的数据覆盖范围’这一关键信息，因此略有扣分。\"}",
+        "model": "qwen-turbo"
+      }
+    },
+    {
+      "fingerprint": "873bd797b14b75f0d87a4b143670252ede8cf32a05e308db13a95c012018363f",
+      "response": {
+        "content": "{\"score\": 1.0, \"reason\": \"回答中的事实性陈述均未涉及犯罪数据性结论，仅包含合规的『不在覆盖范围』说明、警区号识别、通用建议、紧急资源和覆盖区域重选邀请。这些内容均符合【证据】中降级查询的处理规则，且无与证据矛盾的声明。\"}",
+        "model": "qwen-turbo"
+      }
+    },
+    {
+      "fingerprint": "473a6996a72f90b020e56df990dfd9aec1f204876a53147809bfec399cd4fc1e",
+      "response": {
+        "content": "{\"hallucinated\": false, \"reason\": \"回答中未出现禁止声明中的任何完整断言，且明确说明了「中城不在我们的数据覆盖范围」，符合 must_mention 要求，未提供犯罪统计数据或安全评级，因此不构成幻觉。\"}",
+        "model": "qwen-turbo"
+      }
+    },
+    {
+      "fingerprint": "c76d32951f6fb952daf0ac3bdf553a18d9afed32ee95bffbe832e311d28d5535",
+      "response": {
+        "content": "{\"score\": 1.0, \"reason\": \"回答直接回应了用户查询，明确说明了「中城」不在数据覆盖范围内，并提供了重新选择的建议，同时补充了通用安全建议。关键信息「中城不在我们的数据覆盖范围」被直接提及，未涉及犯罪统计数据或安全评级，符合判定规则。\"}",
+        "model": "qwen-turbo"
+      }
+    },
+    {
+      "fingerprint": "2aa5444407261a41c081f966c4e79305782402a9f905ce841e436699e0660f62",
+      "response": {
+        "content": "{\"score\": 1.0, \"reason\": \"回答中未出现任何事实性陈述（如安全评级、案件数、犯罪率等），所有内容均为合规性说明、通用建议、紧急资源和区域重选邀请，符合【证据】标注为降级/越界时的允许范围。\"}",
+        "model": "qwen-turbo"
+      }
+    },
+    {
+      "fingerprint": "5f10a679ccda0eaef2b95aba055696bd4b34fbed947151b89ca0b5a39bc099b8",
+      "response": {
+        "content": "{\"hallucinated\": false, \"reason\": \"回答中未出现禁止声明中的任何断言，且符合证据标注的降级/越界情况，仅说明无法提供上西区的安全分析，并提供了替代信息和建议，未涉及犯罪数据性结论。\"}",
+        "model": "qwen-turbo"
+      }
+    },
+    {
+      "fingerprint": "f9a8f3de61b185e3eeb4ce771bdb8e3152ead259e10bf8f54a929ff9d5671663",
+      "response": {
+        "content": "{\"score\": 0.8, \"reason\": \"回答直接指出未能识别出查询中的具体区域，符合用户查询意图。关键信息中‘未能识别出查询中的具体区域’被覆盖，但未提及‘上西区的犯罪统计数据’和‘给出上西区的安全评级’，属于合理降分。回答提供了应急资源和一般建议，符合降级查询的诚实说明要求。\"}",
+        "model": "qwen-turbo"
+      }
+    },
+    {
+      "fingerprint": "aeac9ae9eca84b5594cc49ac5dc8a0ce50032c433cd61b8ceb0c831f007635fd",
+      "response": {
+        "content": "{\"score\": 1.0, \"reason\": \"1. 安全评级：唐人街为红色，威廉斯堡为绿色，与证据一致。2. 样本量：唐人街样本量138，威廉斯堡101，与证据一致。3. 警区号：唐人街为5，威廉斯堡为90，与证据一致。4. top5案件类型：唐人街的top5案件类型与证据一致；威廉斯堡的top5案件类型与证据一致。5. 昼夜分布：唐人街白天91，夜间47；威廉斯堡白天58，夜间43，与证据一致。6. 时间范围：证据中时间范围为2025-07-01至2026-07-01，回答未直接提及时间范围，因此不构成矛盾。7. 其他声明（如决策辅助内容）属于建议类话术，不参与事实性判定。\"}",
+        "model": "qwen-turbo"
+      }
+    },
+    {
+      "fingerprint": "cfa220237a2e7618e419bf3dfe4d659b11e072d0a0cdd1ad8c21d80c461b7f9c",
+      "response": {
+        "content": "{\"hallucinated\": false, \"reason\": \"回答中未出现与证据矛盾的事实性声明，且未包含禁止声明中的内容。回答中提到的‘长期趋势对比维度仍在开发中，暂不提供’属于对信息的说明，不构成对该信息的声称。同时，回答中包含了必须覆盖的关键信息‘唐人街’和‘威廉斯堡’。\"}",
+        "model": "qwen-turbo"
+      }
+    },
+    {
+      "fingerprint": "ff15372dd97c54c10d1c0a2afc05ddb4bdd46a511c96a24dce0fc381e059f2a5",
+      "response": {
+        "content": "{\"score\": 1.0, \"reason\": \"回答直接回应了用户查询，对比了唐人街和威廉斯堡的安全数据，并覆盖了必须提及的两个区域。未涉及长期趋势对比数据或路径级安全结论，符合要求。\"}",
+        "model": "qwen-turbo"
+      }
+    },
+    {
+      "fingerprint": "e6f37dc13d126602f98a2303e417e0c022743f9f7aeca6996da546e470c0eaac",
+      "response": {
+        "content": "{\"score\": 0.8, \"reason\": \"1. 安全评级：上东区为green，法拉盛为yellow，与证据一致。2. 样本量：上东区105，法拉盛94，与证据一致。3. 警区号：上东区为19，法拉盛为109，与证据一致。4. top5案件类型：上东区的CRIMINAL MISCHIEF、MISDEMEANOR ASSAULT、PETIT LARCENY、HARRASSMENT 2、FELONY ASSAULT，法拉盛的PETIT LARCENY、BURGLARY、CRIMINAL MISCHIEF、ROBBERY、HARRASSMENT 2，与证据一致。5. 昼夜分布：上东区day62，night43；法拉盛day58，night36，与证据一致。6. 决策建议中提到‘夜间出行’，但未明确说明法拉盛夜间案件占比更低，因此存在轻微不准确。\"}",
+        "model": "qwen-turbo"
+      }
+    },
+    {
+      "fingerprint": "7701d28c71978d059d933769e534bf3f62551451ba365ea11790aa3c69c9d518",
+      "response": {
+        "content": "{\"hallucinated\": false, \"reason\": \"回答中未出现与证据矛盾的事实性声明，且未包含禁止声明中的内容。回答中提到的区域名称（上东区、法拉盛）与证据一致，未涉及长期趋势对比数据或路径级安全结论，符合判定规则。\"}",
+        "model": "qwen-turbo"
+      }
+    },
+    {
+      "fingerprint": "9c0aa6d9b5edf3bae109377131ca62e9f27df24d398ea47a38988abd630b845c",
+      "response": {
+        "content": "{\"score\": 1.0, \"reason\": \"回答直接回应了用户查询，对比了上东区和法拉盛的安全情况，覆盖了必须提及的‘上东区’和‘法拉盛’。未涉及‘长期趋势对比数据’和‘路径级安全结论’，符合要求。\"}",
+        "model": "qwen-turbo"
+      }
+    },
+    {
+      "fingerprint": "5646d6f827fea24223228ed75a7f73a25732ffe518a9927503742c7ab3dde78a",
+      "response": {
+        "content": "{\"score\": 1.0, \"reason\": \"1. 安全评级：法拉盛为黄色，唐人街为红色，与证据一致。2. 样本量：法拉盛为94，唐人街为138，与证据一致。3. 警区号：法拉盛为109，唐人街为5，与证据一致。4. top5 案件类型：法拉盛的 PETIT LARCENY（20）、BURGLARY（14）、CRIMINAL MISCHIEF（13）、ROBBERY（13）、HARRASSMENT 2（9）；唐人街的 CRIMINAL MISCHIEF（27）、HARRASSMENT 2（20）、PETIT LARCENY（19）、BURGLARY（16）、GRAND LARCENY（16），与证据一致。5. 昼夜分布：法拉盛白天58，夜晚36；唐人街白天91，夜晚47，与证据一致。6. 时间范围：2025-07-01 至 2026-07-01，与证据一致。所有事实性陈述均在证据中找到依据，无矛盾。\"}",
+        "model": "qwen-turbo"
+      }
+    },
+    {
+      "fingerprint": "c9d9bb9b6c84b26cefcd078e38c5672898ef4056004a3e8cdecbaf538190e44f",
+      "response": {
+        "content": "{\"hallucinated\": false, \"reason\": \"回答中未出现与证据矛盾的事实性声明，且未包含禁止声明中的断言。所有信息均基于证据内容，且覆盖了必须提及的关键信息。\"}",
+        "model": "qwen-turbo"
+      }
+    },
+    {
+      "fingerprint": "a2cd4f502b3fcd93aacea22433f925e4aee2a7b004ae93e72962699a5916186c",
+      "response": {
+        "content": "{\"score\": 1.0, \"reason\": \"回答直接回应了用户关于法拉盛和唐人街的比较查询，覆盖了必须提及的‘法拉盛’和‘唐人街’，未涉及禁止的内容，符合判定规则。\"}",
+        "model": "qwen-turbo"
+      }
+    },
+    {
+      "fingerprint": "1522f09de47d899faea73187b7b19bbe06697083e76e29741ab80ebb5a960d82",
+      "response": {
+        "content": "{\"score\": 0.5, \"reason\": \"1. 回答中提到的 '威廉斯堡' 在证据中未出现，因此无法验证其相关数据。2. 回答中 '布鲁克林高地' 的数据与证据中的 '布鲁克林 Heights' 数据一致，包括警区号（84）、样本量（6）、昼夜分布（day:5, night:1）和 top5 案件类型，但 '布鲁克林高地' 的评级为 'insufficient_data'，而证据中该区域的 'rating' 字段为 'green'，存在矛盾。3. 回答中未提及时间范围，但证据中明确给出 '2025-07-01 至 2026-07-01'，此信息未在回答中体现，属于缺失而非矛盾。4. 回答中 'overall_rating' 和 'top_offense_types' 等维度与证据一致，但 'rating' 存在不一致。\"}",
+        "model": "qwen-turbo"
+      }
+    },
+    {
+      "fingerprint": "01642b2235b8583e786d15ed7c129e57056e0fc2b6323b97a5b412d40b322564",
+      "response": {
+        "content": "{\"hallucinated\": true, \"reason\": \"回答中包含禁止声明中的具体断言，即「布鲁克林高地数据不足」，该表述与禁止声明中的『必须覆盖的关键信息』一致，但根据规则2，若回答中出现禁止声明中的具体断言文本（含近义改写），则判定为幻觉。\"}",
+        "model": "qwen-turbo"
+      }
+    },
+    {
+      "fingerprint": "d156ff061abd2344965fda6f677a793446b8e70265cc217d7109dea4a8d6f8c6",
+      "response": {
+        "content": "{\"score\": 1.0, \"reason\": \"回答直接回应了用户查询，对比了威廉斯堡和布鲁克林高地的数据，并明确提到布鲁克林高地数据不足，符合必须覆盖的关键信息要求。\"}",
+        "model": "qwen-turbo"
+      }
+    },
+    {
+      "fingerprint": "3373b2914d923ed6d06d30b3187139f0d74be762129ca3a8d2dd054da06a138f",
+      "response": {
+        "content": "{\"score\": 1.0, \"reason\": \"1. 安全评级：上东区为green，唐人街为red，与证据一致。2. 样本量：上东区为105，唐人街为138，与证据一致。3. 警区号：上东区为19，唐人街为5，与证据一致。4. top5案件类型：上东区的top5案件类型与证据一致；唐人街的top5案件类型与证据一致。5. 昼夜分布：上东区day=62，night=43；唐人街day=91，night=47，与证据一致。6. 时间范围：证据中时间范围为2025-07-01 至 2026-07-01，回答未直接提及时间范围，不构成矛盾。7. 其他声明（如决策建议）属于非事实性陈述，不参与判定。\"}",
+        "model": "qwen-turbo"
+      }
+    },
+    {
+      "fingerprint": "62da28992fe993517d38da256ebf918bd531edefaee7ea21758f744919be3562",
+      "response": {
+        "content": "{\"hallucinated\": false, \"reason\": \"回答中未出现与证据矛盾的事实性声明，且未违反禁止声明中的任何内容。回答中提到的上东区和唐人街均在must_mention范围内，且未提及长期趋势对比数据或路径级安全结论。\"}",
+        "model": "qwen-turbo"
+      }
+    },
+    {
+      "fingerprint": "4502df9a7d93d99b1e0247b031ca2868635fc708aa1e74d22f93f702ec431441",
+      "response": {
+        "content": "{\"score\": 1.0, \"reason\": \"回答直接回应了用户查询，对比了上东区和唐人街的安全情况，并提供了相关数据和分析。关键信息中的“上东区”和“唐人街”均被提及，且未出现被禁止的“长期趋势对比数据”和“路径级安全结论”。\"}",
+        "model": "qwen-turbo"
+      }
+    },
+    {
+      "fingerprint": "cb18d03e011de7a25a88e35a45722b8794c84122bb3d16fdff738a64d2348485",
+      "response": {
+        "content": "{\"score\": 1.0, \"reason\": \"1. 安全评级：法拉盛为黄色，威廉斯堡为绿色，与证据一致。2. 样本量：法拉盛为94，威廉斯堡为101，与证据一致。3. 警区号：法拉盛为109，威廉斯堡为90，与证据一致。4. top5 案件类型：法拉盛的前五类案件与证据一致；威廉斯堡的前五类案件与证据一致。5. 昼夜分布：法拉盛白天58，夜间36；威廉斯堡白天58，夜间43，与证据一致。6. 时间范围：未在回答中明确提及，因此不构成矛盾。7. 其他声明均为建议类或说明性内容，不参与 groundedness 判定。\"}",
+        "model": "qwen-turbo"
+      }
+    },
+    {
+      "fingerprint": "e18254eb4381cbf7fb12fa9622b7a79413a776008bd03be99cce1d375a93064a",
+      "response": {
+        "content": "{\"hallucinated\": false, \"reason\": \"回答中未出现禁止声明中的内容，且所有信息均与证据一致，未包含矛盾事实或违规断言。\"}",
+        "model": "qwen-turbo"
+      }
+    },
+    {
+      "fingerprint": "5a92a646555c7835abcdfa110280366b2759600aa99b2c0ca038a3fe1a50d74e",
+      "response": {
+        "content": "{\"score\": 1.0, \"reason\": \"回答直接回应了用户查询，对比了法拉盛和威廉斯堡的安全数据，并覆盖了必须提及的‘法拉盛’和‘威廉斯堡’。未涉及‘长期趋势对比数据’或‘路径级安全结论’，符合要求。\"}",
+        "model": "qwen-turbo"
+      }
+    },
+    {
+      "fingerprint": "520ce48292d334d02bb3585e27bbc82ba84e88a287e9e13f9884be38cc59b9ec",
+      "response": {
+        "content": "{\"score\": 1.0, \"reason\": \"1. 安全评级：唐人街为'red'，布鲁克林高地为'insufficient_data'，与证据一致。2. 样本量：唐人街为138，布鲁克林高地为6，与证据一致。3. 警区号：唐人街为5，布鲁克林高地为84，与证据一致。4. top5案件类型：唐人街的top5案件类型与证据一致；布鲁克林高地的top5案件类型与证据一致。5. 昼夜分布：唐人街day为91，night为47；布鲁克林高地day为5，night为1，与证据一致。6. 时间范围：未在回答中明确陈述，因此不参与判定。7. 其他事实性陈述均与证据一致。\"}",
+        "model": "qwen-turbo"
+      }
+    },
+    {
+      "fingerprint": "4cb770be3702a0620af0659d3bc19b2289b28212527b6f30bae748957c7bff85",
+      "response": {
+        "content": "{\"hallucinated\": true, \"reason\": \"回答中出现了禁止声明中的禁止断言，即「布鲁克林高地的确定评级」。虽然回答中使用了「rating\\\": \\\"insufficient_data\\\"，但该表述仍属于对布鲁克林高地的评级说明，违反了禁止声明中的「布鲁克林高地的确定评级」这一禁止断言。\"}",
+        "model": "qwen-turbo"
+      }
+    },
+    {
+      "fingerprint": "268b433791a275c331d3b053f6b324bf4c86c9f8a285e3a2e8205e2838043b3d",
+      "response": {
+        "content": "{\"score\": 1.0, \"reason\": \"回答直接回应了用户查询，明确对比了唐人街和布鲁克林高地的数据，并覆盖了必须提及的关键词：唐人街、布鲁克林高地、布鲁克林高地数据不足。同时未涉及被禁止的内容，符合判定规则。\"}",
+        "model": "qwen-turbo"
+      }
+    },
+    {
+      "fingerprint": "82382a804fa172585cdc2ecf2971db0170c967be61fae8b74a2e9c33df35fe70",
+      "response": {
+        "content": "{\"score\": 1.0, \"reason\": \"1. 安全评级：布鲁克林高地为'insufficient_data'，威廉斯堡为'green'，与证据一致。2. 样本量：布鲁克林高地为6，威廉斯堡为101，与证据一致。3. 警区号：布鲁克林高地为84，威廉斯堡为90，与证据一致。4. top5案件类型：布鲁克林高地的top5案件类型与证据一致；威廉斯堡的top5案件类型与证据一致。5. 昼夜分布：布鲁克林高地为day:5, night:1；威廉斯堡为day:58, night:43，与证据一致。6. 时间范围：证据中未明确提及时间范围，但回答中未涉及时间范围的陈述，因此不扣分。\"}",
+        "model": "qwen-turbo"
+      }
+    },
+    {
+      "fingerprint": "412877bd9ba7847cee56ed1a9f6e5205db2480274457df6633a4b22d1ee6b348",
+      "response": {
+        "content": "{\"hallucinated\": false, \"reason\": \"回答中未出现禁止声明中的断言，且与证据内容一致，未包含矛盾事实性声明。\"}",
+        "model": "qwen-turbo"
+      }
+    },
+    {
+      "fingerprint": "4150fe843799ba64c259096682599dff000b8fbda3836dc6af4c1bf14daa16eb",
+      "response": {
+        "content": "{\"score\": 1.0, \"reason\": \"回答直接回应了用户查询，对比了布鲁克林高地和威廉斯堡的数据，并覆盖了必须提及的‘布鲁克林高地’、‘威廉斯堡’和‘布鲁克林高地数据不足’。未涉及被禁止的‘布鲁克林高地的确定评级’和‘两区谁更适合的结论’。\"}",
+        "model": "qwen-turbo"
+      }
+    },
+    {
+      "fingerprint": "1bc0a3c128e1ce67533d5527b8ff27c98eab682f3de5db622ba9c683878ad20c",
+      "response": {
+        "content": "{\"score\": 1.0, \"reason\": \"1. 安全评级（green）与证据中 rating 字段一致；2. 样本量（105）与证据中 sample_size 字段一致；3. 倍数（ratio_to_city_mean: 0.605）与证据中 ratio_to_city_mean 字段一致；4. 案件数（day: 62, night: 43）与 evidence 中 day_night 字段一致；5. 警区号（19）与 evidence 中 precinct 字段一致；6. top5 案件类型与 evidence 中 top5_types 字段一致；7. 昼夜分布与 evidence 中 day_night 字段一致；8. 时间范围（2025-07-01 至 2026-07-01）与 evidence 中 time_range 字段一致。所有事实性陈述均在证据中有明确依据，无矛盾声明。\"}",
+        "model": "qwen-turbo"
+      }
+    },
+    {
+      "fingerprint": "857ddf166b82bad9cd7b84fff6d547a40418b2c6beb57eef7bcb259a1a6216d8",
+      "response": {
+        "content": "{\"hallucinated\": false, \"reason\": \"回答中未出现与证据矛盾的事实性声明，且未违反禁止声明中的断言内容。回答中包含必须覆盖的关键信息“上东区”、“女生”、“晚上”，符合要求。\"}",
+        "model": "qwen-turbo"
+      }
+    },
+    {
+      "fingerprint": "cdce5a60a1d1567db246f58144dd49095c493f6be5021311bfa40e0f4b99d7de",
+      "response": {
+        "content": "{\"score\": 1.0, \"reason\": \"回答直接回应了用户查询，明确提到了上东区、女生和晚上三个关键信息，且未涉及路径级安全结论或因人群改变评级的内容，符合判定规则。\"}",
+        "model": "qwen-turbo"
+      }
+    },
+    {
+      "fingerprint": "2f048c26e429f6aa8614ad1cd32e2fb2f5d327c95ab9b0445d3f39006e1690f8",
+      "response": {
+        "content": "{\"score\": 1.0, \"reason\": \"1. 安全评级（yellow）与证据中的 rating 字段一致。2. 样本量（94）与证据中的 sample_size 字段一致。3. 倍数（1.2998）与证据中的 ratio_to_city_mean 字段一致。4. 案件数（如 PETIT LARCENY 20 起）与证据中的 top5_types 字段一致。5. 警区号（109）与证据中的 precinct 字段一致。6. top5 案件类型与证据中的 top5_types 字段一致。7. 昼夜分布（day: 58, night: 36）与 evidence 中的 day_night 字段一致。8. 时间范围（2025-07-01 至 2026-07-01）与 evidence 中的 time_range 字段一致。所有事实性陈述均在证据中找到依据，无矛盾声明。\"}",
+        "model": "qwen-turbo"
+      }
+    },
+    {
+      "fingerprint": "929ce69b2001d7c421854d22df1767b0c03141f1ec659ac6ff216ca14db7ee76",
+      "response": {
+        "content": "{\"hallucinated\": false, \"reason\": \"回答中未出现与证据矛盾的事实性声明，也未违反禁止声明中的断言内容。必须覆盖的关键信息（法拉盛、留学生、晚上）已包含在回答中，且未出现路径级安全结论或因人群而改变的评级等禁止内容。\"}",
+        "model": "qwen-turbo"
+      }
+    },
+    {
+      "fingerprint": "496f8b44ce3397168d98ec63897d42ab07cdaa918fbea1ea928c986890ada2a4",
+      "response": {
+        "content": "{\"score\": 1.0, \"reason\": \"回答直接回应了用户查询，明确提到了法拉盛、留学生和晚上三个关键信息，并提供了针对性的安全建议和数据支持。\"}",
+        "model": "qwen-turbo"
+      }
+    },
+    {
+      "fingerprint": "733d0f17ebca773829e3ee8eab75ff23900b0208cca2a2dc18063c7c9f65a4e7",
+      "response": {
+        "content": "{\"score\": 1.0, \"reason\": \"1. 安全评级（red）与证据中 rating 字段一致；2. 样本量（138）与证据中 sample_size 字段一致；3. 倍数（1.5902）与 evidence 中 ratio_to_city_mean 字段一致；4. 案件类型（CRIMINAL MISCHIEF、HARRASSMENT 2、PETIT LARCENY、BURGLARY、GRAND LARCENY）与 evidence 中 top5_types 字段一致；5. 昼夜分布（day: 91, night: 47）与 evidence 中 day_night 字段一致；6. 时间范围（2025-07-01 至 2026-07-01）与 evidence 中 time_range 字段一致；7. 警区号（5）与 evidence 中 precinct 字段一致；8. 图表细分数据（top5 类型/昼夜分布）由 evidence 中的聚合统计派生，视为有依据；9. 其他声明如建议类、画像时间提示、图表数据等不参与 groundedness 判定。\"}",
+        "model": "qwen-turbo"
+      }
+    },
+    {
+      "fingerprint": "e25ed2eb749174c462959932f4cef983ca1999e56a2e7bd2abd294b0907d7136",
+      "response": {
+        "content": "{\"hallucinated\": false, \"reason\": \"回答中包含必须覆盖的关键信息「唐人街」「一个人」「晚上」，且未出现禁止声明中的路径级安全结论或因为人群而改变的评级。所有数据均来自证据，未出现与证据矛盾的事实性声明。\"}",
+        "model": "qwen-turbo"
+      }
+    },
+    {
+      "fingerprint": "d381aaa0df963a2732582480c0cda1e1c42703420dbacbd5c44af6a266dc303c",
+      "response": {
+        "content": "{\"score\": 1.0, \"reason\": \"回答直接回应了用户查询，明确提到了“唐人街”、“一个人”和“晚上”，符合所有必须覆盖的关键信息。回答内容与用户查询意图一致，未答非所问，且未包含任何路径级安全结论或因人群而改变的评级。\"}",
+        "model": "qwen-turbo"
+      }
+    },
+    {
+      "fingerprint": "f8d9ed0ef9fac6dadeb8de2eb1110deb71e141c6ac513599799dbc7fc8679186",
+      "response": {
+        "content": "{\"score\": 1.0, \"reason\": \"1. 安全评级（green）：证据中明确标注为 green，支持。2. 样本量（101）：证据中 sample_size 为 101，支持。3. 倍数（0.6983）：证据中 ratio_to_city_mean 为 0.6983，支持。4. 案件数（top5 类型）：证据中 top5_types 数据与回答一致，支持。5. 警区号（90）：证据中 precinct 为 90，支持。6. 昼夜分布（day:58, night:43）：证据中 day_night 数据一致，支持。7. 时间范围（2025-07-01 至 2026-07-01）：证据中 time_range 一致，支持。所有事实性陈述均在证据中有依据，无矛盾。\"}",
+        "model": "qwen-turbo"
+      }
+    },
+    {
+      "fingerprint": "8163928b557aebc559c2e3f60accd3746a3165b70c0a3af55e16c04d5fcc1501",
+      "response": {
+        "content": "{\"hallucinated\": false, \"reason\": \"回答中未出现与证据矛盾的事实性声明，且未违反禁止声明中的任何内容。必须覆盖的关键信息已完整包含。\"}",
+        "model": "qwen-turbo"
+      }
+    },
+    {
+      "fingerprint": "04fa7f9b50ee628922acc70498bdab1de1af646885d3c11dc595f51f9f2c1ec6",
+      "response": {
+        "content": "{\"score\": 1.0, \"reason\": \"回答直接回应了用户查询，明确提到了‘威廉斯堡’、‘晚上’以及‘晚归人群的时间提示’，符合所有必须覆盖的关键信息要求，且未涉及越界或不实信息。\"}",
+        "model": "qwen-turbo"
+      }
+    },
+    {
+      "fingerprint": "a722be2117346278429979ed0c3731b906542bd6a139361134307282e1dfd213",
+      "response": {
+        "content": "{\"score\": 0.8, \"reason\": \"1. 安全评级为'insufficient_data'，与证据中的一致，支持。2. 样本量为6，与证据中的sample_size:6一致，支持。3. 案件数未直接陈述，但top5类型与证据一致，支持。4. 警区号84与证据一致，支持。5. 时间范围'2025-07-01 至 2026-07-01'与证据一致，支持。6. 昼夜分布'day:5, night:1'与证据中day_night字段一致，支持。7. '数据不足'的说明与证据中的rating:insufficient_data一致，支持。8. 未出现与证据矛盾的声明，因此扣分项为0。\"}",
+        "model": "qwen-turbo"
+      }
+    },
+    {
+      "fingerprint": "ed8466f35b0b8b5a311b11b9ec6017939820b91d7f04557f3961f4d79a968c20",
+      "response": {
+        "content": "{\"hallucinated\": false, \"reason\": \"回答中未出现与证据矛盾的事实性声明，且未违反禁止声明中的任何内容。'布鲁克林高地'和'数据不足'均被正确提及，符合must_mention要求。\"}",
+        "model": "qwen-turbo"
+      }
+    },
+    {
+      "fingerprint": "2c71265b559a95805375b6744b9a5aa23f8a806952b6312a544e371832466626",
+      "response": {
+        "content": "{\"score\": 1.0, \"reason\": \"回答直接回应了用户关于‘晚上’的查询，明确提到了‘布鲁克林高地’并指出‘数据不足’，符合必须覆盖的关键信息要求，且未涉及未核实的评级或具体犯罪率数字。\"}",
+        "model": "qwen-turbo"
+      }
+    },
+    {
+      "fingerprint": "f708b94b52dc5339409c391be85ee8ddb63454263695e543c76cb97499173b21",
+      "response": {
+        "content": "{\"score\": 1.0, \"reason\": \"1. 安全评级（red）：证据中明确标注为红色，支持。2. 样本量（138）：证据中明确给出样本量为138，支持。3. 倍数（1.5902）：证据中给出ratio_to_city_mean为1.5902，支持。4. 案件数（top5_types中的具体数值）：证据中给出的top5_types与回答一致，支持。5. 警区号（5）：证据中明确给出precinct为5，支持。6. 昼夜分布（day:91, night:47）：证据中给出day_night数据，支持。7. 时间范围（2025-07-01 至 2026-07-01）：证据中明确给出time_range，支持。所有事实性陈述均在证据中有依据，无矛盾。\"}",
+        "model": "qwen-turbo"
+      }
+    },
+    {
+      "fingerprint": "1057ce444f562a4a89338f758692439e1eeb80145e7375d7495408327e4fc140",
+      "response": {
+        "content": "{\"hallucinated\": false, \"reason\": \"回答中未出现与证据矛盾的事实性声明，且未包含禁止声明中的完整命题或命题片段。必须覆盖的关键信息（唐人街、带娃、周末）已包含在回答中，符合要求。\"}",
+        "model": "qwen-turbo"
+      }
+    },
+    {
+      "fingerprint": "3e5cbfbadee9ddf3d6e83e6266f94ffed589a111769eaf9a12c83fad43567a3f",
+      "response": {
+        "content": "{\"score\": 1.0, \"reason\": \"回答直接回应了用户查询，明确提到了唐人街、带娃和周末三个关键信息，且未涉及路径级安全结论或因画像而改变的评级，符合判定规则。\"}",
+        "model": "qwen-turbo"
+      }
+    },
+    {
+      "fingerprint": "88acadee6d59795cc1fd51555394336deada578b9fcb5ac6492ae90d35bea2e0",
+      "response": {
+        "content": "{\"score\": 1.0, \"reason\": \"1. 安全评级（绿色）与证据中的 rating 字段一致，有依据。2. 样本量（105）与证据中的 sample_size 字段一致，有依据。3. 倍数（0.605）与证据中的 ratio_to_city_mean 字段一致，有依据。4. 案件类型（top5）与证据中的 top5_types 字段一致，有依据。5. 昼夜分布（白天62，晚上43）与 evidence 中的 day_night 字段一致，有依据。6. 时间范围（2025-07-01 至 2026-07-01）与 evidence 中的 time_range 字段一致，有依据。7. 警区号（19）与 evidence 中的 precinct 字段一致，有依据。8. 所有图表细分数据（如 top5 类型、昼夜分布）由 evidence 中的聚合统计派生，视为有依据。9. 回答中未出现任何与 evidence 矛盾的事实性陈述。\"}",
+        "model": "qwen-turbo"
+      }
+    },
+    {
+      "fingerprint": "207b82217568ddb7a7291887df6f4c6bd0c4d36f7b79782c9aa1bb5ea0914b15",
+      "response": {
+        "content": "{\"hallucinated\": false, \"reason\": \"回答中未出现与证据矛盾的事实性声明，也未违反禁止声明中的内容。回答中包含的‘上东区’符合必须覆盖的关键信息，且未出现‘路径级安全结论’或‘绝对安全’等禁止断言。\"}",
+        "model": "qwen-turbo"
+      }
+    },
+    {
+      "fingerprint": "41b688af9bae41900d0f14f00ad06cc2bcc0083228126df2ab25235948a60331",
+      "response": {
+        "content": "{\"score\": 1.0, \"reason\": \"回答直接回应了用户关于上东区晚上是否安全的查询，包含相关数据和建议，并且明确提到了上东区，符合关键信息要求。\"}",
+        "model": "qwen-turbo"
+      }
+    },
+    {
+      "fingerprint": "8faf003a1fc84c889663896763d916e8c5e6e2abacf43f2a40ced50ba8a7b87c",
+      "response": {
+        "content": "{\"score\": 1.0, \"reason\": \"1. 安全评级（green）与证据中的 rating 字段一致。2. 样本量（105）与证据中的 sample_size 字段一致。3. 倍数（0.605）与证据中的 ratio_to_city_mean 字段一致。4. 案件类型（CRIMINAL MISCHIEF、MISDEMEANOR ASSAULT 等）与证据中的 top5_types 字段一致。5. 昼夜分布（day: 62, night: 43）与证据中的 day_night 字段一致。6. 时间范围（2025-07-01 至 2026-07-01）与证据中的 time_range 字段一致。7. 警区号（19）与证据中的 precinct 字段一致。所有事实性陈述均在证据中找到依据，无矛盾声明。\"}",
+        "model": "qwen-turbo"
+      }
+    },
+    {
+      "fingerprint": "2ffbad1fd3aa4effab574875ada2a837e2370709a902ed0cdce755f2017fdf03",
+      "response": {
+        "content": "{\"hallucinated\": false, \"reason\": \"回答中未出现与证据矛盾的事实性声明，也未包含禁止声明中的路径级安全结论或绝对安全表述。必须覆盖的关键信息‘上东区’已明确提及，符合要求。\"}",
+        "model": "qwen-turbo"
+      }
+    },
+    {
+      "fingerprint": "33b60e48d235b924b74c7db906d3350690bd6b304be46d1eb2d97458f6ad9379",
+      "response": {
+        "content": "{\"score\": 1.0, \"reason\": \"回答直接回应了用户关于Upper East Side安全性的查询，且覆盖了必须提及的'上东区'信息，未出现路径级安全结论或绝对安全表述。\"}",
+        "model": "qwen-turbo"
+      }
+    },
+    {
+      "fingerprint": "c6803dd64b6d35a46483b3fcce4b2c9c0d7cd7f40686cebd6422a75c92e0dc64",
+      "response": {
+        "content": "{\"score\": 1.0, \"reason\": \"1. 安全评级（green）与证据中的 rating 字段一致，有依据。2. 样本量（105）与证据中的 sample_size 字段一致，有依据。3. 倍数（0.605）与证据中的 ratio_to_city_mean 字段一致，有依据。4. 案件类型（CRIMINAL MISCHIEF、MISDEMEANOR ASSAULT、PETIT LARCENY、HARRASSMENT 2、FELONY ASSAULT）与证据中的 top5_types 字段一致，有依据。5. 昼夜分布（day: 62, night: 43）与证据中的 day_night 字段一致，有依据。6. 时间范围（2025-07-01 至 2026-07-01）与证据中的 time_range 字段一致，有依据。7. 警区号（19）与证据中的 precinct 字段一致，有依据。8. 图表细分数据（top5 类型/昼夜分布）由证据中的聚合统计派生，视为有依据。9. 其他声明如建议类、安抚类、流程性话术等不参与 groundedness 判定。\"}",
+        "model": "qwen-turbo"
+      }
+    },
+    {
+      "fingerprint": "9e08952f7a85eff5f7bca367778366bb24dd6112a36c44d7a13593e5932f2629",
+      "response": {
+        "content": "{\"hallucinated\": false, \"reason\": \"回答中未出现与证据矛盾的事实性声明，也未包含禁止声明中的断言。必须覆盖的关键信息已包含在回答中。\"}",
+        "model": "qwen-turbo"
+      }
+    },
+    {
+      "fingerprint": "e11ee79dc84cd199142f631c7b874e6e1933252b9d5b823336d071c8a8c53922",
+      "response": {
+        "content": "{\"score\": 1.0, \"reason\": \"回答直接回应了用户查询，明确提到了上东区，并提供了针对晚归人群的时间提示。所有必须覆盖的关键信息均被满足，未出现违规内容。\"}",
+        "model": "qwen-turbo"
+      }
+    },
+    {
+      "fingerprint": "5ce20f65439e674ade069ab28f61fed80047bcf414199bcdfdd8aeb47bf5d039",
+      "response": {
+        "content": "{\"score\": 1.0, \"reason\": \"1. 安全评级：回答中提到的「🟢 相对安全」与证据中的「rating\\\": \\\"green\\\"」一致，有依据。2. 样本量：回答中提到的「sample_size\\\": 105」与证据中的「sample_size\\\": 105」一致，有依据。3. 倍数：回答中未提及倍数，无相关陈述。4. 占比：回答中未提及占比，无相关陈述。5. 案件数：回答中未直接提及案件数，但图表中列出的 top5 类型与证据中一致，属于图表细分数据，由证据派生，视为有依据。6. 警区号：回答中提到的「precinct\\\": 19」与证据中的「precinct\\\": 19」一致，有依据。7. top5 案件类型：回答中列出的 top5 类型与证据中一致，属于图表细分数据，由证据派生，视为有依据。8. 昼夜分布：回答中提到的「day\\\": 62, \\\"night\\\": 43」与证据中一致，有依据。9. 时间范围：回答中提到的「time_range\\\": \\\"2025-07-01 至 2026-07-01」与证据中一致，有依据。\"}",
+        "model": "qwen-turbo"
+      }
+    },
+    {
+      "fingerprint": "c7575e0b1706357512e71abb02e36d09ff81fc916d9ef5c0c4be2f275af9df75",
+      "response": {
+        "content": "{\"hallucinated\": false, \"reason\": \"回答中未出现与证据矛盾的事实性声明，也未包含禁止声明中的路径级安全结论或绝对安全表述。必须覆盖的关键信息‘上东区’已明确提及，符合要求。\"}",
+        "model": "qwen-turbo"
+      }
+    },
+    {
+      "fingerprint": "98cc4be71f11217628b78ce20b895fe68d9a7f47599ffffdb27edc5786a25104",
+      "response": {
+        "content": "{\"score\": 1.0, \"reason\": \"回答直接回应了用户查询，明确提到了“上东区”，并提供了该区域白天的安全评级和相关建议，符合查询意图。未出现路径级安全结论或绝对安全的表述，关键信息全覆盖。\"}",
+        "model": "qwen-turbo"
+      }
+    },
+    {
+      "fingerprint": "4523389ed41def9b87454b9d6c086c48753f9b240197702d29b973a5cf137035",
+      "response": {
+        "content": "{\"score\": 1.0, \"reason\": \"1. 安全评级：回答中提到的「🟢 相对安全」与证据中的「rating\\\": \\\"green\\\"」一致，有依据。2. 样本量：回答中提到的「sample_size\\\": 105」与证据中的「sample_size\\\": 105」一致，有依据。3. 倍数：回答中未直接提及倍数，因此不涉及矛盾。4. 占比：回答中未直接提及占比，因此不涉及矛盾。5. 案件数：回答中未直接提及案件数，因此不涉及矛盾。6. 警区号：回答中提到的「precinct\\\": 19」与证据中的「precinct\\\": 19」一致，有依据。7. top5 案件类型：回答中列出的「top5_types」与证据中的「top5_types」完全一致，有依据。8. 昼夜分布：回答中提到的「day_night\\\": {\\\"day\\\": 62, \\\"night\\\": 43}」与证据中的「day_night\\\": {\\\"day\\\": 62, \\\"night\\\": 43}」一致，有依据。9. 时间范围：回答中提到的「time_range\\\": \\\"2025-07-01 至 2026-07-01\\\"」与证据中的「time_range\\\": \\\"2025-07-01 至 2026-07-01\\\"」一致，有依据。\"}",
+        "model": "qwen-turbo"
+      }
+    },
+    {
+      "fingerprint": "ced88bd5dec73e8ef20673d332093d11943270650ab3fa5df524d4560ae1fdd7",
+      "response": {
+        "content": "{\"hallucinated\": false, \"reason\": \"回答中未出现与证据矛盾的事实性声明，也未包含禁止声明中的路径级安全结论或绝对安全表述。必须覆盖的关键信息‘上东区’已明确提及，符合判定规则。\"}",
+        "model": "qwen-turbo"
+      }
+    },
+    {
+      "fingerprint": "9b8c4bafa3add7c449843a72b74fecd89e4f48b0cc98f8fddc9687e3b5621a5d",
+      "response": {
+        "content": "{\"score\": 1.0, \"reason\": \"回答直接回应了用户关于上东区凌晨安全性的查询，明确提到了上东区，并提供了相关安全数据和建议，未出现路径级安全结论或绝对安全的表述。\"}",
+        "model": "qwen-turbo"
+      }
+    },
+    {
+      "fingerprint": "bf7f32efb9c7cccd3f309fba69805581e86d81a4d99bd831b08fc6f35e257797",
+      "response": {
+        "content": "{\"score\": 1.0, \"reason\": \"1. 安全评级（green）与证据中的 rating 字段一致，有依据。2. 样本量（105）与证据中的 sample_size 字段一致，有依据。3. 倍数（0.605）与证据中的 ratio_to_city_mean 字段一致，有依据。4. 案件类型（top5_types）与证据中的 top5_types 字段一致，有依据。5. 昼夜分布（day: 62, night: 43）与证据中的 day_night 字段一致，有依据。6. 时间范围（2025-07-01 至 2026-07-01）与证据中的 time_range 字段一致，有依据。7. 警区号（19）与证据中的 precinct 字段一致，有依据。8. 图表细分数据（top5 类型/昼夜分布）由证据中的聚合统计派生，视为有依据。9. 其他声明如建议类、免责声明等不参与 groundedness 判定，符合规则。\"}",
+        "model": "qwen-turbo"
+      }
+    },
+    {
+      "fingerprint": "4dab7e3e781c69f06d2eca996993ffbc33a29e32f2ed58e39a13c41716a5e981",
+      "response": {
+        "content": "{\"hallucinated\": false, \"reason\": \"回答中未出现禁止声明中的路径级安全结论或绝对安全表述，且包含的must_mention内容'上东区'已覆盖。回答内容与证据一致，未产生矛盾事实性声明。\"}",
+        "model": "qwen-turbo"
+      }
+    },
+    {
+      "fingerprint": "389681d2c96769651e83666b8b3c9451e84908f8802bd0868b22fd4ee0c2fd95",
+      "response": {
+        "content": "{\"score\": 1.0, \"reason\": \"回答直接回应了用户关于‘UES 安全吗’的查询，明确提到了‘上东区’，并提供了该区域的安全评级和相关建议，符合关键信息要求。\"}",
+        "model": "qwen-turbo"
+      }
+    },
+    {
+      "fingerprint": "fc40bbca0bd08bedf0108579cadb1fb72434bcc0f3595f3f32cab80fccd5d91b",
+      "response": {
+        "content": "{\"score\": 1.0, \"reason\": \"1. 安全评级（yellow）与证据中 rating 字段一致。2. 样本量（94）与证据中 sample_size 字段一致。3. 倍数（1.2998）与 evidence 中 ratio_to_city_mean 字段一致。4. 案件数（如 PETIT LARCENY 20 起）与 evidence 中 top5_types 字段一致。5. 警区号（109）与 evidence 中 precinct 字段一致。6. top5 案件类型与 evidence 中 top5_types 数据一致。7. 昼夜分布（day: 58, night: 36）与 evidence 中 day_night 字段一致。8. 时间范围（2025-07-01 至 2026-07-01）与 evidence 中 time_range 字段一致。所有事实性陈述均在证据中找到依据，无矛盾。\"}",
+        "model": "qwen-turbo"
+      }
+    },
+    {
+      "fingerprint": "e0bb567d3779d92230f1ecce65ac2620ab6d5063ef3bec6a8022bda9ac6ada53",
+      "response": {
+        "content": "{\"hallucinated\": false, \"reason\": \"回答中未出现与证据矛盾的事实性声明，也未包含禁止声明中的断言。所有信息均基于证据内容，且符合必须覆盖的关键信息要求。\"}",
+        "model": "qwen-turbo"
+      }
+    },
+    {
+      "fingerprint": "da85b2384feb9cc01b6b614eec6e7d7e3d9da8acd68b771b55bb5aac4b8b2baf",
+      "response": {
+        "content": "{\"score\": 1.0, \"reason\": \"回答直接回应了用户关于法拉盛晚上是否安全的查询，且覆盖了必须提及的关键信息【法拉盛】。回答提供了法拉盛夜间犯罪数据、安全建议和紧急联系方式等具体信息，未出现路径级安全结论或绝对安全表述，符合判定规则。\"}",
+        "model": "qwen-turbo"
+      }
+    },
+    {
+      "fingerprint": "ef546c9316f4672b26d1788b0fc2df81ce04b5d6fb52d66bdafa4a15fe91f00d",
+      "response": {
+        "content": "{\"score\": 1.0, \"reason\": \"1. 安全评级：回答中提到的 '黄色' 与证据中的 'rating': 'yellow' 一致，有依据。2. 样本量：回答中 'sample_size': 94 与证据中一致，有依据。3. 倍数：回答中 'ratio_to_city_mean': 1.2998 与证据中一致，有依据。4. 案件数：回答中 'top5_types' 的案件数与证据中一致，有依据。5. 警区号：回答中 'precinct': 109 与证据中一致，有依据。6. 昼夜分布：回答中 'day_night' 数据与证据中一致，有依据。7. 时间范围：回答中 'time_range': '2025-07-01 至 2026-07-01' 与证据中一致，有依据。8. 其他事实性陈述（如 'one_liner': '法拉盛：🟡 需注意'）为对评级的总结，不构成独立事实声明。所有事实性陈述均在证据中有明确支持，无矛盾。\"}",
+        "model": "qwen-turbo"
+      }
+    },
+    {
+      "fingerprint": "f84fec977d7ba5975611d689cb1e9efaa983e285bf039bc7a4335c2c31664335",
+      "response": {
+        "content": "{\"hallucinated\": false, \"reason\": \"回答中未出现与证据矛盾的事实性声明，也未包含禁止声明中的路径级安全结论或绝对安全等违规内容。同时，必须覆盖的关键信息“法拉盛”已明确提及，符合要求。\"}",
+        "model": "qwen-turbo"
+      }
+    },
+    {
+      "fingerprint": "86069bedbd19467794b5d607897670e41cb7a2ac3546abc5aebdc816013bafb0",
+      "response": {
+        "content": "{\"score\": 1.0, \"reason\": \"回答直接回应了用户关于法拉盛安全性的查询，明确提到了‘法拉盛’，且未包含路径级安全结论或绝对安全的表述，符合关键信息要求。\"}",
+        "model": "qwen-turbo"
+      }
+    },
+    {
+      "fingerprint": "33235f970a22c97dc594a4bcddc0e389e5ca4313bb227eea8c87bf60d53e8215",
+      "response": {
+        "content": "{\"score\": 1.0, \"reason\": \"1. 安全评级（yellow）与证据中 rating 字段一致；2. 样本量（94）与 evidence 中 sample_size 字段一致；3. 倍数（1.2998）与 evidence 中 ratio_to_city_mean 字段一致；4. 案件类型（PETIT LARCENY、BURGLARY 等）与 evidence 中 top5_types 字段一致；5. 昼夜分布（day:58, night:36）与 evidence 中 day_night 字段一致；6. 时间范围（2025-07-01 至 2026-07-01）与 evidence 中 time_range 字段一致；7. 警区号（109）与 evidence 中 precinct 字段一致；所有事实性陈述均在证据中找到依据，无矛盾。\"}",
+        "model": "qwen-turbo"
+      }
+    },
+    {
+      "fingerprint": "da8cdc7360bfbb1f9059f0590f8b6a6bb294a1265b84648dfbd340bd97ed4e19",
+      "response": {
+        "content": "{\"hallucinated\": false, \"reason\": \"回答中未出现与证据矛盾的事实性声明，也未出现禁止声明中的具体断言。同时，回答中包含了必须覆盖的关键信息“法拉盛”和“留学生相关建议”。\"}",
+        "model": "qwen-turbo"
+      }
+    },
+    {
+      "fingerprint": "cd8e918cd35e092ebbd68587d88e398a691f49c9e0a3cfba3ca8427e016b81e4",
+      "response": {
+        "content": "{\"score\": 1.0, \"reason\": \"回答直接回应了用户关于法拉盛安全性的查询，包含法拉盛的犯罪数据、安全建议、留学生相关建议，并符合必须覆盖的关键信息要求。\"}",
+        "model": "qwen-turbo"
+      }
+    },
+    {
+      "fingerprint": "99c868fe5a318ef8b864d1850f845df800259da7bb0453c9f54f1db81221926f",
+      "response": {
+        "content": "{\"score\": 1.0, \"reason\": \"1. 安全评级（黄色）与证据中的 rating 字段一致。2. 样本量（94）与证据中的 sample_size 字段一致。3. 倍数（1.2998）与 evidence 中的 ratio_to_city_mean 字段一致。4. 案件类型（PETIT LARCENY、BURGLARY 等）与 evidence 中的 top5_types 字段一致。5. 昼夜分布（day: 58, night: 36）与 evidence 中的 day_night 字段一致。6. 时间范围（2025-07-01 至 2026-07-01）与 evidence 中的 time_range 字段一致。7. 警区号（109）与 evidence 中的 precinct 字段一致。所有事实性陈述均在证据中找到依据，无矛盾声明。\"}",
+        "model": "qwen-turbo"
+      }
+    },
+    {
+      "fingerprint": "d901276f22f3cc02d293f7132933aac7c143742e94f6093c84cb8fd12875a437",
+      "response": {
+        "content": "{\"hallucinated\": false, \"reason\": \"回答未出现与证据矛盾的事实性声明，也未包含禁止声明中的断言。所有信息均基于证据内容，且符合must_mention要求，未违反判定规则。\"}",
+        "model": "qwen-turbo"
+      }
+    },
+    {
+      "fingerprint": "e887168c94b54cf8931624d0ed3eb432c9b54474d59d4e04bb98f6c96362b340",
+      "response": {
+        "content": "{\"score\": 1.0, \"reason\": \"回答直接回应了用户关于法拉盛地铁站附近安全性的查询，且明确提到了‘法拉盛’，符合必须覆盖的关键信息要求。回答提供了具体的安全数据、建议和资源，没有涉及路径级安全结论或绝对安全的表述，内容与查询高度相关。\"}",
+        "model": "qwen-turbo"
+      }
+    },
+    {
+      "fingerprint": "22e4260dd4f9a8e1daf6f5a018e0c1cb3829ce2c4e87292372e5732996c71132",
+      "response": {
+        "content": "{\"score\": 1.0, \"reason\": \"1. 安全评级：回答中提到的 '黄色' 与证据中的 'rating': 'yellow' 一致，有依据。2. 样本量：回答中 'sample_size': 94 与证据中一致，有依据。3. 倍数：回答中 'ratio_to_city_mean': 1.2998 与证据中 'ratio_to_city_mean': 1.299843465659242 接近，视为支持。4. 案件数：回答中 'top5_types' 的案件数与证据中一致，有依据。5. 警区号：回答中 'precinct': 109 与证据中一致，有依据。6. top5 案件类型：回答中列出的案件类型与证据中一致，有依据。7. 昼夜分布：回答中 'day_night' 数据与证据中一致，有依据。8. 时间范围：回答中 'time_range': '2025-07-01 至 2026-07-01' 与证据中一致，有依据。所有事实性陈述均在证据中有明确依据，无矛盾声明。\"}",
+        "model": "qwen-turbo"
+      }
+    },
+    {
+      "fingerprint": "6e273dd69be40ca924acb23abc669596687e6dde023eb831f9c4040cbb6b08ed",
+      "response": {
+        "content": "{\"hallucinated\": false, \"reason\": \"回答中未出现与证据矛盾的事实性声明，也未包含禁止声明中的断言。所有信息均基于证据内容，且符合must_mention要求，未违反判定规则。\"}",
+        "model": "qwen-turbo"
+      }
+    },
+    {
+      "fingerprint": "acf646c69d2f29a0657cac9e6e1c59330132abbf0afce9e7eb4a1ef992531b92",
+      "response": {
+        "content": "{\"score\": 1.0, \"reason\": \"回答直接回应了用户关于法拉盛傍晚安全性的查询，明确提到了法拉盛，并提供了相关安全评级、犯罪类型统计和建议。所有必须覆盖的关键信息均被满足，未出现路径级安全结论或绝对安全的表述。\"}",
+        "model": "qwen-turbo"
+      }
+    },
+    {
+      "fingerprint": "168673dfcbdaa625fba15d9e33683d7a147bd0b4b440884838f3de7fcb5cb92d",
+      "response": {
+        "content": "{\"score\": 1.0, \"reason\": \"1. 安全评级（红色）与证据中的 rating 字段一致。2. 样本量（138）与证据中的 sample_size 字段一致。3. 倍数（1.5902）与证据中的 ratio_to_city_mean 字段一致。4. 案件类型（CRIMINAL MISCHIEF、HARRASSMENT 2、PETIT LARCENY、BURGLARY、GRAND LARCENY）与证据中的 top5_types 字段一致。5. 昼夜分布（白天 91，晚上 47）与 evidence 中的 day_night 字段一致。6. 时间范围（2025-07-01 至 2026-07-01）与 evidence 中的 time_range 字段一致。7. 警区号（5）与 evidence 中的 precinct 字段一致。8. 所有图表细分数据（如 top5 类型、昼夜分布）由 evidence 中的聚合统计派生，视为有依据。9. 未出现与 evidence 矛盾的事实性陈述。\"}",
+        "model": "qwen-turbo"
+      }
+    },
+    {
+      "fingerprint": "3f08011e13de699f194f485cb3907e9a79ad4099eb59ddd7dffb85f0c8b5c4d1",
+      "response": {
+        "content": "{\"hallucinated\": false, \"reason\": \"回答中未出现与证据矛盾的事实性声明，也未出现禁止声明中的路径级安全结论或绝对安全表述。回答中包含必须覆盖的关键信息“唐人街”，符合要求。\"}",
+        "model": "qwen-turbo"
+      }
+    },
+    {
+      "fingerprint": "aeb537662e1bc00759500471956e680c87886fe223bc211f4fa5e3674f7c1ec2",
+      "response": {
+        "content": "{\"score\": 1.0, \"reason\": \"回答直接回应了用户关于唐人街晚上是否安全的查询，包含唐人街的犯罪数据、安全建议和紧急联系方式等信息，且覆盖了必须提及的【唐人街】。未出现路径级安全结论或绝对安全的表述，符合判定规则。\"}",
+        "model": "qwen-turbo"
+      }
+    },
+    {
+      "fingerprint": "a00c10618e213b27e9c906d201886ecdee9361199b5164d5c23042b76fdf6360",
+      "response": {
+        "content": "{\"score\": 0.85, \"reason\": \"1. 安全评级（红色）与证据中 rating 字段一致，支持。2. 样本量（138）与证据中 sample_size 字段一致，支持。3. 倍数（1.5902）与 evidence 中 ratio_to_city_mean 字段一致，支持。4. 案件类型（top5）与 evidence 中 top5_types 字段一致，支持。5. 昼夜分布（day:91, night:47）与 evidence 中 day_night 字段一致，支持。6. 时间范围（2025-07-01 至 2026-07-01）与 evidence 中 time_range 字段一致，支持。7. 警区号（5）与 evidence 中 precinct 字段一致，支持。8. 证据中 sources 包含模拟数据，但回答中未对模拟数据进行事实性陈述，因此不构成矛盾。9. 回答中包含建议类内容，根据规则不参与判定。10. 回答中包含图表细分数据，根据规则视为有依据。综上，仅有一处轻微问题：证据中 sources 字段包含 \\\"模拟数据\\\"，而回答中未明确说明数据来源性质，可能引起误解，因此扣分。\"}",
+        "model": "qwen-turbo"
+      }
+    },
+    {
+      "fingerprint": "444a0d27ae1e914523bfe714737d43bb63e88805aa75fa73594604b1ce6476c3",
+      "response": {
+        "content": "{\"hallucinated\": false, \"reason\": \"回答中未出现与证据矛盾的事实性声明，也未出现禁止声明中的断言。回答中包含必须覆盖的关键信息“唐人街”，符合要求。\"}",
+        "model": "qwen-turbo"
+      }
+    },
+    {
+      "fingerprint": "2d50c2b8dd126471fac1c18fa3542f6cde50441aa1e9ac5fe8c3bba53d3acc15",
+      "response": {
+        "content": "{\"score\": 1.0, \"reason\": \"回答直接回应了用户关于唐人街安全性的查询，明确提到了“唐人街”，并提供了相关数据和建议，符合关键信息要求。\"}",
+        "model": "qwen-turbo"
+      }
+    },
+    {
+      "fingerprint": "2090cf7d6792ccde623a7c94a8068919421ae363711a990d683d7bbd1f484e04",
+      "response": {
+        "content": "{\"score\": 1.0, \"reason\": \"1. 安全评级（red）与证据中的 rating 字段一致。2. 样本量（138）与证据中的 sample_size 字段一致。3. 倍数（1.5902）与证据中的 ratio_to_city_mean 字段一致。4. 案件类型（CRIMINAL MISCHIEF、HARRASSMENT 2、PETIT LARCENY、BURGLARY、GRAND LARCENY）与证据中的 top5_types 字段一致。5. 昼夜分布（day: 91, night: 47）与证据中的 day_night 字段一致。6. 时间范围（2025-07-01 至 2026-07-01）与证据中的 time_range 字段一致。7. 警区号（5）与证据中的 precinct 字段一致。所有事实性陈述均在证据中找到依据，无矛盾声明。\"}",
+        "model": "qwen-turbo"
+      }
+    },
+    {
+      "fingerprint": "1ffe7cd9db200e9d5f1d4ad6a4115de26972dbf46dbee4bdb42b455a1986f96e",
+      "response": {
+        "content": "{\"hallucinated\": false, \"reason\": \"回答中未出现与证据矛盾的事实性声明，也未包含禁止声明中的断言。同时，回答中包含了必须覆盖的关键信息“唐人街”和“带娃出行相关建议”。\"}",
+        "model": "qwen-turbo"
+      }
+    },
+    {
+      "fingerprint": "3658462207887ae25c1d14bed155f12d058642fda142defd162bd00ed16af765",
+      "response": {
+        "content": "{\"score\": 1.0, \"reason\": \"回答直接回应了用户查询，明确提到了唐人街，并提供了带娃出行相关建议。关键信息均被覆盖，符合判定规则。\"}",
+        "model": "qwen-turbo"
+      }
+    },
+    {
+      "fingerprint": "0f8314675f537d9c9bb1edf4cedd3d2ef3ee1dd53d5b1e467f41b4bcb5a466fc",
+      "response": {
+        "content": "{\"score\": 1.0, \"reason\": \"1. 安全评级：回答中提到的「🔴 高风险」与证据中的「rating\\\": \\\"red\\\"」一致，有依据。2. 样本量：回答中提到的「sample_size\\\": 138」与证据中的「sample_size\\\": 138」一致，有依据。3. 倍数：回答中提到的「ratio_to_city_mean\\\": 1.5902」与证据中的「ratio_to_city_mean\\\": 1.5902」一致，有依据。4. 案件类型：回答中的「top5_types」与证据中的「top5_types」完全一致，有依据。5. 昼夜分布：回答中的「day_night\\\": {\\\"day\\\": 91, \\\"night\\\": 47}」与证据中的「day_night\\\": {\\\"day\\\": 91, \\\"night\\\": 47}」一致，有依据。6. 时间范围：回答中的「time_range\\\": \\\"2025-07-01 至 2026-07-01\\\"」与证据中的「time_range\\\": \\\"2025-07-01 至 2026-07-01\\\"」一致，有依据。7. 警区号：回答中的「precinct\\\": 5」与证据中的「precinct\\\": 5」一致，有依据。\"}",
+        "model": "qwen-turbo"
+      }
+    },
+    {
+      "fingerprint": "3c09112eaa9df6ddf72f080af0cf76888b25fa8fd081d45b0f77f40c7da98d8b",
+      "response": {
+        "content": "{\"hallucinated\": false, \"reason\": \"回答未出现与证据矛盾的事实性声明，且未包含禁止声明中的断言。必须覆盖的关键信息（唐人街、老人出行相关建议）已包含在回答中。\"}",
+        "model": "qwen-turbo"
+      }
+    },
+    {
+      "fingerprint": "5ea8688190dcd2537a2147174cd9a656cd164cffa65cce54e7ecb5772b8c36b8",
+      "response": {
+        "content": "{\"score\": 1.0, \"reason\": \"回答直接回应了用户关于唐人街安全性的查询，包含唐人街的详细安全数据、风险提示、针对老人的出行建议，并符合必须覆盖的关键信息要求。\"}",
+        "model": "qwen-turbo"
+      }
+    },
+    {
+      "fingerprint": "95bd21c35f8b8e0384e01a27daf557c11a6e47ebe1b5536b12003d48a23c5ee1",
+      "response": {
+        "content": "{\"score\": 1.0, \"reason\": \"1. 安全评级为「红色」，与证据中的 rating 字段一致。2. 样本量为 138，与证据中的 sample_size 字段一致。3. 倍数为 1.5902，与证据中的 ratio_to_city_mean 字段一致。4. 案件类型为 top5，与证据中的 top5_types 字段一致。5. 昼夜分布为 day:91, night:47，与证据中的 day_night 字段一致。6. 时间范围为 2025-07-01 至 2026-07-01，与证据中的 time_range 字段一致。7. 警区号为 5，与证据中的 precinct 字段一致。所有事实性陈述均在证据中找到依据，无矛盾声明。\"}",
+        "model": "qwen-turbo"
+      }
+    },
+    {
+      "fingerprint": "910eb2697edca65eed8654f8dd33e3db7a2cea1e3eb404165b2bebc305b559fd",
+      "response": {
+        "content": "{\"hallucinated\": false, \"reason\": \"回答中未出现与证据矛盾的事实性声明，也未包含禁止声明中的路径级安全结论或绝对安全的表述。必须覆盖的关键信息‘唐人街’已包含在回答中，且所有数据和结论均基于证据提供的内容，未超出数据支撑范围。\"}",
+        "model": "qwen-turbo"
+      }
+    },
+    {
+      "fingerprint": "1b877ea98856b1cc37481e81a4bc52e6fd4d0d132ff1fba0174ffd96abba0e94",
+      "response": {
+        "content": "{\"score\": 1.0, \"reason\": \"回答直接回应了用户关于唐人街凌晨两点安全性的查询，明确提到了唐人街，并提供了相关安全评级、犯罪类型统计和安全建议，未包含路径级安全结论或绝对安全的表述。\"}",
+        "model": "qwen-turbo"
+      }
+    },
+    {
+      "fingerprint": "8b9792db046e4a88ead1f4c43054808126e4ca7fbd64558d4e3efdd8f710d609",
+      "response": {
+        "content": "{\"score\": 1.0, \"reason\": \"1. 安全评级「🟢 相对安全」与证据中的「rating」字段一致，支持。2. 样本量「101」与证据中的「sample_size」字段一致，支持。3. 倍数「0.6983」与证据中的「ratio_to_city_mean」字段一致，支持。4. 案件类型「CRIMINAL MISCHIEF」「GRAND LARCENY」「MISDEMEANOR ASSAULT」「FELONY ASSAULT」「PETIT LARCENY」与证据中的「top5_types」字段一致，支持。5. 昼夜分布「day: 58, night: 43」与证据中的「day_night」字段一致，支持。6. 时间范围「2025-07-01 至 2026-07-01」与证据中的「time_range」字段一致，支持。7. 警区号「90」与证据中的「precinct」字段一致，支持。8. 图表细分数据（如 top5 类型、昼夜分布）由证据中的聚合统计派生，视为有依据。9. 无与证据矛盾的声明。\"}",
+        "model": "qwen-turbo"
+      }
+    },
+    {
+      "fingerprint": "d12859ebb70667ff71cda8f4e0bd0e7c8eee738dc2edbbe186fdecff430f063a",
+      "response": {
+        "content": "{\"hallucinated\": false, \"reason\": \"回答中未出现与证据矛盾的事实性声明，也未违反禁止声明中的内容。回答中包含的‘威廉斯堡’符合must_mention要求，且未出现‘路径级安全结论’或‘绝对安全’等禁止断言。\"}",
+        "model": "qwen-turbo"
+      }
+    },
+    {
+      "fingerprint": "c0ec7c206454c0fbcb4d8240514877b6c5a0fdf75f6fdeb4ad303eafbc652943",
+      "response": {
+        "content": "{\"score\": 1.0, \"reason\": \"回答直接回应了用户关于威廉斯堡晚上是否安全的查询，明确提到了威廉斯堡，并给出了安全评级为绿色（相对安全），同时提供了相关建议和数据支持。未出现路径级安全结论或绝对安全的表述，符合关键信息要求。\"}",
+        "model": "qwen-turbo"
+      }
+    },
+    {
+      "fingerprint": "713f495e6770b38af19c8f4fa72a9963714ee5d1e05bc43eb5ec378b96f81b79",
+      "response": {
+        "content": "{\"score\": 1.0, \"reason\": \"1. 安全评级（green）：证据中明确标注为 green，支持。2. 样本量（101）：证据中 sample_size 为 101，支持。3. 倍数（0.6983）：证据中 ratio_to_city_mean 为 0.6983，支持。4. 案件数（top5_types）：证据中 top5_types 数据一致，支持。5. 警区号（90）：证据中 precinct 为 90，支持。6. 昼夜分布（day:58, night:43）：证据中 day_night 数据一致，支持。7. 时间范围（2025-07-01 至 2026-07-01）：证据中 time_range 一致，支持。所有事实性陈述均在证据中有依据，无矛盾。\"}",
+        "model": "qwen-turbo"
+      }
+    },
+    {
+      "fingerprint": "c9c05357e081be5e5b48f354e30a9661039ed54e01ad74eb42cdea8ad80833dd",
+      "response": {
+        "content": "{\"hallucinated\": false, \"reason\": \"回答中未出现与证据矛盾的事实性声明，也未违反禁止声明中的路径级安全结论或绝对安全的断言。同时，必须覆盖的关键信息“威廉斯堡”已包含在回答中。\"}",
+        "model": "qwen-turbo"
+      }
+    },
+    {
+      "fingerprint": "15c560269b160450a327c1312af71127504ddc492118d175210e1266da74ddb6",
+      "response": {
+        "content": "{\"score\": 1.0, \"reason\": \"回答直接回应了用户关于威廉斯堡安全性的查询，明确提到了威廉斯堡，并提供了相关安全数据和建议，未涉及路径级安全结论或绝对安全的表述。\"}",
+        "model": "qwen-turbo"
+      }
+    },
+    {
+      "fingerprint": "e595f0bb7ce01cb23e2aedcba67e0b64f8236fdd65ecf1b24f7efeda18e24322",
+      "response": {
+        "content": "{\"score\": 1.0, \"reason\": \"1. 安全评级（green）与证据中的 rating 字段一致。2. 样本量（101）与 evidence 中的 sample_size 字段一致。3. 倍数（0.6983）与 evidence 中的 ratio_to_city_mean 字段一致。4. 案件类型（CRIMINAL MISCHIEF、GRAND LARCENY 等）与 evidence 中的 top5_types 字段一致。5. 昼夜分布（day: 58, night: 43）与 evidence 中的 day_night 字段一致。6. 时间范围（2025-07-01 至 2026-07-01）与 evidence 中的 time_range 字段一致。7. 警区号（90）与 evidence 中的 precinct 字段一致。所有事实性陈述均在证据中找到依据，无矛盾声明。\"}",
+        "model": "qwen-turbo"
+      }
+    },
+    {
+      "fingerprint": "b01a45cc7add60a1feec5cf31c7ea82cea03672cfee91903b90ae9579e5c6192",
+      "response": {
+        "content": "{\"hallucinated\": false, \"reason\": \"回答中未出现与证据矛盾的事实性声明，且未违反禁止声明中的任何断言。所有信息均基于证据内容，未添加额外虚构信息。\"}",
+        "model": "qwen-turbo"
+      }
+    },
+    {
+      "fingerprint": "c1b7d264d81ebaf2f00ee38f5b506d8f5ec1ade7ba2b02afb9d72086857ce20b",
+      "response": {
+        "content": "{\"score\": 1.0, \"reason\": \"回答直接回应了用户关于威廉斯堡安全性的查询，明确提到了威廉斯堡，并包含针对晚归人群的时间提示。所有必须覆盖的关键信息均被满足，未出现违规内容。\"}",
+        "model": "qwen-turbo"
+      }
+    },
+    {
+      "fingerprint": "bd9bd95ee565da6369aa3e214350929cdf44b5f5bfed6bb533597aa1ab3cba75",
+      "response": {
+        "content": "{\"score\": 1.0, \"reason\": \"1. 安全评级：回答中提到的 '🟢 相对安全' 与证据中的 'rating': 'green' 一致，有依据。2. 样本量：回答中 'sample_size': 101 与证据中 'sample_size': 101 一致，有依据。3. 倍数：回答中 'ratio_to_city_mean': 0.6983 与证据中 'ratio_to_city_mean': 0.6983201597424651 接近，可视为一致。4. 案件数：回答中 'top5_types' 的案件类型和数量与证据中一致，有依据。5. 警区号：回答中 'precinct': 90 与证据中 'precinct': 90 一致，有依据。6. 昼夜分布：回答中 'day_night': {'day': 58, 'night': 43} 与证据中一致，有依据。7. 时间范围：回答中 'time_range': '2025-07-01 至 2026-07-01' 与证据中一致，有依据。\"}",
+        "model": "qwen-turbo"
+      }
+    },
+    {
+      "fingerprint": "007d3599b01136acfbfab64443a2ce3fb066b91aa0653968b55f97ad21f73f4a",
+      "response": {
+        "content": "{\"hallucinated\": false, \"reason\": \"回答中未出现禁止声明中的路径级安全结论或绝对安全表述，且包含的「威廉斯堡」符合must_mention要求。所有数据与证据一致，未出现矛盾事实性声明。\"}",
+        "model": "qwen-turbo"
+      }
+    },
+    {
+      "fingerprint": "f88865447ef5d449135fadc6a44407ee0c4e0f346999f58b08c30ca295fd2ddc",
+      "response": {
+        "content": "{\"score\": 1.0, \"reason\": \"回答直接回应了用户关于威廉斯堡周末安全性的查询，明确提到了威廉斯堡，并给出了相对安全的结论，符合用户意图。关键信息中的'威廉斯堡'被覆盖，且未出现路径级安全结论或绝对安全表述，符合判定规则。\"}",
+        "model": "qwen-turbo"
+      }
+    },
+    {
+      "fingerprint": "2b84683b5513fa7f64601d544e3ad2af71761931fca9232566ec2a70ba4382d4",
+      "response": {
+        "content": "{\"score\": 0.8, \"reason\": \"1. 安全评级为'insufficient_data'，与证据中'rating': 'insufficient_data'一致，支持。2. 样本量为6，与证据中'sample_size': 6一致，支持。3. 时间范围为'2025-07-01 至 2026-07-01'，与证据中'time_range': '2025-07-01 至 2026-07-01'一致，支持。4. 警区号为84，与证据中'precinct': 84一致，支持。5. top5案件类型与证据中'top5_types'一致，支持。6. 昼夜分布为day:5, night:1，与证据中'day_night'一致，支持。7. 证据中'sources'包含'模拟数据'，回答中也提到'sources': ['模拟数据']，支持。8. 回答中未出现与证据矛盾的声明，仅存在部分建议类内容，不扣分。\"}",
+        "model": "qwen-turbo"
+      }
+    },
+    {
+      "fingerprint": "c41eb7e8b34513f51dc9d901e2c0b26e2412876c27393703780c3bd5023183a1",
+      "response": {
+        "content": "{\"hallucinated\": false, \"reason\": \"回答中未出现与证据矛盾的事实性声明，且未违反禁止声明中的任何内容。回答明确指出数据不足，并未给出确定评级或具体犯罪率数字，符合must_mention要求。\"}",
+        "model": "qwen-turbo"
+      }
+    },
+    {
+      "fingerprint": "133998b3b5095a63b10c276b75ce5e1b4de4b69296b5c820a3e59cbf47fdd33c",
+      "response": {
+        "content": "{\"score\": 1.0, \"reason\": \"回答直接回应了用户关于布鲁克林高地安全性的查询，明确提到“数据不足”，符合必须覆盖的关键信息要求。同时未对布鲁克林高地做出确定评级或提供具体犯罪率数字，符合规则。\"}",
+        "model": "qwen-turbo"
+      }
+    },
+    {
+      "fingerprint": "98adfef235929c6019f173eb14dec094d0051ba52462484964d4b82993cb6ba2",
+      "response": {
+        "content": "{\"score\": 0.5, \"reason\": \"1. 回答中提到的 '布鲁克林高地：⚪ 数据不足' 与证据中的 'rating': 'insufficient_data' 一致，支持。2. 回答中提到的 '样本量': 6 与证据中的 'sample_size': 6 一致，支持。3. 回答中提到的 '时间范围': '2025-07-01 至 2026-07-01' 与证据中的 'time_range': '2025-07-01 至 2026-07-01' 一致，支持。4. 回答中提到的 '警区号': 84 与证据中的 'precinct': 84 一致，支持。5. 回答中提到的 'top5 案件类型' 与证据中的 'top5_types' 一致，支持。6. 回答中提到的 '昼夜分布': {'day': 5, 'night': 1} 与证据中的 'day_night': {'day': 5, 'night': 1} 一致，支持。7. 回答中未提及 'rate_per_100k': 6.3158 和 'city_mean_per_100k': 144.6328，因此无法判断是否被支持。8. 回答中未提及 'ratio_to_city_mean'，因此无法判断是否被支持。9. 回答中未提及 'population': 95000，因此无法判断是否被支持。\"}",
+        "model": "qwen-turbo"
+      }
+    },
+    {
+      "fingerprint": "88a8e07e0abc03f30afea3bb5459e0c8682dfd0559b93d14f942debd1ca65e49",
+      "response": {
+        "content": "{\"hallucinated\": false, \"reason\": \"回答中未出现与证据矛盾的事实性声明，且未违反禁止声明中的内容。回答明确提到'数据不足'，符合must_mention要求，未提及布鲁克林高地的确定评级或具体犯罪率数字，因此不构成幻觉。\"}",
+        "model": "qwen-turbo"
+      }
+    },
+    {
+      "fingerprint": "8c00c00baebf793232762faff4aa418269b9627f9ee5a50ddfc712502544fd6f",
+      "response": {
+        "content": "{\"score\": 1.0, \"reason\": \"回答直接回应了用户关于布鲁克林高地安全性的查询，明确提到了“布鲁克林高地”和“数据不足”，符合必须覆盖的关键信息要求，同时未声称有确定评级或具体犯罪率数字，符合判定规则。\"}",
+        "model": "qwen-turbo"
+      }
+    },
+    {
+      "fingerprint": "25117cbc933d009ee228856ccf3f8f8ad96074c154fcb7bafbd3e170acc7f0e7",
+      "response": {
+        "content": "{\"score\": 0.5, \"reason\": \"1. 安全评级为 'insufficient_data'，与证据中 'rating': 'insufficient_data' 一致，支持。2. 样本量为 6，与证据中 'sample_size': 6 一致，支持。3. 案件数未明确提及，但证据中 'top5_types' 包含案件类型，可视为有依据。4. 警区号 84 与证据中 'precinct': 84 一致，支持。5. top5 案件类型与证据中 'top5_types' 一致，支持。6. 昼夜分布为 day:5, night:1，与证据中 'day_night': {'day': 5, 'night': 1} 一致，支持。7. 时间范围为 '2025-07-01 至 2026-07-01'，与证据中 'time_range': '2025-07-01 至 2026-07-01' 一致，支持。8. 证据中 'sources' 包含 '模拟数据'，但回答中未明确说明数据来源为模拟，可能误导用户，扣分。\"}",
+        "model": "qwen-turbo"
+      }
+    },
+    {
+      "fingerprint": "d203c29646017bd967a01902227671ebf7a93f06deff7cce5c2747efe2f658e4",
+      "response": {
+        "content": "{\"hallucinated\": false, \"reason\": \"回答中未出现与证据矛盾的事实性声明，且未违反禁止声明。回答中明确提到“数据不足”，符合 must_mention 要求，未提及“布鲁克林高地的确定评级”或“具体犯罪率数字”，因此不构成幻觉。\"}",
+        "model": "qwen-turbo"
+      }
+    },
+    {
+      "fingerprint": "571398c9e14cbe549b76fd2d616d3a68469bbce35dabec986c4b98b1a6da17c1",
+      "response": {
+        "content": "{\"score\": 1.0, \"reason\": \"回答直接回应了用户关于布鲁克林 Heights 晚上是否安全的查询，明确提到“数据不足”，符合必须覆盖的关键信息。同时未给出确定评级或具体犯罪率数字，符合规则要求。\"}",
+        "model": "qwen-turbo"
+      }
+    },
+    {
+      "fingerprint": "41ea13578e791d3424b6f5a684c2cb776ec5db9d73a44f4eecf4bcfe45b91eef",
+      "response": {
+        "content": "{\"score\": 0.5, \"reason\": \"1. 安全评级为'insufficient_data'，与证据中一致，支持。2. 样本量为6，与证据中一致，支持。3. 案件类型为top5，与证据中一致，支持。4. 警区号84，与证据中一致，支持。5. 时间范围为2025-07-01 至 2026-07-01，与证据中一致，支持。6. 昼夜分布为day:5, night:1，与证据中一致，支持。7. 未提及犯罪率、倍数、占比等数据，无矛盾。8. 但回答中包含'周末'的提取信息，而证据中并未明确说明该时间段的安全性，因此存在不完全支持的情况。\"}",
+        "model": "qwen-turbo"
+      }
+    },
+    {
+      "fingerprint": "4d4a327c2d56fb113bc78c07095c49a4c78956dfc83c273907e69f505d2e4c14",
+      "response": {
+        "content": "{\"hallucinated\": false, \"reason\": \"回答中未出现与证据矛盾的事实性声明，且未违反禁止声明。回答中明确提到“数据不足”，符合must_mention要求，未提及布鲁克林高地的确定评级或具体犯罪率数字，因此不构成幻觉。\"}",
+        "model": "qwen-turbo"
+      }
+    },
+    {
+      "fingerprint": "9df9b6bfb93b7d316da07f0dfcd4d7536d4572a6ff3f492e638867950d541126",
+      "response": {
+        "content": "{\"score\": 1.0, \"reason\": \"回答直接回应了用户查询，明确提到了布鲁克林高地，并指出数据不足，符合必须覆盖的关键信息要求，未涉及确定评级或具体犯罪率数字，符合判定规则。\"}",
+        "model": "qwen-turbo"
+      }
+    },
+    {
+      "fingerprint": "5b0445cefe3e5ace1f4bccff6961a16f4772a4794ee2bc7231e3ca18e7b80cac",
+      "response": {
+        "content": "{\"score\": 1.0, \"reason\": \"1. 安全评级：唐人街为红色，威廉斯堡为绿色，与证据一致。2. 样本量：唐人街138，威廉斯堡101，与证据一致。3. 警区号：唐人街为5，威廉斯堡为90，与证据一致。4. top5案件类型：唐人街为CRIMINAL MISCHIEF、HARRASSMENT 2、PETIT LARCENY、BURGLARY、GRAND LARCENY；威廉斯堡为CRIMINAL MISCHIEF、GRAND LARCENY、MISDEMEANOR ASSAULT、FELONY ASSAULT、PETIT LARCENY，与证据一致。5. 昼夜分布：唐人街白天91，夜间47；威廉斯堡白天58，夜间43，与证据一致。6. 时间范围：2025-07-01 至 2026-07-01，与证据一致。所有事实性陈述均在证据中找到依据，无矛盾。\"}",
+        "model": "qwen-turbo"
+      }
+    },
+    {
+      "fingerprint": "ae2008f810b9a0d508d409ecea8e0b69339b10eb2094d4886fc4e72403e05a8a",
+      "response": {
+        "content": "{\"hallucinated\": false, \"reason\": \"回答中未出现禁止声明中的‘长期趋势对比数据’或‘路径级安全结论’，且所有信息均基于证据内容，未出现与证据矛盾的事实性声明。同时，必须覆盖的关键信息‘唐人街’和‘威廉斯堡’已被正确提及。\"}",
+        "model": "qwen-turbo"
+      }
+    },
+    {
+      "fingerprint": "ec09b86708138e653d96bdceac62120b5a8c8d8a5331fd5b7dfe15059d479c97",
+      "response": {
+        "content": "{\"score\": 1.0, \"reason\": \"回答直接回应了用户关于唐人街和威廉斯堡哪个更安全的查询，明确提供了两个区域的安全评级、案件类型及夜间风险等信息，并在决策辅助部分对比了两者的表现。同时，回答中包含了必须提及的‘唐人街’和‘威廉斯堡’，未涉及被禁止的‘长期趋势对比数据’和‘路径级安全结论’。\"}",
+        "model": "qwen-turbo"
+      }
+    },
+    {
+      "fingerprint": "fb2b696ef054a87de9fcec8dd021a719a25da42d8a54bdaf8cbe25748486790c",
+      "response": {
+        "content": "{\"score\": 1.0, \"reason\": \"1. 回答中提到的法拉盛和上东区的安全评级（yellow 和 green）与证据中的 rating 字段一致，有依据。2. 样本量（94 和 105）与证据中的 sample_size 字段一致，有依据。3. 警区号（109 和 19）与证据中的 precinct 字段一致，有依据。4. top5 案件类型与证据中的 top5_types 字段一致，有依据。5. 昼夜分布（day: 58/62, night: 36/43）与 evidence 中的 day_night 字段一致，有依据。6. 时间范围未在回答中明确提及，因此不构成事实性陈述。7. 所有事实性陈述均在证据中有明确支持，无矛盾或未被支持的内容。\"}",
+        "model": "qwen-turbo"
+      }
+    },
+    {
+      "fingerprint": "fd76d9ec99cc54cc4288bed7609602b3dd38bbfecf7e28eef39b0849174263e4",
+      "response": {
+        "content": "{\"hallucinated\": false, \"reason\": \"回答中未出现与证据矛盾的事实性声明，且未包含禁止声明中的断言内容。回答中提到的‘长期趋势对比维度仍在开发中，暂不提供’属于对信息状态的说明，不构成对该信息的声称，符合规则。同时，回答中覆盖了必须提及的‘法拉盛’和‘上东区’，符合要求。\"}",
+        "model": "qwen-turbo"
+      }
+    },
+    {
+      "fingerprint": "dcf92746959713e92a2ac2bae896386dd0d9350c79ed1689950e872f62393020",
+      "response": {
+        "content": "{\"score\": 1.0, \"reason\": \"回答直接回应了用户查询，对比了法拉盛和上东区的安全数据，并覆盖了必须提及的'法拉盛'和'上东区'。未涉及'长期趋势对比数据'和'路径级安全结论'，符合要求。\"}",
+        "model": "qwen-turbo"
+      }
+    }
+  ]
+}

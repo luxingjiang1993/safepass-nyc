@@ -177,6 +177,24 @@ class IntelConfig:
 
 
 @dataclass(frozen=True)
+class EvalConfig:
+    """L2 LLM-as-judge 评估套件配置（issue 03 / M1，spec v2「L2」节）。
+
+    judge_model/base_url：考官模型与接入点（dev = DashScope Qwen，考官考生同源）；
+    cassette：judge 调用录制回放文件（录制一次性在线，回放离线零调用）；
+    pass_threshold：判定通过分数下界（三项 L2 指标同口径）；
+    prompt_versions：三类 evaluator 提示词模板版本锁定（键 = feedback_key，
+    值 = 版本字符串；改模板必须升版本，否则 cassette 指纹校验直接拒放）。
+    """
+
+    judge_model: str
+    base_url: str
+    cassette: str
+    pass_threshold: float
+    prompt_versions: dict[str, str]
+
+
+@dataclass(frozen=True)
 class AppConfig:
     thresholds: RatingThresholds
     sample_size_tiers: tuple[SampleSizeTier, ...]
@@ -195,6 +213,7 @@ class AppConfig:
     guardrails: GuardrailsConfig
     profile: ProfileConfig
     intel: IntelConfig
+    eval: EvalConfig
 
 
 def _require(mapping: dict[str, Any], key: str, where: str) -> Any:
@@ -449,6 +468,28 @@ def load_config(path: str | Path | None = None) -> AppConfig:
     if not intel.unverified_label.strip():
         raise ConfigError("intel.unverified_label 不得为空（F7-3 未记载项统一标注）")
 
+    eval_raw = _require(data, "eval", "root")
+    prompt_versions_raw = _require(eval_raw, "prompt_versions", "eval")
+    if not isinstance(prompt_versions_raw, dict) or not prompt_versions_raw:
+        raise ConfigError("eval.prompt_versions 必须是非空映射（feedback_key → 版本）")
+    eval_cfg = EvalConfig(
+        judge_model=str(_require(eval_raw, "judge_model", "eval")),
+        base_url=str(_require(eval_raw, "base_url", "eval")),
+        cassette=str(_require(eval_raw, "cassette", "eval")),
+        pass_threshold=float(_require(eval_raw, "pass_threshold", "eval")),
+        prompt_versions={str(k): str(v) for k, v in prompt_versions_raw.items()},
+    )
+    if not eval_cfg.judge_model.strip():
+        raise ConfigError("eval.judge_model 不得为空（L2 考官模型锁定）")
+    if not eval_cfg.base_url.strip():
+        raise ConfigError("eval.base_url 不得为空（judge 接入点）")
+    if not eval_cfg.cassette.strip():
+        raise ConfigError("eval.cassette 不得为空（judge 录制回放路径）")
+    if not (0.0 < eval_cfg.pass_threshold <= 1.0):
+        raise ConfigError("eval.pass_threshold 必须在 (0, 1] 区间")
+    if any(not v.strip() for v in eval_cfg.prompt_versions.values()):
+        raise ConfigError("eval.prompt_versions 的值（版本字符串）不得为空")
+
     return AppConfig(
         thresholds=thresholds,
         sample_size_tiers=tiers,
@@ -467,6 +508,7 @@ def load_config(path: str | Path | None = None) -> AppConfig:
         guardrails=guardrails,
         profile=profile,
         intel=intel,
+        eval=eval_cfg,
     )
 
 

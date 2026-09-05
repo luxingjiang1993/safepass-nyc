@@ -246,4 +246,23 @@ intel:
   # 知识库未记载事实的统一输出（F7-3 诚实路径；如某警区是否有中文警员）
   unverified_label: "未核实到"
 
+# ============================================================================
+# L2 LLM-as-judge 评估套件（issue 03 / M1，spec v2「L2」节）：
+# judge = dev 模型（DashScope Qwen，考官考生同源）；judge 调用走 cassette
+# 离线回放（tests/cassettes/l2_judge.json，录制入口 scripts/record_l2_cassette.py，
+# 需一次性真实 DASHSCOPE_API_KEY；回放零真实调用）。
+# 提示词模板本体在 safepass/evaluators.py（改写自 CASE-openevals使用，
+# 来源逐组件标注）；此处锁定 judge 模型名、接入点与各模板版本——
+# 评估基准不随依赖升级或模型切换悄悄漂移。
+# ============================================================================
+eval:
+  judge_model: "qwen-turbo"     # dev/test 考官模型（CLAUDE.md 模型路由：DashScope Qwen 系列）
+  base_url: "https://dashscope.aliyuncs.com/compatible-mode/v1"
+  cassette: "tests/cassettes/l2_judge.json"
+  pass_threshold: 0.7           # 判定通过分数下界（三项指标同口径）
+  prompt_versions:
+    groundedness: "sp-groundedness-v4"
+    hallucination: "sp-hallucination-v4"
+    relevance: "sp-relevance-v1"
+
 

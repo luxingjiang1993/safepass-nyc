@@ -69,17 +69,23 @@ def chat_with_cassette(
     messages: Sequence[dict[str, Any]],
     *,
     model: str | None = None,
+    record: bool = False,
     **kwargs: Any,
 ) -> ChatResponse:
     """cassette 存在则离线重放；否则调用 client 并把交互录制到 cassette。
 
     重放是严格的：下一条录制交互的请求指纹必须与本次调用一致，
     否则抛 CassetteError（防止测试改了提示词却还在用旧录制 silently 通过）。
+
+    record=True 显式切录制模式（一次性在线，如 scripts/record_l2_cassette.py）：
+    一律追加新交互并推进游标，绝不回放——同一进程连续录制多条交互
+    （L2 套件 50 条 × 3 判定 = 150 条）不会因为游标语义混用而失败。
+    回放路径绝不使用 record=True（耗尽/指纹不符必须报错，不静默补录）。
     """
     path = Path(cassette_path)
     fp = _fingerprint(messages, {"model": model, **kwargs})
 
-    if path.exists():
+    if not record and path.exists():
         try:
             entries = json.loads(path.read_text(encoding="utf-8"))["interactions"]
         except (json.JSONDecodeError, KeyError, OSError) as exc:
@@ -105,11 +111,17 @@ def chat_with_cassette(
         response = ChatResponse(content=str(response), model=model or "")
     entries: list[dict[str, Any]] = []
     if path.exists():
-        entries = json.loads(path.read_text(encoding="utf-8"))["interactions"]
+        try:
+            entries = json.loads(path.read_text(encoding="utf-8"))["interactions"]
+        except (json.JSONDecodeError, KeyError, OSError) as exc:
+            raise CassetteError(f"cassette 损坏：{path}（{exc}）") from exc
     entries.append({"fingerprint": fp, "response": asdict(response)})
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(
         json.dumps({"interactions": entries}, ensure_ascii=False, indent=2, sort_keys=True),
         encoding="utf-8",
     )
+    # 录制也把消费游标推进到最新条目：同一进程内连续录制多条交互
+    # （如 L2 套件 50 条 × 3 判定）时，下一条调用不会误回放已录制的首条。
+    _consumed[path] = len(entries)
     return response
