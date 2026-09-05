@@ -586,18 +586,20 @@ def render_guardrail(result: contracts.GuardrailResult) -> str:
 
 # ---------------------------------------------------------------- 错误态（404，票 09）
 
-def render_not_found() -> str:
+def render_not_found(cfg: config_loader.AppConfig) -> str:
     """404 错误页（票 09）：完整页面——明确状态码 + 友好文案 + 回家路径。
 
-    错误态不打断成裸文本：与全站同一样式体系（style.css），视觉与
-    语气跟问候/降级页一致（诚实、温暖、给出路）。
+    错误态不打断成裸文本：与全站同一样式体系（style.css），共享页脚免责
+    与返回导航（与全部既有页面同一骨架），语气跟问候/降级页一致。
     """
-    body = """<header class="error-head">
+    body = f"""{_back_link()}
+<header class="error-head">
   <p class="error-code">404</p>
   <h1>咦，这里好像没有页面 🧭</h1>
   <p class="error-copy">链接可能写错了，或者页面已经搬家了。回到首页就能继续查询～</p>
 </header>
-<p class="error-home"><a href="/">🏠 回到首页</a></p>"""
+<p class="error-home"><a href="/">🏠 回到首页</a></p>
+{_disclaimer(cfg.disclaimer)}"""
     return _page("页面不存在 — SafePass NYC", body)
 
 

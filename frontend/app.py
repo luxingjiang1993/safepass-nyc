@@ -154,7 +154,9 @@ def make_handler(store: SessionStore | None = None):
 
         def _send_not_found(self) -> None:
             """404 错误态（票 09）：渲染层完整页面（文案 + 视觉 + 回家路径）。"""
-            self._send_html(render.render_not_found(), HTTPStatus.NOT_FOUND)
+            self._send_html(
+                render.render_not_found(config_loader.get_config()), HTTPStatus.NOT_FOUND
+            )
 
         def _send_redirect(self, location: str, set_cookie: str | None = None) -> None:
             """PRG：303 See Other 重定向，表单提交后回到页面视图。"""

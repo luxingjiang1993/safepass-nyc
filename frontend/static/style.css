@@ -266,6 +266,10 @@ body.theme-emergency .emergency-contacts small { color: #e0a9ac; }
   .error-code { font-size: 2.2rem; }
 }
 
+/* --- 排版（票 09）：标题换行平衡 + 段落孤词控制（渐进增强，不支持时无退化） --- */
+h1, h2 { text-wrap: balance; }
+p, li { text-wrap: pretty; }
+
 /* --- 横切 --- */
 .disclaimer {
   margin-top: 1.5rem;

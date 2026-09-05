@@ -68,6 +68,14 @@ class TestNotFoundPage:
         assert "404" in body  # 明确状态码呈现
         assert 'href="/"' in body  # 明确的回家路径，不把用户留在死胡同
 
+    def test_404_shares_site_chrome(self, server):
+        # 风格统一（spec 票 09 头部）：404 与全站同一骨架——返回导航 + 页脚免责
+        from safepass import config_loader
+
+        body = get(server, "/nope").body  # type: ignore[attr-defined]
+        assert 'class="back"' in body
+        assert config_loader.get_config().disclaimer in body
+
     def test_404_post_unknown_path_also_styled(self, server):
         conn = http.client.HTTPConnection(server.server_address[0], server.server_address[1], timeout=60)
         conn.request("POST", "/nope", body="", headers={"Content-Type": "application/x-www-form-urlencoded"})
@@ -121,3 +129,9 @@ class TestNarrowScreen:
     def test_long_links_can_break(self, css):
         # 窄屏下长 URL 可断行，不撑出横向滚动（overflow-wrap）
         assert "overflow-wrap" in css
+
+    def test_typography_progressive_enhancement(self, css):
+        # 排版打磨（spec 票 09 头部「排版」）：标题换行平衡 + 段落孤词控制；
+        # 纯渐进增强，不支持的浏览器无退化
+        assert "text-wrap: balance" in css
+        assert "text-wrap: pretty" in css
