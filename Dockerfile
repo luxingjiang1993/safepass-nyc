@@ -24,7 +24,9 @@ RUN apt-get update \
 # 先装 CPU 版 torch（默认索引的 torch 拉 ~2.5GB CUDA 依赖，运行时纯 CPU
 # 用不到；CPU wheel ~200MB）。requirements.txt 仍是应用依赖的单一事实源，
 # 此行只是安装源的层内优化——sentence-transformers 的 torch 依赖已被满足。
-RUN pip install --no-cache-dir torch --index-url https://download.pytorch.org/whl/cpu
+# 版本钉死（==2.14.0，验收审计 N6）：torch 与 sentence-transformers 的兼容
+# 配对经 venv 实测（2.14.0+cpu / 6.0.1），不钉版构建随上游漂移。
+RUN pip install --no-cache-dir torch==2.14.0 --index-url https://download.pytorch.org/whl/cpu
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PIP_NO_CACHE_DIR=1

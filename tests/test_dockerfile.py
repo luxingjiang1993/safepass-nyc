@@ -148,6 +148,32 @@ def test_runtime_cost_report_dir_precreated_for_non_root():
     )
 
 
+def test_build_dependencies_pinned():
+    """torch（Dockerfile 层内优化安装）与 sentence-transformers（requirements）
+    钉版（验收审计 N6）：不钉版 = 构建随上游漂移，且两者兼容配对断裂时构建期
+    才爆。torch/sentence-transformers 必须 == 钉死，且 major.minor 配对一致
+    （升级须两侧同步改，单侧漂移即红）。"""
+    text = DOCKERFILE.read_text(encoding="utf-8")
+    m = re.search(r"pip install --no-cache-dir (torch==\S+)\s+--index-url", text)
+    assert m, "Dockerfile 的 torch 层内安装必须钉版（torch==X.Y.Z）"
+    torch_pin = m.group(1).removeprefix("torch==")
+
+    req = (REPO_ROOT / "requirements.txt").read_text(encoding="utf-8")
+    m = re.search(r"^sentence-transformers==(\S+)", req, re.M)
+    assert m, "requirements.txt 的 sentence-transformers 必须钉版（==，禁 >=/<=）"
+    st_pin = m.group(1)
+
+    assert torch_pin.count(".") == 2 and st_pin.count(".") == 2, (
+        f"两侧都须完整三段式钉版：torch=={torch_pin} / sentence-transformers=={st_pin}"
+    )
+    # 兼容配对锁：torch major.minor 与 sentence-transformers major.minor 成对升级
+    # （2.14 ↔ 6.0 为 venv 实测配对；单侧改 major.minor = 红 = 刻意事件）
+    assert torch_pin.rsplit(".", 1)[0] == "2.14" and st_pin.rsplit(".", 1)[0] == "6.0", (
+        f"torch({torch_pin}) 与 sentence-transformers({st_pin}) 的实测兼容配对为 "
+        "2.14.x ↔ 6.0.x：单侧升级须先实测并同步改另一侧与本断言"
+    )
+
+
 # ---------------------------------------------------------------------------
 # 5. 端口一致性：EXPOSE == serve.py 默认 PORT == 冒烟脚本容器侧端口
 # ---------------------------------------------------------------------------

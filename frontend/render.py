@@ -678,7 +678,7 @@ def render_disclaimer_page(
   <ul>
     <li>{_esc(cfg.disclaimer)}</li>
     <li>本产品的评级与建议不构成法律、安保或置业决策依据，重大决定请咨询专业人士。</li>
-    <li>如遇紧急情况请立即拨打 911；非紧急市政协助请拨 311。</li>
+    <li>{_esc(cfg.disclaimer_emergency_line)}</li>
   </ul>
 </section>
 {venue_list}

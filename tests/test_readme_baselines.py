@@ -1,6 +1,6 @@
 """issue 04 / M1 勾选一二：README 质量基线对账测试。
 
-三项指标（路由准确率 L1 / groundedness L2 / 幻觉率 L2）已写入 README，
+三项指标（L1 金标通过率 / groundedness L2 / 幻觉率 L2）已写入 README，
 本测试把 README 里的数字与权威事实源对账，防"文档漂移"（文档说一套、
 套件跑一套）：
 
@@ -56,14 +56,14 @@ def test_readme_l2_baselines_match_recorded_artifact():
         )
 
 
-def test_readme_l1_routing_accuracy_covers_all_golden_entries():
-    """README 路由准确率 = 100% 且分子分母恰等于金标条目总数。"""
+def test_readme_l1_golden_pass_rate_covers_all_golden_entries():
+    """README L1 金标通过率 = 100% 且分子分母恰等于金标条目总数。"""
     n_entries = len(json.loads(GOLDEN_PATH.read_text(encoding="utf-8"))["entries"])
-    cell = _readme_baseline_cell("路由准确率（L1）")
+    cell = _readme_baseline_cell("L1 金标通过率")
     match = re.fullmatch(r"100%（(\d+)/(\d+)）", cell)
-    assert match, f"README 路由准确率基线列格式应为「100%（分子/分母）」，实际 {cell!r}"
+    assert match, f"README L1 金标通过率基线列格式应为「100%（分子/分母）」，实际 {cell!r}"
     assert (int(match.group(1)), int(match.group(2))) == (n_entries, n_entries), (
-        f"README 路由准确率分子分母 {match.groups()} 与金标条目数 {n_entries} 不符"
+        f"README L1 金标通过率分子分母 {match.groups()} 与金标条目数 {n_entries} 不符"
     )
 
 

@@ -11,7 +11,7 @@ PyYAML==6.0.2              # 集中配置（config/app.yaml）
 # --- 检索（spec D11a：全部本地文件形态，无向量数据库服务）---
 faiss-cpu==1.9.0.post1     # 向量索引，本地索引文件
 rank-bm25==0.2.2           # BM25 关键词检索
-sentence-transformers>=3.0.0  # 本地 embedding 模型，不依赖 API
+sentence-transformers==6.0.1  # 本地 embedding 模型，不依赖 API（钉版：与 Dockerfile 的 torch==2.14.0 配对经 venv 实测，验收审计 N6）
 
 # --- 数据与修复 ---
 pandas==2.2.3              # 数据集聚合

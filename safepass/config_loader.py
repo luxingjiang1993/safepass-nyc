@@ -281,6 +281,8 @@ class AppConfig:
     city_mean_per_100k: float | None
     max_retries: int
     disclaimer: str
+    # 免责页紧急资源提示行（验收审计 #5-④：号码字面量单一事实源在配置）
+    disclaimer_emergency_line: str
     addressing: AddressingConfig
     degraded: DegradedConfig
     suggestions: SuggestionsConfig
@@ -415,6 +417,10 @@ def load_config(path: str | Path | None = None) -> AppConfig:
     disclaimer = str(_require(data, "disclaimer", "root"))
     if not disclaimer.strip():
         raise ConfigError("disclaimer 不得为空")
+
+    disclaimer_emergency_line = str(_require(data, "disclaimer_emergency_line", "root"))
+    if not disclaimer_emergency_line.strip():
+        raise ConfigError("disclaimer_emergency_line 不得为空")
 
     suggestions_raw = _require(data, "suggestions", "root")
     suggestions = SuggestionsConfig(
@@ -685,6 +691,7 @@ def load_config(path: str | Path | None = None) -> AppConfig:
         city_mean_per_100k=city_mean,
         max_retries=max_retries,
         disclaimer=disclaimer,
+        disclaimer_emergency_line=disclaimer_emergency_line,
         addressing=AddressingConfig(aliases=aliases),
         degraded=degraded,
         suggestions=suggestions,

@@ -17,6 +17,7 @@ from urllib.parse import quote
 import pytest
 
 from frontend import app
+from safepass import config_loader
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 
@@ -293,6 +294,8 @@ class TestLegalPages:
         body = resp.body  # type: ignore[attr-defined]
         assert "本分析仅供参考，不替代专业安保建议。" in body
         assert "911" in body and "311" in body
+        # 紧急提示行逐字来自 config（验收审计 #5-④：号码字面量单一事实源在配置）
+        assert config_loader.get_config().disclaimer_emergency_line in body
         # 通用安全场所清单（五警局静态表）逐字段透出
         assert "NYPD" in body
 

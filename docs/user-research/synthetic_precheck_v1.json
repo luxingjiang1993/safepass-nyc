@@ -1,0 +1,157 @@
+{
+  "label": "开发参考",
+  "note": "本报告由 LLM 扮演的合成用户生成，仅供开发参考（开发参考），永不冒充真人证据；真人结论以票 11 访谈为准。",
+  "model": "qwen-turbo",
+  "script_version": "interview-v1",
+  "persona_ids": [
+    "student",
+    "new_immigrant",
+    "visitor"
+  ],
+  "answers": [
+    {
+      "persona_id": "student",
+      "question_id": "q1_first_impression",
+      "reply": "我第一眼会注意到有没有地铁线路的安全评分，然后立刻查我常坐的F线和7号线的安全情况。",
+      "label": "开发参考"
+    },
+    {
+      "persona_id": "student",
+      "question_id": "q2_rating_reading",
+      "reply": "法拉盛是黄色，说明治安情况一般，可能有小偷或者轻微犯罪。我可能会多注意周围环境，比如不要晚上单独走夜路，或者选择更安全的路线回家。不过因为样本量只有45，可能不太准确，我可能还会看看其他来源的信息再决定。",
+      "label": "开发参考"
+    },
+    {
+      "persona_id": "student",
+      "question_id": "q3_trust_boundary",
+      "reply": "更不信任，因为数据量有限的话，可能无法真实反映实际情况，尤其是在纽约这样复杂的环境中，我需要更可靠的信息来确保安全。",
+      "label": "开发参考"
+    },
+    {
+      "persona_id": "student",
+      "question_id": "q4_profile_privacy",
+      "reply": "我可能会填，但有点担心隐私问题。毕竟纽约治安不好，我不太想让别人知道我晚归或者是个留学生。不过如果能保证信息只在这次会话中有效，可能还是愿意试试看。",
+      "label": "开发参考"
+    },
+    {
+      "persona_id": "student",
+      "question_id": "q5_suggestions",
+      "reply": "有用，但『提前告知朋友行程』是废话，我根本没朋友。",
+      "label": "开发参考"
+    },
+    {
+      "persona_id": "student",
+      "question_id": "q6_distrust",
+      "reply": "如果评级和我亲眼看到的实际情况差别很大，比如地铁上明明很空，但评级却显示很拥挤，或者我遇到有人偷东西，但评级却显示安全，我就完全不相信这个产品给的评级。",
+      "label": "开发参考"
+    },
+    {
+      "persona_id": "student",
+      "question_id": "q7_recommend",
+      "reply": "会推荐，但会提醒它在地铁上要小心财物，尤其是晚自习后回家的时候。",
+      "label": "开发参考"
+    },
+    {
+      "persona_id": "student",
+      "question_id": "q8_missing",
+      "reply": "我最想要的功能是地铁实时安全信息推送，特别是在晚自习后回家的路上，能知道哪些线路或站点最近有治安事件，这样心里会踏实很多。",
+      "label": "开发参考"
+    },
+    {
+      "persona_id": "new_immigrant",
+      "question_id": "q1_first_impression",
+      "reply": "我第一眼会注意到有没有中文界面，然后会立刻查我家附近有没有犯罪报告或者安全提示。",
+      "label": "开发参考"
+    },
+    {
+      "persona_id": "new_immigrant",
+      "question_id": "q2_rating_reading",
+      "reply": "法拉盛是黄色，可能表示有中等风险。我不太懂这些颜色代表什么，但我会注意周围的情况，可能不会带孩子去人多的地方。",
+      "label": "开发参考"
+    },
+    {
+      "persona_id": "new_immigrant",
+      "question_id": "q3_trust_boundary",
+      "reply": "更不信任。因为数据量有限，可能不能真实反映实际情况，特别是社区安全这种关系到家人生活的事情，需要更可靠的信息。",
+      "label": "开发参考"
+    },
+    {
+      "persona_id": "new_immigrant",
+      "question_id": "q4_profile_privacy",
+      "reply": "我愿意填，但希望信息只用于这次对话，不会被保存或用来推销。",
+      "label": "开发参考"
+    },
+    {
+      "persona_id": "new_immigrant",
+      "question_id": "q5_suggestions",
+      "reply": "有些建议有用，比如不要走偏僻的小路。但『夜间出行尽量结伴』听起来像废话，谁不知道要结伴呢？",
+      "label": "开发参考"
+    },
+    {
+      "persona_id": "new_immigrant",
+      "question_id": "q6_distrust",
+      "reply": "如果评级没有明确说明具体的安全事件或原因，或者评级信息和我亲眼看到的社区情况完全不符，我就不会相信这个产品给的评级。",
+      "label": "开发参考"
+    },
+    {
+      "persona_id": "new_immigrant",
+      "question_id": "q7_recommend",
+      "reply": "会，但会提醒它有时候中文信息更新不及时，最好再确认一下。",
+      "label": "开发参考"
+    },
+    {
+      "persona_id": "new_immigrant",
+      "question_id": "q8_missing",
+      "reply": "我最想要的是一个可以随时查看社区安全情况的中文信息平台，比如附近有没有犯罪事件或者安全隐患，这样我可以更放心地带孩子出门。",
+      "label": "开发参考"
+    },
+    {
+      "persona_id": "visitor",
+      "question_id": "q1_first_impression",
+      "reply": "第一眼会注意到地图上不同区域的色块，看起来很直观。我会立刻查曼哈顿中城和法拉盛晚上是否安全。",
+      "label": "开发参考"
+    },
+    {
+      "persona_id": "visitor",
+      "question_id": "q2_rating_reading",
+      "reply": "法拉盛的黄色警报说明晚上可能不太安全，但样本量只有45，可信度中等。我可能会稍微谨慎一点，但还是会去，毕竟行程紧张，需要靠手机导航，还是以实际看到的情况为准。",
+      "label": "开发参考"
+    },
+    {
+      "persona_id": "visitor",
+      "question_id": "q3_trust_boundary",
+      "reply": "更不信任。因为数据量有限的话，可能无法准确反映实际情况，尤其是在像纽约这样复杂的城市，晚上不同区域的安全性和活跃度变化很大，不能完全依赖这样的提示。",
+      "label": "开发参考"
+    },
+    {
+      "persona_id": "visitor",
+      "question_id": "q4_profile_privacy",
+      "reply": "愿意填，但担心隐私问题，不确定信息会不会被保存或用于其他用途。",
+      "label": "开发参考"
+    },
+    {
+      "persona_id": "visitor",
+      "question_id": "q5_suggestions",
+      "reply": "有用，但『提前告知朋友行程』有点废话，我根本不知道该跟谁说。",
+      "label": "开发参考"
+    },
+    {
+      "persona_id": "visitor",
+      "question_id": "q6_distrust",
+      "reply": "如果产品给出的评级和我看到的实际情况完全不符，比如晚上某个区域看起来很安全，但产品却给出低评级，或者相反，我会完全不相信这个产品。",
+      "label": "开发参考"
+    },
+    {
+      "persona_id": "visitor",
+      "question_id": "q7_recommend",
+      "reply": "会推荐，但会提醒它晚上某些区域可能不太安全，最好提前查好路线和时间。",
+      "label": "开发参考"
+    },
+    {
+      "persona_id": "visitor",
+      "question_id": "q8_missing",
+      "reply": "我最想要的功能是能快速查看各个区域晚上是否安全，有没有什么活动或者封闭道路，这样我可以更好地安排行程。",
+      "label": "开发参考"
+    }
+  ]
+}

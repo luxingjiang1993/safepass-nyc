@@ -35,7 +35,7 @@ pip install -r requirements.txt
 
 | 指标 | 基线 | 口径（分子/分母） | 复算 |
 |------|------|------|------|
-| 路由准确率（L1） | 100%（50/50） | 命中期望路由分支的金标条目数 / 金标条目总数（契约类型/警区/越界降级分支与金标 expect 逐条一致） | `pytest tests/test_golden_set.py -q` 全绿即 100% |
+| L1 金标通过率 | 100%（50/50） | 全字段断言通过的金标条目数 / 金标条目总数（契约类型/警区/越界降级分支与金标 expect 逐条一致；命名刻意不叫"路由准确率"——L1 断言的是全契约字段，路由只是其中一轴） | `pytest tests/test_golden_set.py -q` 全绿即 100% |
 | groundedness（L2） | 0.914 | 50 条金标逐条 groundedness judge 分数之和 / 50（分母 = 金标条目数） | `pytest tests/eval -q` cassette 回放，工件 `fixtures/eval/l2_results_v1.json` |
 | 幻觉率（L2） | 0.060 | hallucinated=true 的条目数 / 50（二元判定，judge = qwen-turbo，prompt 版本锁定进 config） | 同上 |
 
