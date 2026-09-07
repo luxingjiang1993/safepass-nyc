@@ -22,6 +22,22 @@
 3. **one_liner 确定性填空**：A3 缩小为确定性模板 + 数据钩子票（LLM 不写 one_liner），可在 A1 前并行。
 4. **停点 = 波 1 + P4 八项门闩**：波 2 起按面试日程滚动决策，波 3/4 不预支。
 5. A2 开工第一动作 = 对金标 must_mention 事实跑检索召回探针，先测后建；测不过先把 C8 知识库加厚提上滚动日程。
+6. 波 1 执行矩阵（/implement = 人工在环会话；/ralph = headless 机械票，须 env -u ANTHROPIC_MODEL；槽内票可多对话窗口并行，跨槽必须等前置合并）：
+
+| 槽 | 票 | 方式 | 前置 | 文件冲突警示 |
+|----|----|------|------|--------------|
+| 1 | A1 #16 | /implement | — | 独占 pipeline/contracts/config |
+| 1 | D1 #21 | /implement | — | 独占 frontend/ |
+| 1 | N3 #25 | /ralph | — | README 一节（与他票不同 hunk） |
+| 2 | A2 #17 | /implement | A1 合并 | pipeline（A3 让位至槽 3） |
+| 2 | D2 #22 | /implement | D1 合并 | frontend 同文件 |
+| 3 | A3 #18 | /ralph | A2 合并（pipeline 空出） | 与 B1 同槽时先开工半天（test_golden_set 摩擦） |
+| 3 | B1 #19 | /implement | A1+A2 合并 | golden fixture+cassettes+README 指标表 |
+| 3 | N1 #24 | /implement | A2 合并 | 无（新建攻击 fixture） |
+| 4 | B2 #20 | /implement | B1 合并 | evaluators/config/README 指标表 |
+| 4 | E1 #23 | /implement | A1 合并 + B2 数字落 README 后 | B2 先、E1 后（同槽串行，波 1 收口票） |
+
+GitHub 原生阻塞边：A1→A2/B1/E1；A2→B1/N1/A3；D1→D2；B1→B2；B2→E1。
 
 ### P0. Default path（先读什么）
 

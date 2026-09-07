@@ -1,5 +1,12 @@
 # 02 — A2 混合检索 query-conditioned 进入建议
 
+## 执行方式 / 并行组
+- **方式：/implement**（召回探针先行 + 注入校验设计，半探索）
+- **依赖**：A1（#16）合并
+- **并行组**：槽 2，与 D2（#22）并行
+- **文件冲突警示**：pipeline.py（A3 在槽 3 等本票合并）
+- **阻塞**：B1（#19）、N1（#24）、A3（#18）
+
 ## 来源
 docs/portfolio-100-execution-plan.md §2 A2 + 文首补丁 P6 + docs/adr/0003-suggestion-generation-architecture.md
 

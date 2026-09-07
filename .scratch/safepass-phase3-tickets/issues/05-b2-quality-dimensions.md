@@ -1,5 +1,12 @@
 # 05 — B2 质量维度：actionability + specificity + 矛盾检测
 
+## 执行方式 / 并行组
+- **方式：/implement**（新 judge 维度设计，探索性）
+- **依赖**：B1（#19）合并
+- **并行组**：槽 4，与 E1（#23）同槽但串行——本票先落 README 指标行，E1 后收口叙事
+- **文件冲突警示**：evaluators.py / config eval 节 / README 指标表
+- **阻塞**：E1（#23）
+
 ## 来源
 docs/portfolio-100-execution-plan.md §2 B2 + 文首补丁 P6
 

@@ -1,5 +1,12 @@
 # 01 — A1 Suggestion Skill 主路径（LLM 措辞 + 数据定调）
 
+## 执行方式 / 并行组
+- **方式：/implement**（架构 + 提示词探索 + cassette 录制，探索性任务不进 ralph）
+- **依赖**：无
+- **并行组**：槽 1，与 D1（#21）、N3（#25）三窗口并行
+- **文件独占**：pipeline.py / contracts.py / config（A2、A3 必须等本票合并）
+- **阻塞**：A2（#17）、B1（#19）、E1（#23）
+
 ## 来源
 docs/portfolio-100-execution-plan.md §2 A1 + 文首补丁 P2/P6 + docs/adr/0003-suggestion-generation-architecture.md
 

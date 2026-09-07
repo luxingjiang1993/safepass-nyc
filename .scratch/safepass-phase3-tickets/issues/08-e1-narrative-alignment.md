@@ -1,5 +1,11 @@
 # 08 — E1 叙事与代码对齐
 
+## 执行方式 / 并行组
+- **方式：/implement**（文档一致性涉及产品范围判断）
+- **依赖**：A1（#16）合并（硬规则）+ B2（#20）数字落 README 后收口
+- **并行组**：槽 4 末——波 1 收口票，B2 先、本票后（README/CONTEXT 同文件）
+- **阻塞**：无（波 1 最后一票）
+
 ## 来源
 docs/portfolio-100-execution-plan.md §2 E1 + 文首补丁 P6 + docs/adr/0003-suggestion-generation-architecture.md
 

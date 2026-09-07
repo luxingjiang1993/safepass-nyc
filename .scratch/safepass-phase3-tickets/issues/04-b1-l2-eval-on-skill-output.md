@@ -1,5 +1,12 @@
 # 04 — B1 L2 咬合生成建议（两路径对照，禁止测模板自嗨）
 
+## 执行方式 / 并行组
+- **方式：/implement**（cassette 重录需真实 DashScope key + judge 口径校准，探索性）
+- **依赖**：A1（#16）+ A2（#17）合并
+- **并行组**：槽 3，与 N1（#24）、A3（#18）并行（A3 先半天）
+- **文件冲突警示**：golden_set_v1.json + cassettes + README 指标表（B2、E1 等本票）
+- **阻塞**：B2（#20）
+
 ## 来源
 docs/portfolio-100-execution-plan.md §2 B1 + 文首补丁 P6 + docs/adr/0003-suggestion-generation-architecture.md
 

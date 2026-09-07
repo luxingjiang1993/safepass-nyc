@@ -1,5 +1,11 @@
 # 03 — A3 one_liner 确定性数据钩子化
 
+## 执行方式 / 并行组
+- **方式：/ralph**（确定性模板 + 金标断言，机械票；前置齐全：钩子例子在票文、契约字段在库、测试接缝存在。headless 注意 `env -u ANTHROPIC_MODEL` + 停循环清孤儿孙进程）
+- **依赖**：A2（#17）合并——pipeline.py 让位（逻辑上不依赖，文件冲突所致）
+- **并行组**：槽 3，与 B1（#19）、N1（#24）并行；**与 B1 同槽时本票先开工半天**（test_golden_set.py 潜在 hunk 摩擦）
+- **阻塞**：无
+
 ## 来源
 docs/portfolio-100-execution-plan.md §2 A3 + 文首补丁 P6 + docs/adr/0003-suggestion-generation-architecture.md
 
