@@ -311,6 +311,16 @@ def _venues_block(title: str, venues: list[contracts.Venue]) -> str:
     return f'<section class="venues"><h2>{_esc(title)}</h2>\n  <ul>\n{chr(10).join(items)}\n  </ul>\n</section>'
 
 
+def _llm_degraded_banner(result: Any, cfg: config_loader.AppConfig) -> str:
+    """票 06 降级明示的渲染侧落地（spec v2 用户故事 18）：llm_degraded 时首屏
+    横幅展示契约里的 degradation_notice——用户可明确区分模板降级建议与
+    AI 生成的建议（契约层保证降级时 notice 非空，缺失时回退配置话术兜底）。"""
+    if not result.llm_degraded:
+        return ""
+    notice = result.degradation_notice or cfg.cost_control.degraded_notice
+    return f'<p class="llm-degraded-banner" role="status">⚠️ {_esc(notice)}</p>'
+
+
 def render_safety(
     result: contracts.SafetyQueryResult,
     cfg: config_loader.AppConfig,
@@ -367,7 +377,7 @@ def render_safety(
     body = "\n".join(
         part
         for part in (
-            _back_link(), header, basis, _pin_hint(result, profile), one_liner, dimensions,
+            _back_link(), header, _llm_degraded_banner(result, cfg), basis, _pin_hint(result, profile), one_liner, dimensions,
             suggestions, charts, community, unknowns, venues, meta,
             _profile_sidebar(profile, cfg),
             _disclaimer(result.disclaimer),
@@ -414,6 +424,7 @@ def render_comparison(
     sources_items = "\n".join(f"    <li>{_esc(s)}</li>" for s in result.sources)
     body = f"""{_back_link()}
 <header class="result-head"><h1>🔀 区域对比</h1></header>
+{_llm_degraded_banner(result, cfg)}
 <section class="compare-grid">
 {cards}
 </section>
@@ -488,6 +499,7 @@ def render_degraded(
             _back_link(),
             f'<header class="result-head degraded"><h1>🛠️ 暂时无法给出完整分析</h1></header>',
             f'<section class="degraded-message"><p>{_esc(result.message)}</p></section>',
+            _llm_degraded_banner(result, cfg),
             alternative_block, invitation, suggestions, venues, sources,
             _profile_sidebar(profile, cfg),
             _disclaimer(result.disclaimer),

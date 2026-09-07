@@ -120,9 +120,11 @@ def execute_query(
     resolved = addressing.resolve_areas(query_text, cfg)
     try:
         decision = routing.route_query(query_text, llm_client, cfg)
-    except cost_control.CostControlError:
+    except (cost_control.CostControlError, OSError):
         # 查询中途限流/熔断（路由 LLM 调用被拦）：路由退确定性默认
         # area_safety_query——与未注入客户端同一事实源，D12 后置兜底终局权威。
+        # OSError 兜底：成本上报写盘失败（如容器 /app/logs 缺失的 PermissionError）
+        # 不得 500——降级明示照常，红线 4 诚实降级（验收审计问题 #2）。
         decision = routing.RouteDecision(route=routing.ROUTE_AREA_SAFETY)
         llm_client = None
         llm_degraded = True
@@ -374,9 +376,10 @@ def _build_safety_result(
     profile_text = _profile_text(profile)
     try:
         extracted = extraction.extract(query_text, extraction_client, cfg)
-    except cost_control.CostControlError:
+    except (cost_control.CostControlError, OSError):
         # 查询中途熔断/限流：三维提取退确定性 fallback（零额外 LLM 调用），
         # 与未注入客户端同一事实源；响应带明示降级标记。
+        # OSError 同上兜底：成本上报写盘失败（PermissionError 等）降级不 500。
         extracted = extraction.extract(query_text, None, cfg)
         llm_degraded = True
     assessment = degraded.assess_area(resolved, records, cfg)

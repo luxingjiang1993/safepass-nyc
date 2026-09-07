@@ -127,6 +127,27 @@ def test_runtime_non_root_user():
     )
 
 
+def test_runtime_cost_report_dir_precreated_for_non_root():
+    """非 root 容器无法自建 /app/logs：cost_control 上报 mkdir 抛 PermissionError
+    → 首个真实 LLM 调用 500（验收审计问题 #2）。runtime 必须预建成本上报目录
+    且属主 = 运行用户；目录名与 config cost_control.report_path 的父目录对账
+    （配置漂移即红，HF_HOME↔COPY 同款锁）。"""
+    from safepass import config_loader
+
+    report_parent = Path(config_loader.get_config().cost_control.report_path).parent
+    container_dir = "/app/" + report_parent.as_posix()
+    _, lines = _runtime_stage()
+    joined = "\n".join(lines)
+    assert f"mkdir -p {container_dir}" in joined, (
+        f"runtime 必须预建成本上报目录：{container_dir}"
+    )
+    user = [l.strip().split()[1] for l in lines if l.strip().startswith("USER ")][0]
+    chowns = [l.strip() for l in lines if "chown" in l and container_dir in l]
+    assert any(user in l for l in chowns), (
+        f"{container_dir} 必须 chown 给运行用户 {user}：{chowns}"
+    )
+
+
 # ---------------------------------------------------------------------------
 # 5. 端口一致性：EXPOSE == serve.py 默认 PORT == 冒烟脚本容器侧端口
 # ---------------------------------------------------------------------------

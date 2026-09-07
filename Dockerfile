@@ -78,9 +78,13 @@ COPY token-budget.json ./
 # 索引以构建期自检通过的产物为准（覆盖仓库随带副本，消除跨环境漂移）
 COPY --from=index /app/fixtures/index ./fixtures/index
 
-# 非 root 运行；模型缓存目录属主交给运行用户
+# 非 root 运行；模型缓存与成本上报目录属主交给运行用户。
+# /app/logs 必须预建：非 root 无法在 /app 下自建子目录，缺失时 cost_control
+# 的上报 mkdir 抛 PermissionError → 首个真实 LLM 调用 500（验收审计问题 #2）。
 RUN useradd --system --uid 10001 --create-home safepass \
-    && chown -R safepass:safepass /opt/hf-cache
+    && chown -R safepass:safepass /opt/hf-cache \
+    && mkdir -p /app/logs \
+    && chown safepass:safepass /app/logs
 USER safepass
 
 EXPOSE 8000

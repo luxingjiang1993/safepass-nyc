@@ -175,8 +175,8 @@ class TestSafetyResult:
 
 # ---------------------------------------------------------------- 对比
 
-def make_comparison() -> contracts.ComparisonResult:
-    return contracts.ComparisonResult(
+def make_comparison(**overrides) -> contracts.ComparisonResult:
+    base = dict(
         areas=[
             contracts.AreaSummary(
                 area="上东区", precinct=19, rating="green", sample_size=312,
@@ -197,6 +197,8 @@ def make_comparison() -> contracts.ComparisonResult:
         sources=["NYPD 公开数据（模拟）"],
         disclaimer="本分析仅供参考，不替代专业安保建议。",
     )
+    base.update(overrides)
+    return contracts.ComparisonResult(**base)
 
 
 class TestComparison:
@@ -218,7 +220,7 @@ class TestComparison:
 
 # ---------------------------------------------------------------- 降级
 
-def make_degraded(alternative: bool = True) -> contracts.DegradedResult:
+def make_degraded(alternative: bool = True, **overrides) -> contracts.DegradedResult:
     alt = (
         contracts.AlternativeInfo(
             precinct=19, area="上东区", rating="green", confidence="HIGH",
@@ -228,7 +230,7 @@ def make_degraded(alternative: bool = True) -> contracts.DegradedResult:
         if alternative
         else None
     )
-    return contracts.DegradedResult(
+    base = dict(
         degraded_capability="out_of_coverage",
         message="我们能识别「哥大附近」对应的警区（26），但该区域不在我们的数据覆盖范围内，没有可靠数据支撑分析。",
         alternative_info=alt,
@@ -239,6 +241,8 @@ def make_degraded(alternative: bool = True) -> contracts.DegradedResult:
         sources=["NYPD 公开数据（模拟）"] if alternative else [],
         sample_size=312 if alternative else None,
     )
+    base.update(overrides)
+    return contracts.DegradedResult(**base)
 
 
 class TestDegraded:
@@ -263,6 +267,53 @@ class TestDegraded:
         assert "夜间出行尽量结伴" in html
         assert "19th Precinct" in html
         assert "本分析仅供参考，不替代专业安保建议。" in html
+
+
+# ---------------------------------------------------------------- LLM 降级明示（票 06 / 用户故事 18）
+
+NOTICE = "今日 AI 生成预算已用尽，本回复改由确定性数据与模板生成；安全评级与统计数据不受影响。"
+
+
+class TestLlmDegradedBanner:
+    """llm_degraded 时首屏渲染降级横幅（spec v2 用户故事 18）：用户可区分
+    模板降级建议与 AI 建议；未降级时页面无任何横幅（零 LLM 分支不带标记）。"""
+
+    def test_safety_page_shows_banner_when_degraded(self):
+        html = render.render_result(
+            make_safety(llm_degraded=True, degradation_notice=NOTICE), CFG
+        )
+        assert 'class="llm-degraded-banner"' in html
+        assert 'role="status"' in html
+        assert NOTICE in html
+
+    def test_safety_page_no_banner_when_not_degraded(self):
+        html = render.render_result(make_safety(), CFG)
+        assert "llm-degraded-banner" not in html
+
+    def test_comparison_page_shows_banner_when_degraded(self):
+        html = render.render_result(
+            make_comparison(llm_degraded=True, degradation_notice=NOTICE), CFG
+        )
+        assert 'class="llm-degraded-banner"' in html
+        assert NOTICE in html
+
+    def test_degraded_page_shows_banner_when_degraded(self):
+        result = make_degraded(llm_degraded=True, degradation_notice=NOTICE)
+        html = render.render_result(result, CFG)
+        assert 'class="llm-degraded-banner"' in html
+        assert NOTICE in html
+
+    def test_notice_is_html_escaped(self):
+        html = render.render_result(
+            make_safety(llm_degraded=True, degradation_notice="<script>x</script>"), CFG
+        )
+        assert "<script>" not in html
+        assert "&lt;script&gt;" in html
+
+    def test_notice_falls_back_to_config_when_missing(self):
+        """契约保证降级时 notice 非空；防御性兜底回退配置话术，不静默。"""
+        html = render.render_result(make_safety(llm_degraded=True, degradation_notice=None), CFG)
+        assert CFG.cost_control.degraded_notice in html
 
 
 # ---------------------------------------------------------------- 横切

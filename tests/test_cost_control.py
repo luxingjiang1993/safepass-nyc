@@ -414,3 +414,67 @@ def test_corrupt_budget_file_fails_safe_not_fatal(tmp_path: Path):
     emergency_result = execute_query("救命！有人跟踪我", llm_client=client)
     assert emergency_result.type == "emergency"
     assert not getattr(emergency_result, "llm_degraded", False), "紧急静态分支无 LLM 降级语义"
+
+
+# ---------------------------------------------------------------------------
+# 7. 上报写盘失败（OSError）兜底：降级不 500（验收审计问题 #2）
+# ---------------------------------------------------------------------------
+
+
+class _UnwritableReportClient(cost_control.BudgetFusedClient):
+    """上报目录不可写的熔断器替身：第 fail_on 次上报起 _record 抛
+    PermissionError——容器 /app/logs 缺失的现场（Dockerfile 已预建修复）
+    在本机的确定性复现。"""
+
+    def __init__(self, *args, fail_on: int = 1, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
+        self._records = 0
+        self._fail_on = fail_on
+
+    def _record(self, *args, **kwargs):
+        self._records += 1
+        if self._records >= self._fail_on:
+            raise PermissionError("logs 目录不可写（容器 /app/logs 缺失现场）")
+        super()._record(*args, **kwargs)
+
+
+def _make_unwritable_client(tmp_path: Path, fake: _ScriptedFake, fail_on: int) -> _UnwritableReportClient:
+    return _UnwritableReportClient(
+        fake,
+        budget_path=_write_budget(tmp_path, 5.0),
+        report_path=tmp_path / "cost_report.jsonl",
+        rate_window_seconds=_CC.rate_window_seconds,
+        rate_max_requests=_CC.rate_max_requests,
+        chars_per_token=CHARS_PER_TOKEN,
+        prices_per_1k_tokens=PRICES,
+        clock=_ManualClock(),
+        fail_on=fail_on,
+    )
+
+
+def test_report_write_failure_in_routing_degrades_not_500(tmp_path: Path):
+    """路由调用后的成本上报写盘失败（PermissionError ∈ OSError）：路由退确定性
+    默认，响应完整且明示降级——不逃出契约（验收审计问题 #2 的管线侧兜底）。"""
+    fake = _ScriptedFake()
+    client = _make_unwritable_client(tmp_path, fake, fail_on=1)
+    result = execute_query("上东区安全吗", llm_client=client)
+
+    assert fake.calls == 1, "路由 LLM 调用真实发生，仅上报失败"
+    assert result.type == "safety"
+    assert result.llm_degraded, "写盘失败必须降级明示，不静默"
+    assert result.degradation_notice == config_loader.load_config().cost_control.degraded_notice
+    assert result.rating in contracts.LEGAL_RATINGS, "结构化评级照出"
+
+
+def test_report_write_failure_in_extraction_degrades_not_500(tmp_path: Path):
+    """提取调用后的成本上报写盘失败：三维提取退确定性 fallback（路由已正常），
+    响应完整且明示降级。"""
+    fake = _ScriptedFake()
+    client = _make_unwritable_client(tmp_path, fake, fail_on=2)
+    result = execute_query("唐人街晚上安全吗", llm_client=client)
+
+    assert fake.calls == 2, "路由 + 提取各 1 次，仅第二次上报失败"
+    assert result.type == "safety"
+    assert result.llm_degraded
+    assert result.degradation_notice
+    assert result.rating in contracts.LEGAL_RATINGS

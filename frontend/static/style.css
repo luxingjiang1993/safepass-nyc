@@ -129,6 +129,17 @@ ul, ol { padding-left: 1.3rem; margin: 0.3rem 0; }
 .degraded-message p, .guardrail-message p { margin: 0.3rem 0; }
 .phrase { font-style: italic; }
 
+/* LLM 降级明示横幅（票 06 / spec v2 用户故事 18）：降级建议 vs AI 建议可区分；
+   语义靠文字（⚠️ + 完整话术），颜色只是强调——与全站"不靠颜色传达"一致 */
+.llm-degraded-banner {
+  background: #fdf3d8;
+  border: 1px solid #e0c56b;
+  border-radius: 0.5rem;
+  color: #6b5416;
+  margin: 0.6rem 0;
+  padding: 0.5rem 0.75rem;
+}
+
 /* --- 紧急模式（issue 12，PRD §6.2 紧急线框）：红色极简整页 --- */
 /* 红色主题由 body.theme-emergency 承载；语义信息仍靠文字（图标+文字并存）。 */
 body.theme-emergency {
