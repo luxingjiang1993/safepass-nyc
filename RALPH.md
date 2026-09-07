@@ -6,11 +6,7 @@
 
 ## 当前任务
 
-**票 #18 A3 one_liner 确定性数据钩子化**（`.scratch/safepass-phase3-tickets/issues/03-a3-deterministic-one-liner.md`）
-
-- 做法：确定性模板填空，LLM 不写 one_liner；钩子词典只进 `config/app.yaml`（与 A1 同源）；字数上限 30 字 + 空话/恐慌黑名单
-- 允许改动：`safepass/pipeline.py`、`config/app.yaml` + `safepass/config_loader.py`、`tests/`
-- 完成承诺：金标断言 one_liner 含至少一类允许的数据钩子且与 charts/ratio 不矛盾；LLM 调用路径零参与 one_liner；`python -m pytest tests/ -q` 基线全绿
+（空——票 #18 A3 已归档至下方迭代历史 ✅。Phase 3 波 1 余票见 `docs/specs/safepass-v3-spec.md`；下一张机械票候选 = N3 #25 一键复现，登记时须写完成承诺。）
 
 ## 完成承诺（Definition of Done）
 
