@@ -4,12 +4,15 @@
 是全系统唯一测试接缝：紧急检测、意图路由、数据聚合、评级计算、
 降级分支、建议生成全部在管线内部完成。
 
-当前切片（issue 16 / A1）：建议生成 Skill 主路径——用户可见的贴心建议来自
+当前切片（issue 17 / A2）：建议生成 Skill 主路径——用户可见的贴心建议来自
 受约束生成（LLM 措辞 + 数据定调，ADR-0003）：注入客户端且开关开时经
-safepass/skills/suggestion（提示词 + Pydantic 契约 + grounds 可核对校验）
-走统一输出控制管线；熔断/限流/无客户端/开关关/校验耗尽 → 确定性模板
-（suggestions_source 明示来源）。画像永不进入 Skill 请求体，只在本机排序
-前置；评级/可信度/越界零 LLM 接触（红线 2）。
+safepass/skills/suggestion（提示词 + Pydantic 契约 + grounds 可核对校验 +
+间接注入防线）走统一输出控制管线；检索不再「测得到、用户感不到」——
+query-conditioned 混合检索 top-3（intel.search + doc_text）注入 Skill 上下文，
+grounds 引文逐字可核对（检索/知识库漂移 → 空摘要诚实降级，不编造）。
+熔断/限流/无客户端/开关关/校验耗尽 → 确定性模板（suggestions_source 明示
+来源）。画像永不进入 Skill 请求体，只在本机排序前置；评级/可信度/越界
+零 LLM 接触（红线 2）。
 
 既有切片（issue 10 / RALPH T8）：情报 Agent 混合检索 + community_info 装配——
 覆盖区内安全查询的 community_info（仇恨犯罪/诈骗提醒/中文警员/社区资源）
@@ -322,6 +325,27 @@ def _mark_llm_degraded(
     return result
 
 
+def _retrieval_snippets(
+    query_text: str,
+) -> tuple[suggestion_skill.SuggestionSnippet, ...]:
+    """A2 检索注入装配：query-conditioned 混合检索 top-3 → 建议 Skill 上下文。
+
+    intel.search 的命中集合与 doc_text 的原文同源装配为 SuggestionSnippet：
+    grounds.quote 的逐字比对对象 = 注入模型的同一文本。检索是本地离线
+    确定性路径（零 LLM、零 API）；community_info 仍只走警区锚定、不参与
+    检索排序（棘轮）。失败由调用方决定降级形态。
+
+    检索单元 = 整篇知识文档（fixtures/index 的构建粒度，15 篇）；chunk 级
+    切片需重建索引（scripts/build_index.py 超出本票授权面），不作此处
+    假想切分——注入单元与索引单元一致是唯一无冗余路径（宪法 1/4）。
+    """
+    hits = intel_agent.search(query_text)
+    return tuple(
+        suggestion_skill.SuggestionSnippet(doc_id=doc_id, text=intel_agent.doc_text(doc_id))
+        for doc_id, _ in hits
+    )
+
+
 def _profile_text(profile: dict[str, Any] | None) -> str:
     """画像展平为可扫描文本（字符串值与字符串列表项）；None → 空串（无画像）。"""
     if not profile:
@@ -434,8 +458,21 @@ def _build_safety_result(
     suggestions: list[str] | None = None
     suggestion_grounds: list[contracts.SuggestionGround] = []
     if cfg.suggestions.skill_enabled and extraction_client is not None:
+        # A2 检索注入：query-conditioned top-3 先装配（本地离线，零 LLM 调用，
+        # 调用计数不变）。检索任何失败 → 空摘要继续生成（退回 A1 形态：
+        # grounds 校验强制为空、建议保持通用，诚实不编造），绝不带病透出。
+        # 兜底 Exception 而非枚举：棘轮表两次索引事故的异常形态各异（pickle
+        # 协议漂移 → UnpicklingError；FAISS 非 ASCII 路径 → RuntimeError；本地
+        # embedding 模型缺缓存 → huggingface_hub 异常），枚举必然漏接新形态；
+        # 检索是建议上下文的可选增益，失败语义只有「退回无摘要」一种。
         try:
-            skill_out = suggestion_skill.generate(extraction_client, query_text, pack, cfg)
+            snippets = _retrieval_snippets(query_text)
+        except Exception:
+            snippets = ()
+        try:
+            skill_out = suggestion_skill.generate(
+                extraction_client, query_text, pack, cfg, snippets=snippets
+            )
             suggestions = list(skill_out.suggestions)
             suggestion_grounds = list(skill_out.suggestion_grounds)
         except output_pipeline.OutputPipelineError:

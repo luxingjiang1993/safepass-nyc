@@ -110,10 +110,12 @@ class DegradedResult(BaseModel):
 
 
 class SuggestionGround(BaseModel):
-    """建议的数据依据（issue 16 / A1；P6 验收硬项：契约强制携带、可先空但字段必须立）。
+    """建议的数据依据（issue 16 / A1 立字段；issue 17 / A2 起检索注入后非空）。
 
-    doc_id = 检索上下文文档标识；quote = 逐字引文——机器可核对（与建议上下文
-    逐字比对，A2 检索注入后非空）。评级/可信度/越界判定永远不写进这里。
+    doc_id = 检索上下文文档标识（safepass/intel_agent 混合检索命中文档）；
+    quote = 逐字引文——机器可核对（与注入模型的检索摘要逐字比对，防改写）。
+    无检索摘要（A1 形态/检索降级）时强制为空：禁止凭空引用。评级/可信度/
+    越界判定永远不写进这里。
     """
 
     doc_id: str

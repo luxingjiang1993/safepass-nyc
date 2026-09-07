@@ -5,9 +5,12 @@
 在 scripts.build_index），MVP 不引入重排层。检索 15 篇预计算安全报告
 （含华人特定注意事项），为 community_info 提供语境。
 
-两个对外入口：
+三个对外入口：
     search(query, k=TOP_K)             — 混合检索，返回 ((doc_id, rrf_score), ...)
                                            按融合分降序（检索集的断言对象）
+    doc_text(doc_id)                   — 检索命中文档的原文（A2 建议 Skill
+                                           上下文注入的文本来源；grounds.quote
+                                           逐字比对的同一文本对象）
     build_community_info(precinct, cfg) — 警区锚定的 community_info 装配：
                                            该警区三主题知识文档（overview/scam/
                                            emergency）确定性解析，零 LLM、零编造。
@@ -110,9 +113,9 @@ def build_community_info(
         cfg = config_loader.get_config()
     meta = _index_bundle(str(DEFAULT_INDEX_DIR))[2]
     themes = _doc_ids_for_precinct(meta, precinct)
-    overview = _doc_text(themes["overview"])
-    scam = _doc_text(themes["scam"])
-    emergency = _doc_text(themes["emergency"])
+    overview = doc_text(themes["overview"])
+    scam = doc_text(themes["scam"])
+    emergency = doc_text(themes["emergency"])
     info: dict[str, Any] = {
         "hate_crime": _hate_crime_status(overview, cfg),
         "scam_alerts": list(_scam_alert_titles(scam)),
@@ -144,7 +147,12 @@ def _doc_ids_for_precinct(meta: dict[str, Any], precinct: int) -> dict[str, str]
     return themes
 
 
-def _doc_text(doc_id: str) -> str:
+def doc_text(doc_id: str) -> str:
+    """知识文档原文（A2 建议 Skill 上下文注入的文本；检索命中文档集合内）。
+
+    grounds.quote 的逐字比对与此函数读出的同一文本对象进行——注入模型的
+    文本与机器核对的文本同源，杜绝「注入一套、核对另一套」的缝。
+    """
     path = KNOWLEDGE_DIR / f"{doc_id}.md"
     if not path.exists():
         raise IntelFormatError(f"知识文档缺失：{path}")

@@ -83,11 +83,15 @@ class SuggestionsConfig:
     结构边界（3-5 条）由装配层业务校验执行；具体性/温暖度是人工抽查项。
     skill_enabled（issue 16 / A1）：建议 Skill 主路径开关。false = 强制模板
     路径——B1 两路径同台实测对照用同一开关跑双侧（对照不引入新接缝）。
+    rating_disclaimer_rewrite_blacklist（issue 17 / A2）：评级/免责改写词表
+    ——Skill 产出（建议正文 + grounds 引文）命中即业务校验失败（间接注入
+    防线骨架，与 N1 交叉；只作用于 Skill 路径）。
     """
 
     empty_talk_blacklist: tuple[str, ...]
     safety_general: tuple[str, ...]
     skill_enabled: bool = True
+    rating_disclaimer_rewrite_blacklist: tuple[str, ...] = ()
 
 
 @dataclass(frozen=True)
@@ -432,6 +436,10 @@ def load_config(path: str | Path | None = None) -> AppConfig:
         ),
         safety_general=tuple(
             str(s) for s in _require(suggestions_raw, "safety_general", "suggestions")
+        ),
+        rating_disclaimer_rewrite_blacklist=tuple(
+            str(w)
+            for w in _require(suggestions_raw, "rating_disclaimer_rewrite_blacklist", "suggestions")
         ),
         skill_enabled=bool(suggestions_raw.get("skill_enabled", True)),
     )
