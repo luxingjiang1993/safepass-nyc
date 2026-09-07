@@ -13,6 +13,13 @@
         "content": "{\"area\": \"上东区\", \"crowd\": null, \"time\": \"晚上\"}",
         "model": "scripted"
       }
+    },
+    {
+      "fingerprint": "2aed78c431f062af952b2c6a4b007c159b58afbf1cddb84483012d4a894bd82d",
+      "response": {
+        "content": "{\"suggestions\": [\"夜间出行优先选择照明好、人流多的主干道，避开偏僻小巷\", \"随身包放在身前视线范围内，手机不要边走边外露\", \"本区夜间案件少于白天，22 点后仍建议尽量结伴通行\"], \"suggestion_grounds\": []}",
+        "model": "scripted"
+      }
     }
   ]
 }

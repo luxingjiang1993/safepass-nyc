@@ -198,8 +198,16 @@ def run_l2_suite(
     all_verdicts: list[evaluators.JudgeVerdict] = []
     for entry in entries:
         result = run_entry(entry)
+        # A1（issue 16）新增字段对 judge 质量判定零信号（L2 世界零 LLM 注入：
+        # suggestion_grounds 恒空、suggestions_source 恒 template）——从 outputs
+        # 排除以保持 judge 请求字节稳定、cassette 指纹不失效（票 07 棘轮表）。
+        # B1（L2 咬合生成物）重录 cassette 时再决定是否把两者纳入 judge 输入。
         outputs = json.dumps(
-            result.model_dump(mode="json"), ensure_ascii=False, sort_keys=True
+            result.model_dump(
+                mode="json", exclude={"suggestion_grounds", "suggestions_source"}
+            ),
+            ensure_ascii=False,
+            sort_keys=True,
         )
         evidence = evaluators.dumps_slot(build_evidence(entry, cfg))
         reference = evaluators.dumps_slot(build_reference(entry))

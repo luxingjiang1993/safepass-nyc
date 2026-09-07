@@ -13,6 +13,13 @@
         "content": "{\"area\": \"Upper East Side\", \"crowd\": \"女生\", \"time\": \"晚上10点\"}",
         "model": "scripted"
       }
+    },
+    {
+      "fingerprint": "5693bed1a2f714ea2532ea8c1a1de3819a456fd8c929f27f7bd493f6db75b010",
+      "response": {
+        "content": "{\"suggestions\": [\"晚上 10 点从图书馆回家，优先走照明好的主干道\", \"把包放在身前、手机拿在手里，避免边走路边看手机\", \"提前把行程告诉朋友，到家后报个平安\"], \"suggestion_grounds\": []}",
+        "model": "scripted"
+      }
     }
   ]
 }

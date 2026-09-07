@@ -81,10 +81,13 @@ class SuggestionsConfig:
     """建议配置（issue 06 / T4）：空话黑名单 + 覆盖区内安全查询的通用建议。
 
     结构边界（3-5 条）由装配层业务校验执行；具体性/温暖度是人工抽查项。
+    skill_enabled（issue 16 / A1）：建议 Skill 主路径开关。false = 强制模板
+    路径——B1 两路径同台实测对照用同一开关跑双侧（对照不引入新接缝）。
     """
 
     empty_talk_blacklist: tuple[str, ...]
     safety_general: tuple[str, ...]
+    skill_enabled: bool = True
 
 
 @dataclass(frozen=True)
@@ -430,6 +433,7 @@ def load_config(path: str | Path | None = None) -> AppConfig:
         safety_general=tuple(
             str(s) for s in _require(suggestions_raw, "safety_general", "suggestions")
         ),
+        skill_enabled=bool(suggestions_raw.get("skill_enabled", True)),
     )
     if not suggestions.safety_general:
         raise ConfigError("suggestions.safety_general 不得为空")

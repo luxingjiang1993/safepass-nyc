@@ -249,7 +249,7 @@ class _FailIfCalled:
 
 
 class _CassetteClient:
-    """把调用转发到 chat_with_cassette 的客户端（fc_routing_seam.json：路由+提取）。"""
+    """把调用转发到 chat_with_cassette 的客户端（fc_routing_seam.json：路由+提取+建议）。"""
 
     def __init__(self, inner, path: Path):
         self._inner = inner
@@ -270,7 +270,7 @@ def test_execute_query_safety_result_carries_community_info():
     result = execute_query("上东区晚上安全吗？", llm_client=client)
 
     assert inner.calls == 0, "cassette 回放必须零底层调用（离线可重复）"
-    assert client.calls == 2, "接缝 LLM 路径 = 路由 1 次 + 三维提取 1 次"
+    assert client.calls == 3, "接缝 LLM 路径 = 路由 + 三维提取 + 建议 Skill 各 1 次（A1）"
     assert result.type == "safety"
     info = result.community_info
     assert info is not None, "覆盖区内安全查询必须携带 community_info（AC-015）"

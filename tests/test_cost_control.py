@@ -468,13 +468,16 @@ def test_report_write_failure_in_routing_degrades_not_500(tmp_path: Path):
 
 def test_report_write_failure_in_extraction_degrades_not_500(tmp_path: Path):
     """提取调用后的成本上报写盘失败：三维提取退确定性 fallback（路由已正常），
-    响应完整且明示降级。"""
+    响应完整且明示降级。A1 起建议 Skill 的调用同样在上报写盘失败时退模板
+    （OSError 同口径兜底）：底层到达 3 次（路由 + 提取 + 建议各 1 次），
+    后两次上报均失败。"""
     fake = _ScriptedFake()
     client = _make_unwritable_client(tmp_path, fake, fail_on=2)
     result = execute_query("唐人街晚上安全吗", llm_client=client)
 
-    assert fake.calls == 2, "路由 + 提取各 1 次，仅第二次上报失败"
+    assert fake.calls == 3, "路由 + 提取 + 建议各 1 次，第 2/3 次上报失败（A1）"
     assert result.type == "safety"
     assert result.llm_degraded
     assert result.degradation_notice
+    assert result.suggestions_source == "template", "建议降级为配置模板文本（A1）"
     assert result.rating in contracts.LEGAL_RATINGS

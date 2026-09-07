@@ -197,16 +197,16 @@ def test_ac002_three_dimensions_extracted_via_llm_cassette():
     result = execute_query(AC002_QUERY, llm_client=client)
 
     assert inner.calls == 0, "cassette 回放必须零底层调用"
-    assert client.calls == 2, "LLM 路径 = 路由 1 次 + 三维提取 1 次"
+    assert client.calls == 3, "LLM 路径 = 路由 + 三维提取 + 建议 Skill 各 1 次（A1）"
     _assert_ac002_contract(result)
 
 
 def test_extraction_cassette_asset_wellformed():
-    """cassette 资产完整性：2 条交互（路由 → 提取），指纹与 JSON 载荷齐备。"""
+    """cassette 资产完整性：3 条交互（路由 → 提取 → 建议 Skill），指纹与 JSON 载荷齐备。"""
     assert CASSETTE_EXTRACTION.exists(), f"缺少 {CASSETTE_EXTRACTION.name}（需录制后提交）"
     data = json.loads(CASSETTE_EXTRACTION.read_text(encoding="utf-8"))
     interactions = data["interactions"]
-    assert len(interactions) == 2, "AC-002 cassette 固定 2 条交互（路由 + 三维提取）"
+    assert len(interactions) == 3, "AC-002 cassette 固定 3 条交互（路由+提取+建议，A1）"
     assert all(e["fingerprint"] for e in interactions)
     route_payload = json.loads(interactions[0]["response"]["content"])
     assert route_payload["route"] == "area_safety_query"
@@ -214,6 +214,9 @@ def test_extraction_cassette_asset_wellformed():
     assert extraction_payload["area"] == "Upper East Side"
     assert extraction_payload["crowd"] == "女生"
     assert "晚上" in (extraction_payload["time"] or "")
+    skill_payload = json.loads(interactions[2]["response"]["content"])
+    assert skill_payload["suggestions"], "建议 Skill 契约必须带建议（A1）"
+    assert "suggestion_grounds" in skill_payload, "grounds 字段必须立（P6 验收硬项）"
 
 
 # ---------------------------------------------------------------------------
@@ -263,13 +266,28 @@ def test_chinese_address_query_end_to_end_contract():
 
 
 class _ScriptedFake:
-    """录制用的剧本 fake：按系统提示词区分路由调用与提取调用。"""
+    """录制用的剧本 fake：按系统提示词区分路由 / 提取 / 建议调用（A1）。"""
 
     def chat(self, messages, *, model=None, **kwargs):
         system = messages[0]["content"]
         if "路由助手" in system:
             return ChatResponse(
                 content=json.dumps({"route": "area_safety_query"}, ensure_ascii=False),
+                model="scripted",
+            )
+        if "建议作者" in system:
+            return ChatResponse(
+                content=json.dumps(
+                    {
+                        "suggestions": [
+                            "晚上 10 点从图书馆回家，优先走照明好的主干道",
+                            "把包放在身前、手机拿在手里，避免边走路边看手机",
+                            "提前把行程告诉朋友，到家后报个平安",
+                        ],
+                        "suggestion_grounds": [],
+                    },
+                    ensure_ascii=False,
+                ),
                 model="scripted",
             )
         return ChatResponse(

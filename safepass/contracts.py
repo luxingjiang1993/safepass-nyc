@@ -41,6 +41,10 @@ CAPABILITY_TREND = "trend"
 CAPABILITY_OUT_OF_COVERAGE = "out_of_coverage"
 LEGAL_CAPABILITIES = frozenset({CAPABILITY_PATH, CAPABILITY_TREND, CAPABILITY_OUT_OF_COVERAGE})
 
+# 建议来源明示标记（issue 16 / A1）：B1 两路径对照与模板降级路径的判别字段
+SUGGESTIONS_SOURCE_SKILL = "skill"
+SUGGESTIONS_SOURCE_TEMPLATE = "template"
+
 
 class Venue(BaseModel):
     """安全场所/紧急资源条目（与 fixtures/safe_places 静态表同构，逐字段透出）。"""
@@ -105,6 +109,17 @@ class DegradedResult(BaseModel):
     sample_size: int | None = None  # 无数据（越界）时为 None
 
 
+class SuggestionGround(BaseModel):
+    """建议的数据依据（issue 16 / A1；P6 验收硬项：契约强制携带、可先空但字段必须立）。
+
+    doc_id = 检索上下文文档标识；quote = 逐字引文——机器可核对（与建议上下文
+    逐字比对，A2 检索注入后非空）。评级/可信度/越界判定永远不写进这里。
+    """
+
+    doc_id: str
+    quote: str
+
+
 class ExtractedDimensions(BaseModel):
     """三维提取（AC-002，issue 09 / T7）：区域 / 人群 / 时间。
 
@@ -126,9 +141,14 @@ class SafetyQueryResult(BaseModel):
     profile_notice：AC-023 画像隐私透明声明（"会话级、关闭即删除"，单一事实源在配置）。
     community_info：情报 Agent 装配的华人社区信息（issue 10 / T8；dict 结构见
     intel_agent 模块 docstring，未记载项统一标注、社区资源只列官方来源）；
-    dimensions 由细节追问叠加维度填充；建议当前来自集中配置
-    （具体性/温暖度是人工抽查项）；数据不足（⚪）时 unknowns 非空、
-    charts 为 null、不给评级数值与可信度。
+    dimensions 由细节追问叠加维度填充；
+    suggestions：issue 16 / A1 起走建议 Skill 主路径（LLM 措辞 + 数据定调，
+    注入客户端且开关开时），熔断/无客户端/开关关/校验耗尽 → 确定性模板
+    （suggestions_source 明示来源，不静默）；
+    suggestion_grounds：数据依据（可先空但字段必须立，P6 验收硬项）；
+    suggestions_source：建议来源明示标记（B1 两路径对照与模板降级路径的
+    判别字段；"template" = 模板/降级，"skill" = 受约束生成通过校验）；
+    数据不足（⚪）时 unknowns 非空、charts 为 null、不给评级数值与可信度。
     """
 
     type: Literal["safety"] = "safety"
@@ -142,6 +162,11 @@ class SafetyQueryResult(BaseModel):
     extracted: ExtractedDimensions
     dimensions: list[dict] = Field(default_factory=list)
     suggestions: list[str] = Field(default_factory=list)
+    suggestion_grounds: list[SuggestionGround] = Field(default_factory=list)
+    # 建议来源明示（A1/B1）：标注生成路径（Skill 受约束生成 vs 确定性模板），
+    # 不是逐条文本出处——画像命中时本机排序前置（D5②）可能把配置文案排在
+    # 首条；该文案是两侧路径的受控常量（两路径对照时同现，不构成区分信号）。
+    suggestions_source: Literal["skill", "template"] = "template"
     unknowns: list[str] = Field(default_factory=list)
     llm_degraded: bool = False  # 票 06：LLM 熔断/限流降级明示（不静默；评级/数据字段不受影响）
     degradation_notice: str | None = None  # 降级时非空（config cost_control.degraded_notice）

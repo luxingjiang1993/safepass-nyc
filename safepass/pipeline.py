@@ -4,7 +4,14 @@
 是全系统唯一测试接缝：紧急检测、意图路由、数据聚合、评级计算、
 降级分支、建议生成全部在管线内部完成。
 
-当前切片（issue 10 / RALPH T8）：情报 Agent 混合检索 + community_info 装配——
+当前切片（issue 16 / A1）：建议生成 Skill 主路径——用户可见的贴心建议来自
+受约束生成（LLM 措辞 + 数据定调，ADR-0003）：注入客户端且开关开时经
+safepass/skills/suggestion（提示词 + Pydantic 契约 + grounds 可核对校验）
+走统一输出控制管线；熔断/限流/无客户端/开关关/校验耗尽 → 确定性模板
+（suggestions_source 明示来源）。画像永不进入 Skill 请求体，只在本机排序
+前置；评级/可信度/越界零 LLM 接触（红线 2）。
+
+既有切片（issue 10 / RALPH T8）：情报 Agent 混合检索 + community_info 装配——
 覆盖区内安全查询的 community_info（仇恨犯罪/诈骗提醒/中文警员/社区资源）
 由情报 Agent 从该警区三主题知识文档确定性装配（零 LLM），未记载事实输出
 统一标注（intel.unverified_label，F7-3 诚实路径），社区资源只列有官方来源
@@ -75,6 +82,7 @@ from safepass import (
 )
 from safepass.llm_client import LLMClient
 from safepass.session_state import SessionState
+from safepass.skills import suggestion as suggestion_skill
 
 
 def execute_query(
@@ -368,9 +376,12 @@ def _build_safety_result(
     """覆盖区内单区查询的契约：评级/可信度/样本量/图表/三维提取/诚实缺口。
 
     dimensions = 细节追问叠加的人群/时间维度（F8-2）；extraction_client =
-    AC-002 三维提取的注入客户端（None 时由确定性 fallback 产出）；
-    profile = 会话画像，只作用于建议排序与时间提示（spec D5）；
-    llm_degraded = 票 06 熔断/限流降级标记：提取调用被成本控制拦截时
+    AC-002 三维提取的注入客户端（None 时由确定性 fallback 产出）——issue 16
+    / A1 起同时是建议 Skill 的注入客户端（追问轮两者同降零额外 LLM，AC-002
+    同款政策）；
+    profile = 会话画像，只作用于建议排序与时间提示（spec D5）——永不进入
+    Skill 请求体（ADR-0003/P6），只在本机确定性排序前置；
+    llm_degraded = 票 06 熔断/限流降级标记：提取或建议调用被成本控制拦截时
     退确定性 fallback 并置位（降级不静默）。
     """
     profile_text = _profile_text(profile)
@@ -399,6 +410,54 @@ def _build_safety_result(
         )
     )
     insufficient = rated.confidence is None  # 强制 ⚪ 档：不给评级数值/可信度/解释
+    # --- 建议装配（issue 16 / A1）：Skill 主路径 → 校验不过/熔断/无客户端 → 模板 ---
+    # 两路径对照接线（B1）：同一 query 关掉 suggestions.skill_enabled 即得模板侧。
+    # 画像剔除（ADR-0003/P6）：pack 结构上无画像字段，画像只在下游本机排序。
+    pack = suggestion_skill.SuggestionPack(
+        area=resolved.canonical_name,
+        precinct=stats.precinct,
+        rating=rated.rating,
+        rating_label=degraded.RATING_LABELS[rated.rating],
+        sample_size=stats.sample_size,
+        confidence_tier=rated.confidence,
+        ratio_to_city_mean=rated.ratio_to_city_mean,
+        data_sufficient=charts_data is not None,
+        top5_types=() if charts_data is None else tuple(
+            (t.offense_type, t.count) for t in charts_data.top5_types
+        ),
+        day_count=None if charts_data is None else charts_data.day_night.day,
+        night_count=None if charts_data is None else charts_data.day_night.night,
+        extracted_area=None if extracted is None else extracted.area,
+        extracted_crowd=None if extracted is None else extracted.crowd,
+        extracted_time=None if extracted is None else extracted.time,
+    )
+    suggestions: list[str] | None = None
+    suggestion_grounds: list[contracts.SuggestionGround] = []
+    if cfg.suggestions.skill_enabled and extraction_client is not None:
+        try:
+            skill_out = suggestion_skill.generate(extraction_client, query_text, pack, cfg)
+            suggestions = list(skill_out.suggestions)
+            suggestion_grounds = list(skill_out.suggestion_grounds)
+        except output_pipeline.OutputPipelineError:
+            # 校验耗尽仍不合法（明确失败）：降级确定性模板——suggestions_source
+            # 明示来源，不静默。LLM 措辞放弃，数据定调不放弃。
+            suggestions = None
+        except (cost_control.CostControlError, OSError):
+            # 建议调用被熔断/限流/写盘失败拦截：与提取同口径明示降级（票 06），
+            # 建议退模板，结构化数据（评级/图表/community_info）照出。
+            suggestions = None
+            llm_degraded = True
+    suggestions_source = (
+        contracts.SUGGESTIONS_SOURCE_SKILL if suggestions is not None
+        else contracts.SUGGESTIONS_SOURCE_TEMPLATE
+    )
+    if suggestions is None:
+        suggestions = list(cfg.suggestions.safety_general)
+    # 画像的唯一作用（spec D5②）：本机确定性排序前置——不进请求体。对 Skill
+    # 产出同样适用（ADR-0003「本地确定性加权/排序」）：命中人群标签时配置文案
+    # 前置，可能截断末条保持 3-5 边界（与模板路径同款语义，issue 09 先例）。
+    # suggestions_source 标注生成路径而非逐条出处（见 contracts 注释）。
+    suggestions = _personalized_suggestions(tuple(suggestions), profile_text, cfg)
     result = contracts.SafetyQueryResult(
         area=resolved.canonical_name,
         precinct=stats.precinct,
@@ -417,7 +476,9 @@ def _build_safety_result(
             profile_text,
             cfg,
         ),
-        suggestions=_personalized_suggestions(cfg.suggestions.safety_general, profile_text, cfg),
+        suggestions=suggestions,
+        suggestion_grounds=suggestion_grounds,
+        suggestions_source=suggestions_source,
         unknowns=[cfg.degraded.insufficient_data_message] if insufficient else [],
         sources=list(stats.sources),
         time_range=data_agent.load_time_range() or "未知时间范围",

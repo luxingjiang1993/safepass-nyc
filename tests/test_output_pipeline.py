@@ -461,8 +461,9 @@ def test_fc_routing_replay_offline_zero_calls():
 def test_execute_query_consumes_cassette_fixed_routing():
     """唯一接缝路径上，模型行为同样由 cassette 固定：LLM 路由出安全查询契约。
 
-    T7 起接缝在注入客户端时消费 2 次 LLM 调用（FC 路由 + 三维提取），
-    本用例使用专用 cassette（fc_routing_seam.json，2 条交互顺序消费）。
+    A1（issue 16）起接缝在注入客户端时消费 3 次 LLM 调用（FC 路由 + 三维提取
+    + 建议 Skill），本用例使用专用 cassette（fc_routing_seam.json，3 条交互
+    顺序消费）。
     """
     inner = _FailIfCalled()
     client = _CassetteClient(inner, CASSETTE_SEAM)
@@ -471,23 +472,27 @@ def test_execute_query_consumes_cassette_fixed_routing():
     result = execute_query("上东区晚上安全吗？", llm_client=client)
 
     assert inner.calls == 0
-    assert client.calls == 2, "接缝 LLM 路径 = 路由 1 次 + 三维提取 1 次（T7）"
+    assert client.calls == 3, "接缝 LLM 路径 = 路由 + 三维提取 + 建议 Skill 各 1 次（A1）"
     assert result.type == "safety"
     assert result.rating in contracts.LEGAL_RATINGS
     assert result.extracted.time is not None, "三维提取经 cassette 固定并透出契约（AC-002）"
+    assert result.suggestions_source == "skill", "注入客户端且开关开：建议来自 Skill（A1）"
 
 
 def test_seam_cassette_asset_committed_and_wellformed():
-    """接缝专用 cassette 资产完整性：2 条交互（路由 → 三维提取）。"""
+    """接缝专用 cassette 资产完整性：3 条交互（路由 → 三维提取 → 建议 Skill）。"""
     assert CASSETTE_SEAM.exists(), "缺少 tests/cassettes/fc_routing_seam.json（需录制后提交）"
     data = json.loads(CASSETTE_SEAM.read_text(encoding="utf-8"))
     interactions = data["interactions"]
-    assert len(interactions) == 2, "fc_routing_seam.json 固定 2 条交互（路由 + 三维提取）"
+    assert len(interactions) == 3, "fc_routing_seam.json 固定 3 条交互（路由+提取+建议，A1）"
     assert all(e["fingerprint"] for e in interactions)
     route_payload = json.loads(interactions[0]["response"]["content"])
     assert route_payload["route"] == "area_safety_query"
     extraction_payload = json.loads(interactions[1]["response"]["content"])
     assert "area" in extraction_payload and "crowd" in extraction_payload
+    skill_payload = json.loads(interactions[2]["response"]["content"])
+    assert skill_payload["suggestions"], "建议 Skill 契约必须带建议（A1）"
+    assert "suggestion_grounds" in skill_payload, "grounds 字段必须立（P6 验收硬项）"
 
 
 def test_cassette_asset_committed_and_wellformed():
@@ -536,6 +541,18 @@ def test_query_latency_p95_within_budget():
             script=[
                 json.dumps({"route": "area_safety_query"}),
                 json.dumps({"area": "上东区", "crowd": None, "time": "晚上"}),
+                # A1（issue 16）：接缝注入客户端时建议 Skill 消费第 3 次调用
+                json.dumps(
+                    {
+                        "suggestions": [
+                            "夜间出行选择照明好的主干道",
+                            "随身包放在身前视线范围内",
+                            "提前告知朋友行程并保持联系",
+                        ],
+                        "suggestion_grounds": [],
+                    },
+                    ensure_ascii=False,
+                ),
             ]
         )
         start = time.perf_counter()
