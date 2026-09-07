@@ -3,4 +3,21 @@
 Ralph 跨迭代记忆。每次 ./ralph-once.sh 未达标迭代，agent 的承诺追加/改写于此。
  afk-ralph.sh 检测到 <promise>COMPLETE</promise> 后由人工归档本文件内容到 RALPH.md 迭代历史。
 
-（尚未开始迭代）
+## 票 #18 A3 one_liner 确定性数据钩子化（2026-09-08，人工会话接管完成）
+
+headless 三连发秒挂（ralph-run-20260908-015839/020340/0220…22.log，title-gen
+unrecognized_model）后由人工会话接管，实现与验证已完成：
+
+<promise>
+COMPLETE：金标断言 one_liner 含至少一类允许的数据钩子且与 charts/ratio
+不矛盾（tests/test_a3_one_liner_hooks.py 四类断言全过：金标精确相等 /
+允许钩子集合成员 / 倍数与 rating_explainable_basis 逐字一致 / ⚪ 零钩子）；
+LLM 调用路径零参与 one_liner（pipeline._one_liner 纯函数装配，suggestion
+契约 docstring 明示不写）；`python -m pytest tests/ -q` = 587 passed 全绿
+（基线按 conftest collect_ignore 不含 tests/eval）。
+</promise>
+
+遗留（人工，棘轮表约束）：judge 请求内嵌 one_liner → l2_judge.json 指纹
+失效，须 `python scripts/record_l2_cassette.py` 重录（需网络 + DASHSCOPE_API_KEY
++ 预算）后跑 `pytest tests/eval -q` 验证；在此之前 tests/eval 回放不可用。
+已归档 RALPH.md 迭代历史 + 优雅失败记录。

@@ -56,6 +56,44 @@ city_mean_per_100k: 2769.4118
 output_pipeline:
   max_retries: 3          # 有限重试上界（输出控制管线）
 
+# ============================================================================
+# one_liner（issue 18 / A3，ADR-0003 定案）：确定性模板 + 数据钩子填空。
+# LLM 永不写 one_liner。允许的数据钩子集合（词典）只活在本节：钩子话术、
+# 判定阈值唯一事实源在此（红线 1：代码零字面量，loader 只搬运与校验）。
+# 装配规则 = 按 hooks 声明顺序逐条判定，首条命中的钩子短语拼到
+# 「{区域}：{评级标签}」之后——30 字上限内只放一个钩子（确定性、可证伪）。
+# 判定输入 = 本次查询聚合的 charts 数据与 ratio_to_city_mean（与 A1 建议
+# pack 同源同次聚合），钩子与 charts/ratio 构造上不矛盾；charts 缺失
+# （⚪ 数据不足）时零钩子，退回纯标签模板（不基于图表编造断言）。
+# ============================================================================
+one_liner:
+  hooks:
+    # 夜间案件偏高：charts day/night 计数 night ≥ day × night_min_ratio
+    # （同一聚合可核对：图表两栏数字一比即知）
+    - id: night_higher
+      text: "夜间案件偏高"
+      night_min_ratio: 1.2
+    # 单一类型突出：top1 类型计数 / 样本量 ≥ top_type_min_share，且该类型
+    # 代码在 type_names 收有中文名（未收录代码不产此钩子——诚实不编造；
+    # {type} = type_names 的中文名，与图表代码一一对应可核对）
+    - id: top_type_dominant
+      text: "以{type}为主"
+      top_type_min_share: 0.4
+    # 相对全市：charts 在场即兜底发言（数值锚点——Walk Score 式"单一数字 +
+    # 固定人话带"；{ratio} = ratio_to_city_mean 保留一位小数，"约"口径，
+    # 与 rating_explainable_basis / 评级带同源同值，逐字可核对）。前两个
+    # 钩子命中时优先（真实数据的夜间/类型信号更有行动价值），本钩子垫底
+    - id: city_relative
+      text: "约为全市均值{ratio}倍"
+  # 犯罪类型代码 → one_liner 中文名（钩子词典的展示词表）
+  type_names:
+    "GRAND LARCENY": "重大盗窃"
+    "ROBBERY": "抢劫"
+    "BURGLARY": "入室盗窃"
+    "FELONY ASSAULT": "重伤害"
+    "PETIT LARCENY": "轻微盗窃"
+    "HARRASSMENT 2": "骚扰"
+
 # 免责声明：每处分析末尾自动附加（AC-010，横切字段，全部响应形态都有，含 T7 新增的 guardrail）
 disclaimer: "本分析仅供参考，不替代专业安保建议。"
 # 免责页紧急资源提示行（验收审计 #5-④：紧急/市政号码字面量只进本配置，

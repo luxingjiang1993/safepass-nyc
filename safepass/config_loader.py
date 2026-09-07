@@ -27,6 +27,35 @@ class ConfigError(RuntimeError):
 
 
 @dataclass(frozen=True)
+class OneLinerHookSpec:
+    """one_liner 数据钩子（issue 18 / A3，ADR-0003 定案）：判定阈值 + 填空话术。
+
+    id 是装配分支的判别键（loader 校验其属于 KNOWN_HOOK_IDS，未知 id =
+    配置损坏明确失败）；text 是拼进 one_liner 的固定人话（可能含 {type}/
+    {ratio} 占位，由装配层按数据填充）；night_min_ratio/top_type_min_share
+    是各自钩子的触发阈值（city_relative 复用 rating.thresholds 的评级带，
+    不设自有阈值）。一切字面量只活在 config/app.yaml。
+    """
+
+    id: str
+    text: str
+    night_min_ratio: float | None = None
+    top_type_min_share: float | None = None
+
+
+@dataclass(frozen=True)
+class OneLinerConfig:
+    """one_liner 确定性钩子词典（issue 18 / A3）。
+
+    hooks：按装配优先级声明的钩子列表（首个命中者胜，30 字上限只放一个）；
+    type_names：犯罪类型代码 → 中文名展示词表（未收录代码不产类型钩子）。
+    """
+
+    hooks: tuple[OneLinerHookSpec, ...]
+    type_names: dict[str, str]
+
+
+@dataclass(frozen=True)
 class RatingThresholds:
     """相对阈值：per-100k 犯罪率 / 全市均值（spec D4）。"""
 
@@ -293,6 +322,7 @@ class AppConfig:
     addressing: AddressingConfig
     degraded: DegradedConfig
     suggestions: SuggestionsConfig
+    one_liner: OneLinerConfig
     emergency: EmergencyConfig
     followup: FollowUpConfig
     comparison: ComparisonConfig
@@ -693,6 +723,69 @@ def load_config(path: str | Path | None = None) -> AppConfig:
     if any(not v.strip() for v in eval_cfg.prompt_versions.values()):
         raise ConfigError("eval.prompt_versions 的值（版本字符串）不得为空")
 
+    # one_liner 钩子词典（issue 18 / A3）：词典与阈值只活在本节，loader 只搬运校验。
+    # 装配分支的判别键（与 pipeline._one_liner_hook_text 的 id 分支一一对应）；
+    # 未知 id = 配置损坏，明确失败不静默（新增钩子必须两端同步登记）。
+    known_hook_ids = {"night_higher", "top_type_dominant", "city_relative"}
+    one_liner_raw = _require(data, "one_liner", "root")
+    hooks_raw = _require(one_liner_raw, "hooks", "one_liner")
+    if not isinstance(hooks_raw, list) or not hooks_raw:
+        raise ConfigError("one_liner.hooks 必须是非空列表（钩子词典，按装配优先级排序）")
+    hook_specs: list[OneLinerHookSpec] = []
+    for raw in hooks_raw:
+        hook_id = str(_require(raw, "id", "one_liner.hooks"))
+        if hook_id not in known_hook_ids:
+            raise ConfigError(f"one_liner.hooks 含未知钩子 id {hook_id!r}（装配分支不认，配置损坏）")
+        if hook_id in {h.id for h in hook_specs}:
+            raise ConfigError(f"one_liner.hooks 的 id {hook_id!r} 重复")
+        text = str(_require(raw, "text", f"one_liner.hooks[{hook_id}]"))
+        if not text.strip():
+            raise ConfigError(f"one_liner.hooks[{hook_id}].text 不得为空")
+        spec = OneLinerHookSpec(
+            id=hook_id,
+            text=text,
+            night_min_ratio=(
+                None
+                if raw.get("night_min_ratio") is None
+                else float(raw["night_min_ratio"])
+            ),
+            top_type_min_share=(
+                None
+                if raw.get("top_type_min_share") is None
+                else float(raw["top_type_min_share"])
+            ),
+        )
+        if hook_id == "night_higher":
+            if spec.night_min_ratio is None or spec.night_min_ratio < 1:
+                raise ConfigError("night_higher 必须声明 night_min_ratio ≥ 1（夜间须显著高于日间才说“偏高”）")
+            if "{" in spec.text:
+                raise ConfigError("night_higher.text 是固定话术，不得含 {占位符}")
+        elif hook_id == "top_type_dominant":
+            if spec.top_type_min_share is None or not (0 < spec.top_type_min_share <= 1):
+                raise ConfigError("top_type_dominant 必须声明 top_type_min_share ∈ (0, 1]")
+            if "{type}" not in spec.text:
+                raise ConfigError("top_type_dominant.text 必须含 {type} 占位（type_names 中文名）")
+        else:  # city_relative：垫底数值锚点（charts 在场即发言），无自有阈值
+            if "{ratio}" not in spec.text:
+                raise ConfigError("city_relative.text 必须含 {ratio} 占位（全市均值倍数）")
+        hook_specs.append(spec)
+    type_names_raw = one_liner_raw.get("type_names", {})
+    if not isinstance(type_names_raw, dict) or not type_names_raw:
+        raise ConfigError("one_liner.type_names 必须是非空映射（犯罪类型代码 → 中文名）")
+    type_names = {str(k): str(v) for k, v in type_names_raw.items()}
+    if any(not name.strip() for name in type_names.values()):
+        raise ConfigError("one_liner.type_names 的值（中文名）不得为空")
+    # A3 收紧面：钩子词典话术与展示词表本身不得命中空话/恐慌黑名单
+    # （装配层 NEG-006 兜底的是叙事输出；词典层先拦配置，双保险）。
+    for word in (*guardrails.panic_blacklist, *suggestions.empty_talk_blacklist):
+        for spec in hook_specs:
+            if word in spec.text:
+                raise ConfigError(f"one_liner 钩子 {spec.id} 的话术命中黑名单词 {word!r}（A3 收紧）")
+        for code, name in type_names.items():
+            if word in name:
+                raise ConfigError(f"one_liner.type_names[{code!r}] 命中黑名单词 {word!r}（A3 收紧）")
+    one_liner = OneLinerConfig(hooks=tuple(hook_specs), type_names=type_names)
+
     return AppConfig(
         thresholds=thresholds,
         sample_size_tiers=tiers,
@@ -707,6 +800,7 @@ def load_config(path: str | Path | None = None) -> AppConfig:
         addressing=AddressingConfig(aliases=aliases),
         degraded=degraded,
         suggestions=suggestions,
+        one_liner=one_liner,
         emergency=emergency,
         followup=followup,
         comparison=comparison,

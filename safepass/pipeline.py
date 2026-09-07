@@ -4,7 +4,14 @@
 是全系统唯一测试接缝：紧急检测、意图路由、数据聚合、评级计算、
 降级分支、建议生成全部在管线内部完成。
 
-当前切片（issue 17 / A2）：建议生成 Skill 主路径——用户可见的贴心建议来自
+当前切片（issue 18 / A3）：one_liner 确定性数据钩子填空——LLM 永不写
+one_liner（ADR-0003 定案）：固定前缀「{区域}：{评级标签}」+ 首个命中的
+数据钩子短语（config one_liner.hooks 词典按声明序判定：夜间偏高 > 单一
+类型突出 > 相对全市倍数）；判定输入 = 本次查询聚合的 charts/ratio（与
+建议 pack 同源同值，与 charts/ratio 构造上不矛盾）；⚪ 数据不足零钩子
+退回纯标签（不基于图表编造断言）。
+
+既有切片（issue 17 / A2）：建议生成 Skill 主路径——用户可见的贴心建议来自
 受约束生成（LLM 措辞 + 数据定调，ADR-0003）：注入客户端且开关开时经
 safepass/skills/suggestion（提示词 + Pydantic 契约 + grounds 可核对校验 +
 间接注入防线）走统一输出控制管线；检索不再「测得到、用户感不到」——
@@ -386,6 +393,60 @@ def _profile_time_note(
     return dimensions
 
 
+def _one_liner_hook_text(
+    charts: contracts.Charts,
+    ratio_to_city_mean: float,
+    cfg: config_loader.AppConfig,
+) -> str | None:
+    """钩子词典首个命中者（issue 18 / A3）：判定输入 = 本次聚合的
+    charts/ratio（与 A1 建议 pack 同源同值）→ 命中文本与 charts/ratio
+    构造上一致。id 白名单在 config_loader 锁死（未知 id 加载即失败）；
+    词典与阈值唯一事实源 = config one_liner.hooks。"""
+    day = charts.day_night.day
+    night = charts.day_night.night
+    for hook in cfg.one_liner.hooks:
+        if hook.id == "night_higher":
+            # 夜间案件偏高：night ≥ day × 系数（日间零案时系数语义退化为
+            # night > 0 即命中——全部案件落在夜间，说“偏高”真实可核对）
+            if night >= day * hook.night_min_ratio:
+                return hook.text
+        elif hook.id == "top_type_dominant":
+            top1 = charts.top5_types[0]
+            display = cfg.one_liner.type_names.get(top1.offense_type)
+            if display is not None and top1.count >= (day + night) * hook.top_type_min_share:
+                return hook.text.format(type=display)
+        else:  # city_relative：数值锚点垫底钩子（声明序最后）——charts 在场
+            # 即发言，{ratio} 保留一位小数（“约”口径，与 rating_explainable_basis
+            # 同源同值逐字可核对）。前序钩子命中时已 return，本行不可达除非
+            # 词典顺序被改（id 分支与声明序解耦，防御性兜底）
+            return hook.text.format(ratio=f"{ratio_to_city_mean:.1f}")
+    return None
+
+
+def _one_liner(
+    area: str,
+    rating_label: str,
+    charts: contracts.Charts | None,
+    ratio_to_city_mean: float | None,
+    cfg: config_loader.AppConfig,
+) -> str:
+    """one_liner 确定性装配（issue 18 / A3，ADR-0003 定案；LLM 零参与）。
+
+    模板 = 「{area}：{label}」固定前缀 + 首个命中的数据钩子短语（config
+    one_liner.hooks 声明序）。charts 缺失（⚪ 数据不足）或全钩子未命中 →
+    纯前缀（诚实：不基于不可见/不显著的数据做断言）。30 字上限兜底：
+    超限宁可退回纯前缀也不截断——区域名来自配置别名表，防御不可达。
+    """
+    one_liner = f"{area}：{rating_label}"
+    if charts is not None and ratio_to_city_mean is not None:
+        hook = _one_liner_hook_text(charts, ratio_to_city_mean, cfg)
+        if hook is not None:
+            filled = f"{one_liner}，{hook}"
+            if len(filled) <= output_pipeline.ONE_LINER_MAX_CHARS:
+                one_liner = filled
+    return one_liner
+
+
 def _build_safety_result(
     resolved: addressing.ResolvedArea,
     records: tuple[data_agent.CrimeRecord, ...],
@@ -502,7 +563,13 @@ def _build_safety_result(
         rating_explainable_basis=None if insufficient else rated.ratio_to_city_mean,
         confidence_tier=rated.confidence,
         sample_size=stats.sample_size,
-        one_liner=f"{resolved.canonical_name}：{degraded.RATING_LABELS[rated.rating]}",
+        one_liner=_one_liner(
+            resolved.canonical_name,
+            degraded.RATING_LABELS[rated.rating],
+            charts,
+            rated.ratio_to_city_mean,
+            cfg,
+        ),
         extracted=contracts.ExtractedDimensions(
             area=None if extracted is None else extracted.area,
             crowd=None if extracted is None else extracted.crowd,

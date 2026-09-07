@@ -6,7 +6,11 @@
 
 ## 当前任务
 
-（无 — 等待 Phase 2 PRD.md 落到 `docs/specs/` 后在此登记）
+**票 #18 A3 one_liner 确定性数据钩子化**（`.scratch/safepass-phase3-tickets/issues/03-a3-deterministic-one-liner.md`）
+
+- 做法：确定性模板填空，LLM 不写 one_liner；钩子词典只进 `config/app.yaml`（与 A1 同源）；字数上限 30 字 + 空话/恐慌黑名单
+- 允许改动：`safepass/pipeline.py`、`config/app.yaml` + `safepass/config_loader.py`、`tests/`
+- 完成承诺：金标断言 one_liner 含至少一类允许的数据钩子且与 charts/ratio 不矛盾；LLM 调用路径零参与 one_liner；`python -m pytest tests/ -q` 基线全绿
 
 ## 完成承诺（Definition of Done）
 
@@ -54,9 +58,11 @@ Ralph 循环本身跑在 dev 模型上；eval 套件负责验证生产模型兼�
 |------|------|--------|------|
 | 2026-09-04 | MVP T0–T8（ralph-loop 插件时代） | — | ✅ 335 green，归档 |
 | 2026-09-05 | 票 07 真实数据入库 + 路径切换 | 1（人工会话接管秒挂循环） | ✅ 467 green 零 skip；真实数据入 fixtures/nypd_real（11770 条）；city_mean 回填 2769.4118；生产路径切 config runtime_dataset_path，测试世界钉 mock |
+| 2026-09-08 | 票 #18 A3 one_liner 确定性数据钩子化 | 3（headless 秒挂）→ 人工会话接管 1 | ✅ `python -m pytest tests/ -q` 587 green；金标钩子断言入 tests/test_a3_one_liner_hooks.py（允许钩子集合成员 + 与 rating_explainable_basis 逐字一致 + ⚪ 零钩子）；LLM 零参与 one_liner（装配纯函数，suggestion 契约明示不写）；**遗留：L2 cassette 须重录**（judge 请求内嵌 one_liner 随本次变更漂移、指纹失效——棘轮表；重录前 `pytest tests/eval -q` 不可回放） |
 
 ## 优雅失败记录
 
 | 日期 | 任务 | 轮数 | 卡住的布尔条件 | 人工介入结论 |
 |------|------|------|----------------|--------------|
 | 2026-09-05 | 票 07 真实数据入库 | 10（全部秒挂） | 未进入任务——headless `claude -p` 继承会话 `ANTHROPIC_MODEL=kimi-for-coding`，报 `unrecognized_model` | 环境配置事故非任务失败，不计票；以 `env -u ANTHROPIC_MODEL` 重启循环 |
+| 2026-09-08 | 票 #18 A3 one_liner 确定性数据钩子化 | 3（全部秒挂，ralph-run-20260908-015839/020340/0220…22.log） | 未进入任务——headless `claude -p` 在 `generate_session_title` 报 `unrecognized_model`（settings.json 兜底 deepseek-v4-flash，headless 不认；即使 .launch-a3.sh 显式 ANTHROPIC_MODEL=deepseek-v4-pro 也复现），零主调用产物 | 环境配置事故非任务失败，不计票；人工会话接管完成实现与验证（587 green）；提交待人工 push；L2 cassette 重录留待有网络/预算环境（棘轮表） |
