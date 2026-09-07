@@ -1,0 +1,1142 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>SafePass NYC — How We Built It (0→1)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<script type="module">
+  import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs";
+  mermaid.initialize({
+    startOnLoad: true,
+    theme: "dark",
+    securityLevel: "loose",
+    fontFamily: "DM Sans, sans-serif",
+    themeVariables: {
+      darkMode: true,
+      background: "#0c1219",
+      primaryColor: "#1a2736",
+      primaryTextColor: "#e8eef5",
+      primaryBorderColor: "#3d5168",
+      secondaryColor: "#152030",
+      tertiaryColor: "#101820",
+      lineColor: "#7a8ea3",
+      textColor: "#e8eef5",
+      mainBkg: "#1a2736",
+      nodeBorder: "#4a6280",
+      clusterBkg: "#101820",
+      clusterBorder: "#2c3e52",
+      titleColor: "#f0c14a",
+      edgeLabelBackground: "#0c1219",
+      actorBkg: "#1a2736",
+      actorBorder: "#4a6280",
+      actorTextColor: "#e8eef5",
+      signalColor: "#e8eef5",
+      signalTextColor: "#e8eef5",
+      labelBoxBkgColor: "#1a2736",
+      labelTextColor: "#e8eef5",
+      noteBkgColor: "#243447",
+      noteTextColor: "#e8eef5",
+    },
+    flowchart: { curve: "basis", padding: 16, htmlLabels: true },
+    sequence: { actorMargin: 28, messageMargin: 36 },
+  });
+</script>
+<style>
+:root {
+  --bg: #0c1219;
+  --bg-2: #111923;
+  --surface: #162230;
+  --surface-2: #1c2b3c;
+  --line: #2c3e52;
+  --text: #e8eef5;
+  --muted: #8fa0b3;
+  --faint: #5f7186;
+  --gold: #f0c14a;
+  --gold-soft: rgba(240, 193, 74, 0.12);
+  --green: #3ecf8e;
+  --yellow: #e6b422;
+  --red: #ef6b6b;
+  --blue: #6cb0e0;
+  --max: 920px;
+  --wide: 1100px;
+}
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .film-scene, .film-progress span, .hero-glow { animation: none !important; }
+}
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: "DM Sans", system-ui, sans-serif;
+  font-size: 17px;
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+}
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 80% 50% at 50% -10%, rgba(240,193,74,0.07), transparent 55%),
+    radial-gradient(ellipse 40% 30% at 100% 40%, rgba(108,176,224,0.05), transparent 50%);
+  z-index: 0;
+}
+a { color: var(--gold); }
+a:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; }
+code, .mono {
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 0.86em;
+  background: var(--surface);
+  padding: 0.1em 0.35em;
+  border-radius: 3px;
+}
+.wrap { position: relative; z-index: 1; max-width: var(--max); margin: 0 auto; padding: 0 1.4rem 5rem; }
+.wide { max-width: var(--wide); margin-left: auto; margin-right: auto; }
+
+/* Hero */
+.hero {
+  padding: 4rem 0 3rem;
+  border-bottom: 1px solid var(--line);
+  position: relative;
+}
+.hero-glow {
+  position: absolute;
+  width: 280px; height: 280px;
+  right: -40px; top: -20px;
+  background: radial-gradient(circle, rgba(240,193,74,0.18), transparent 70%);
+  filter: blur(20px);
+  pointer-events: none;
+  animation: pulse 6s ease-in-out infinite;
+}
+@keyframes pulse {
+  0%, 100% { opacity: 0.5; transform: scale(1); }
+  50% { opacity: 0.85; transform: scale(1.08); }
+}
+.kicker {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 1.4rem;
+}
+.kicker i {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--gold);
+  box-shadow: 0 0 0 4px var(--gold-soft);
+  font-style: normal;
+}
+.hero h1 {
+  font-family: Fraunces, Georgia, serif;
+  font-weight: 600;
+  font-size: clamp(2.5rem, 6vw, 3.8rem);
+  line-height: 1.1;
+  letter-spacing: -0.025em;
+  margin: 0 0 1.2rem;
+  max-width: 14ch;
+}
+.hero .lede {
+  font-size: 1.2rem;
+  color: var(--muted);
+  max-width: 38rem;
+  margin: 0 0 1.8rem;
+}
+.hero .lede em { color: var(--text); font-style: normal; font-weight: 500; }
+.plain-box {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--gold);
+  padding: 1.1rem 1.25rem;
+  margin: 0 0 2rem;
+  max-width: 40rem;
+}
+.plain-box strong { color: var(--gold); font-weight: 600; }
+.stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.75rem;
+}
+@media (max-width: 700px) { .stats { grid-template-columns: 1fr 1fr; } }
+.stat {
+  background: var(--bg-2);
+  border: 1px solid var(--line);
+  padding: 1rem;
+}
+.stat b {
+  display: block;
+  font-family: Fraunces, serif;
+  font-size: 1.35rem;
+  color: var(--text);
+  font-weight: 600;
+}
+.stat span {
+  font-size: 0.78rem;
+  color: var(--faint);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/* Nav */
+.toc {
+  position: sticky; top: 0; z-index: 30;
+  display: flex; gap: 0.25rem;
+  margin: 0 -1.4rem;
+  padding: 0.55rem 1.4rem;
+  background: rgba(12,18,25,0.94);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--line);
+  overflow-x: auto;
+}
+.toc a {
+  flex: 0 0 auto;
+  text-decoration: none;
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 500;
+  padding: 0.55rem 0.8rem;
+  border-radius: 4px;
+  white-space: nowrap;
+}
+.toc a:hover { color: var(--text); background: var(--surface); }
+.toc a.play-link { color: var(--gold); }
+
+/* Sections */
+section {
+  padding: 3.25rem 0 2.5rem;
+  border-bottom: 1px solid var(--line);
+}
+.sec-label {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 0.5rem;
+}
+h2 {
+  font-family: Fraunces, Georgia, serif;
+  font-size: clamp(1.7rem, 3.2vw, 2.2rem);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  margin: 0 0 0.75rem;
+  line-height: 1.2;
+}
+h3 {
+  font-family: Fraunces, Georgia, serif;
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 2.2rem 0 0.7rem;
+}
+.one-liner {
+  color: var(--muted);
+  font-size: 1.05rem;
+  max-width: 40rem;
+  margin: 0 0 1.75rem;
+}
+p { margin: 0 0 1rem; }
+.muted { color: var(--muted); }
+ul, ol { margin: 0 0 1.2rem; padding-left: 1.25rem; }
+li { margin-bottom: 0.45rem; }
+li::marker { color: var(--gold); }
+
+.tldr {
+  background: linear-gradient(135deg, #152030, #1a2a3c);
+  border: 1px solid var(--line);
+  padding: 1.25rem 1.4rem;
+  margin: 0 0 2rem;
+  border-radius: 2px;
+}
+.tldr .t {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.68rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 0.55rem;
+}
+.tldr p { margin: 0; font-size: 1.05rem; }
+
+.diagram {
+  background: var(--bg-2);
+  border: 1px solid var(--line);
+  padding: 1.25rem 0.75rem;
+  margin: 1.25rem 0 1.75rem;
+  overflow-x: auto;
+  border-radius: 2px;
+}
+.diagram .cap {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.68rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--faint);
+  padding: 0 0.75rem 0.85rem;
+  border-bottom: 1px solid var(--line);
+  margin-bottom: 0.85rem;
+}
+.mermaid { display: flex; justify-content: center; }
+
+.grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.85rem;
+  margin: 1rem 0 1.5rem;
+}
+@media (max-width: 640px) { .grid-2 { grid-template-columns: 1fr; } }
+.card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  padding: 1.1rem 1.15rem;
+}
+.card .lab {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.65rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--faint);
+  margin-bottom: 0.4rem;
+}
+.card h4 { margin: 0 0 0.4rem; font-size: 1rem; }
+.card p { margin: 0; font-size: 0.92rem; color: var(--muted); }
+
+.ratings { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 1rem 0 1.5rem; }
+.chip {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.75rem;
+  padding: 0.4rem 0.7rem;
+  border: 1px solid var(--line);
+  background: var(--bg-2);
+}
+.chip.g { color: var(--green); border-color: color-mix(in srgb, var(--green) 45%, var(--line)); }
+.chip.y { color: var(--yellow); border-color: color-mix(in srgb, var(--yellow) 45%, var(--line)); }
+.chip.r { color: var(--red); border-color: color-mix(in srgb, var(--red) 45%, var(--line)); }
+.chip.i { color: var(--muted); }
+
+.announce {
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  padding: 1.4rem 1.5rem;
+  margin: 1rem 0 1.75rem;
+  font-family: Fraunces, Georgia, serif;
+  font-size: 1.12rem;
+  line-height: 1.65;
+}
+.announce::before {
+  content: "If we announced this product tomorrow";
+  display: block;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.65rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 0.8rem;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+  margin: 0.8rem 0 1.5rem;
+}
+th, td {
+  text-align: left;
+  padding: 0.65rem 0.8rem;
+  border: 1px solid var(--line);
+  vertical-align: top;
+}
+th {
+  background: var(--bg-2);
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--faint);
+  font-weight: 500;
+}
+td { background: var(--surface); }
+
+.rule {
+  display: flex; gap: 1rem; align-items: flex-start;
+  padding: 1rem 0;
+  border-bottom: 1px solid var(--line);
+}
+.rule:last-child { border-bottom: 0; }
+.rule .n {
+  flex: 0 0 2rem;
+  font-family: Fraunces, serif;
+  font-size: 1.4rem;
+  color: var(--gold);
+  line-height: 1;
+}
+.rule h4 { margin: 0 0 0.3rem; font-size: 1rem; }
+.rule p { margin: 0; color: var(--muted); font-size: 0.95rem; }
+
+/* Film / video section */
+#film {
+  border-bottom: 0;
+  padding-bottom: 1rem;
+}
+.film-shell {
+  max-width: var(--wide);
+  margin: 0 auto;
+  background: #05080c;
+  border: 1px solid var(--line);
+  overflow: hidden;
+}
+.film-stage {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  background: #05080c;
+  overflow: hidden;
+}
+.film-scene {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 8% 9%;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(12px);
+  transition: opacity 0.55s ease, transform 0.55s ease;
+}
+.film-scene.on {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+.film-scene .eyebrow {
+  font-family: "JetBrains Mono", monospace;
+  font-size: clamp(0.65rem, 1.4vw, 0.8rem);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 0.9rem;
+}
+.film-scene h3 {
+  font-family: Fraunces, Georgia, serif;
+  font-size: clamp(1.5rem, 4.2vw, 2.6rem);
+  margin: 0 0 0.9rem;
+  line-height: 1.15;
+  max-width: 16ch;
+}
+.film-scene p {
+  margin: 0;
+  color: #b8c4d4;
+  font-size: clamp(0.9rem, 2vw, 1.15rem);
+  max-width: 34ch;
+  line-height: 1.55;
+}
+.film-scene .visual {
+  position: absolute;
+  right: 6%;
+  top: 50%;
+  transform: translateY(-50%);
+  width: min(38%, 320px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  opacity: 0.9;
+}
+.s0 .visual { background: radial-gradient(circle at 40% 40%, #f0c14a55, transparent 60%), radial-gradient(circle at 70% 70%, #6cb0e033, transparent 55%); }
+.s1 .visual { background: conic-gradient(from 210deg, #3ecf8e55, #e6b42255, #ef6b6b55, #8fa0b355, #3ecf8e55); filter: blur(1px); }
+.s2 .visual { background: linear-gradient(135deg, #1a2736, #243447); border: 1px solid #3d5168; border-radius: 8px; aspect-ratio: 4/3; }
+.s2 .visual::after {
+  content: "execute_query(...)";
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-family: "JetBrains Mono", monospace;
+  font-size: clamp(0.55rem, 1.3vw, 0.8rem);
+  color: var(--gold);
+}
+.s3 .visual { background: repeating-linear-gradient(-45deg, #1a2736, #1a2736 8px, #243447 8px, #243447 16px); border-radius: 4px; }
+.s4 .visual {
+  background:
+    radial-gradient(circle at 30% 40%, #ef6b6b66, transparent 35%),
+    radial-gradient(circle at 70% 60%, #3ecf8e44, transparent 40%),
+    #152030;
+}
+.s5 .visual { background: linear-gradient(180deg, transparent 40%, #f0c14a22), radial-gradient(circle, #243447, #0c1219); }
+@media (max-width: 640px) {
+  .film-scene .visual { display: none; }
+  .film-scene { padding: 10% 7%; }
+}
+
+.film-controls {
+  display: flex; align-items: center; gap: 0.85rem;
+  padding: 0.85rem 1rem;
+  background: #0a0f15;
+  border-top: 1px solid var(--line);
+}
+.film-btn {
+  appearance: none;
+  border: 1px solid var(--gold);
+  background: var(--gold-soft);
+  color: var(--gold);
+  font-family: "DM Sans", sans-serif;
+  font-weight: 600;
+  font-size: 0.85rem;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  border-radius: 2px;
+}
+.film-btn:hover { background: rgba(240,193,74,0.22); }
+.film-btn:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+.film-progress {
+  flex: 1;
+  height: 4px;
+  background: var(--line);
+  border-radius: 2px;
+  overflow: hidden;
+  position: relative;
+}
+.film-progress span {
+  display: block;
+  height: 100%;
+  width: 0%;
+  background: var(--gold);
+  transition: width 0.15s linear;
+}
+.film-meta {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.7rem;
+  color: var(--faint);
+  min-width: 5.5rem;
+  text-align: right;
+}
+.film-chapters {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 1px;
+  background: var(--line);
+  border-top: 1px solid var(--line);
+}
+@media (max-width: 700px) { .film-chapters { grid-template-columns: 1fr 1fr 1fr; } }
+.film-chapters button {
+  appearance: none;
+  border: 0;
+  background: #0a0f15;
+  color: var(--muted);
+  font-size: 0.72rem;
+  text-align: left;
+  padding: 0.7rem 0.75rem;
+  cursor: pointer;
+  font-family: "DM Sans", sans-serif;
+}
+.film-chapters button:hover, .film-chapters button.active {
+  background: var(--surface);
+  color: var(--text);
+}
+.film-chapters button.active { color: var(--gold); }
+.film-chapters button .n {
+  display: block;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.62rem;
+  color: var(--faint);
+  margin-bottom: 0.2rem;
+}
+
+.sources {
+  margin-top: 2.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--line);
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+.sources strong { color: var(--text); }
+footer {
+  margin-top: 2rem;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--faint);
+}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header class="hero">
+    <div class="hero-glow" aria-hidden="true"></div>
+    <div class="kicker"><i></i> Engineering story · Already shipped</div>
+    <h1>SafePass NYC</h1>
+    <p class="lede">
+      这是一份给<em>所有人</em>看的建造故事：我们如何从零做出一个
+      「用中文问纽约哪里安不安全」的 AI 产品——以及我们<em>故意不做</em>什么。
+    </p>
+    <div class="plain-box">
+      <strong>一句话：</strong>
+      留学生和新移民用中文提问，系统用纽约警局（NYPD）风格的数据算出可核对的安全评级，
+      再配上能照做的建议。模型负责理解问题与写建议；数字评级从不靠模型「感觉」。
+    </div>
+    <div class="stats">
+      <div class="stat"><b>5</b><span>核心警区</span></div>
+      <div class="stat"><b>4</b><span>级安全评级</span></div>
+      <div class="stat"><b>1</b><span>条总入口函数</span></div>
+      <div class="stat"><b>335</b><span>MVP 测试全绿</span></div>
+    </div>
+  </header>
+</div>
+
+<nav class="toc wrap" aria-label="目录">
+  <a href="#who">给谁</a>
+  <a href="#product">产品</a>
+  <a href="#architecture">架构</a>
+  <a href="#program">怎么写代码</a>
+  <a href="#slices">建造顺序</a>
+  <a href="#film" class="play-link">▶ 视觉讲解片</a>
+</nav>
+
+<div class="wrap">
+
+  <!-- WHO -->
+  <section id="who">
+    <div class="sec-label">Before Gate 1</div>
+    <h2>先看懂：这是什么、不是什么</h2>
+    <p class="one-liner">读完这三段，你不需要写过代码，也能跟别人讲清 SafePass。</p>
+
+    <div class="tldr">
+      <div class="t">TL;DR</div>
+      <p>
+        小红书上安全经验互相矛盾，警局官网又是英文表格。
+        SafePass 把「某片区相对全市安不安全」算清楚，用中文说出来；
+        没数据就直说没数据；真出事了，两秒内给你报警用语——不绕 AI 绕弯。
+      </p>
+    </div>
+
+    <div class="grid-2">
+      <div class="card">
+        <div class="lab">它是</div>
+        <h4>中文安全情报助手</h4>
+        <p>问地点 → 看评级、样本量、建议、社区提醒；可对比两个区；可追问「女生晚上呢」。</p>
+      </div>
+      <div class="card">
+        <div class="lab">它不是</div>
+        <h4>恐吓地图 / 路径导航 / 算命</h4>
+        <p>不做路径安不安全、不做五年治安趋势、不编造覆盖区外的数字。这些会诚实说「做不了」。</p>
+      </div>
+    </div>
+
+    <div class="diagram">
+      <div class="cap">图 1 · 用户怎么用（任何人都能跟）</div>
+      <pre class="mermaid">
+flowchart LR
+  A["你用中文提问<br/>上东区晚上安全吗？"] --> B["系统认出地点<br/>落到某个警区"]
+  B --> C{"这个警区<br/>我们有数据吗？"}
+  C -->|有| D["算出四级评级<br/>+ 建议 + 图表"]
+  C -->|没有| E["诚实说没数据<br/>给通用建议"]
+  D --> F["你在网页上看到结果"]
+  E --> F
+  A -.->|被跟踪了…| G["紧急模式<br/>911 中文引导<br/>不调用 AI"]
+  G --> F
+      </pre>
+    </div>
+  </section>
+
+  <!-- GATE 1 PRODUCT -->
+  <section id="product">
+    <div class="sec-label">Gate 01 · Product</div>
+    <h2>产品：我们在解决什么问题</h2>
+    <p class="one-liner">对应「先想清楚用户问题再写代码」——下面全是已经做出来的产品定义，不是愿景 PPT。</p>
+
+    <h3>痛点（用人话）</h3>
+    <p>
+      第一次来纽约的人，租房、夜归、接孩子，都要判断「那一片安不安全」。
+      中文社区里经验贴很多，但互相打架；官方犯罪数据是英文、难读、没有结论。
+      紧急时刻更糟：你可能连怎么用英文打 911、该说什么都不知道。
+    </p>
+
+    <h3>我们交了什么</h3>
+    <ul>
+      <li><strong>五个核心警区</strong>：上东区(19)、法拉盛(109)、唐人街(5)、威廉斯堡(90)、布鲁克林高地(84)。早期写过「中城」，后来删掉——中城跨两个警区，没法公平评级。</li>
+      <li><strong>四级评级</strong>：相对安全 / 需注意 / 高风险 / 数据不足。颜色和图标一起出现，不只靠颜色。</li>
+      <li><strong>可核对</strong>：评级来自「该区犯罪率 ÷ 全市平均」再套阈值；样本量太少就强制「数据不足」，不装懂。</li>
+      <li><strong>两种追问</strong>：「和布鲁克林高地比呢？」「女生晚上呢？」——只接上一问的地点，不是无限闲聊。</li>
+      <li><strong>紧急模式</strong>：关键词命中后，静态页面出 911 引导，保证快、不依赖模型。</li>
+    </ul>
+
+    <div class="ratings" aria-label="四级评级">
+      <span class="chip g">相对安全 · green</span>
+      <span class="chip y">需注意 · yellow</span>
+      <span class="chip r">高风险 · red</span>
+      <span class="chip i">数据不足 · insufficient</span>
+    </div>
+
+    <div class="diagram">
+      <div class="cap">图 2 · 评级怎么算（模型不许插手）</div>
+      <pre class="mermaid">
+flowchart TD
+  A["拿到该警区过去约 12 个月的案件"] --> B["算 per-100k 犯罪率"]
+  B --> C["除以全市均值<br/>得到倍数"]
+  C --> D{"样本量 &lt; 10？"}
+  D -->|是| E["⚪ 数据不足<br/>不给评级、不给星级"]
+  D -->|否| F{"倍数 vs 阈值"}
+  F -->|"&lt; 0.7×"| G["🟢 相对安全"]
+  F -->|"0.7× ~ 1.3×"| H["🟡 需注意"]
+  F -->|"&gt; 1.3×"| I["🔴 高风险"]
+  G --> J["可信度星级<br/>只看样本量厚不厚"]
+  H --> J
+  I --> J
+      </pre>
+    </div>
+
+    <h3>成功标准（可验证，不是「感觉好用」）</h3>
+    <div class="grid-2">
+      <div class="card">
+        <div class="lab">工程出口</div>
+        <h4>pytest 全绿 · MVP 335</h4>
+        <p>同一输入，任何机器结果一致。测试可离线跑，不靠运气。</p>
+      </div>
+      <div class="card">
+        <div class="lab">产品红线</div>
+        <h4>不编造 · 可复算 · 紧急够快</h4>
+        <p>越界必降级；评级可手算复核；紧急路径目标 &lt; 2 秒。</p>
+      </div>
+    </div>
+
+    <div class="announce">
+      从今天起，你可以用中文问「上东区晚上安全吗？我是女生」。
+      SafePass 会给出能核对的四级评级、命中了多少条数据、以及能照做的建议。
+      评级是算出来的，不是模型随口说的。覆盖区外我们直说没数据；
+      紧急情况立刻给你 911 中文引导——这是写给留学生和新移民的安全情报，不是恐吓仪表盘。
+    </div>
+
+    <h3>页面长什么样（已上线形态）</h3>
+    <div class="grid-2">
+      <div class="card"><div class="lab">首页</div><h4>输入框 + 五区一键查询</h4><p>零输入也能点开常见区域。</p></div>
+      <div class="card"><div class="lab">结果页</div><h4>评级 / 建议 / 图表 / 对比 / 降级</h4><p>前端只负责显示，不自己算安全。</p></div>
+      <div class="card"><div class="lab">紧急页</div><h4>大红 911 + 中文报警句</h4><p>外加信息清单与安全场所表。</p></div>
+      <div class="card"><div class="lab">侧边画像</div><h4>可选 · 关掉网页就没了</h4><p>只微调建议排序，永不改评级颜色。</p></div>
+    </div>
+  </section>
+
+  <!-- GATE 2 ARCHITECTURE -->
+  <section id="architecture">
+    <div class="sec-label">Gate 02 · Architecture</div>
+    <h2>架构：系统怎样拼在一起</h2>
+    <p class="one-liner">用人话：网页很薄，脑子全在一条叫 <code>execute_query</code> 的函数里；没有重型数据库服务器。</p>
+
+    <div class="tldr">
+      <div class="t">记住这一句</div>
+      <p>
+        所有提问都走进同一个大门。门里面再决定：紧急？拒绝？降级？还是正常评级。
+        这样测试只要盯住大门，不用拆开每个零件单独演戏。
+      </p>
+    </div>
+
+    <div class="diagram wide" style="max-width:100%">
+      <div class="cap">图 3 · 系统鸟瞰（零服务架构）</div>
+      <pre class="mermaid">
+flowchart TB
+  subgraph UI["前端 · 薄渲染层"]
+    H["首页 / 结果页 / 紧急页<br/>Python 标准库 http.server"]
+  end
+  subgraph SEAM["唯一接缝"]
+    EQ["execute_query<br/>查询文本 + 画像 + 会话状态"]
+  end
+  subgraph CORE["确定性核心 · 不算模型"]
+    ADDR["地址别名表"]
+    DATA["数据聚合"]
+    RATE["评级引擎"]
+    DEG["越界/降级 D12"]
+    EMG["紧急静态组装"]
+  end
+  subgraph LLM["模型只做这几件事"]
+    ROUTE["意图路由"]
+    EXT["抽取区域/人群/时间"]
+    SUG["建议文案等生成"]
+  end
+  subgraph STORE["文件级资产"]
+    FIX["NYPD fixture"]
+    IDX["FAISS + BM25 本地索引"]
+    CFG["config/app.yaml"]
+  end
+  H --> EQ
+  EQ --> ADDR
+  EQ --> ROUTE
+  EQ --> EMG
+  ROUTE --> DEG
+  DEG --> DATA
+  DATA --> RATE
+  EQ --> EXT
+  EQ --> SUG
+  DATA --> FIX
+  EQ --> IDX
+  RATE --> CFG
+      </pre>
+    </div>
+
+    <h3>网页只有三个入口</h3>
+    <table>
+      <thead><tr><th>地址</th><th>干什么</th></tr></thead>
+      <tbody>
+        <tr><td><code>GET /</code></td><td>首页：提问框 + 五个快查按钮</td></tr>
+        <tr><td><code>GET /query?q=…</code></td><td>调用唯一接缝，把结果画出来</td></tr>
+        <tr><td><code>GET /static/style.css</code></td><td>样式；手机窄屏也能用</td></tr>
+      </tbody>
+    </table>
+
+    <div class="diagram">
+      <div class="cap">图 4 · 一次查询在门里怎么走（顺序很重要）</div>
+      <pre class="mermaid">
+sequenceDiagram
+  participant U as 用户
+  participant F as 前端
+  participant P as execute_query
+  participant R as 规则引擎
+  participant L as 模型(可选)
+  participant D as 数据与评级
+  U->>F: 中文提问
+  F->>P: 文本 + 画像 + 上轮结果
+  P->>R: 是否紧急关键词？
+  alt 紧急
+    R-->>F: 紧急页（无模型）
+  else 继续
+    P->>L: 意图路由
+    P->>R: 偏见/武器守卫
+    P->>R: 警区是否在覆盖内？
+    alt 越界
+      R-->>F: 诚实降级
+    else 覆盖内
+      P->>D: 聚合 + 评级 + 检索
+      D-->>F: 安全分析页
+    end
+  end
+      </pre>
+    </div>
+
+    <h3>数据放哪儿</h3>
+    <ul>
+      <li><strong>模拟 NYPD 数据集</strong>：版本化文件；运行时不联网拉警局 API（MVP）。</li>
+      <li><strong>安全场所表</strong>：五个区的 24 小时清单 + 通用清单；没核实的电话只写机构名。</li>
+      <li><strong>知识库 15 篇</strong>：本地向量索引 + 关键词索引混合检索；写不清的事实标「未核实到」。</li>
+      <li><strong>配置单文件</strong>：阈值 0.7/1.3、样本量档位、警区号——只允许出现在配置里。</li>
+    </ul>
+
+    <div class="diagram">
+      <div class="cap">图 5 · 五种结果卡片（前端只认这些形状）</div>
+      <pre class="mermaid">
+flowchart LR
+  Q["提问"] --> T{"结果类型"}
+  T --> A["SafetyQueryResult<br/>正常安全分析"]
+  T --> B["ComparisonResult<br/>两区对比"]
+  T --> C["EmergencyResult<br/>紧急模式"]
+  T --> D["DegradedResult<br/>做不了/没数据"]
+  T --> E["GuardrailResult<br/>拒绝有害问题"]
+      </pre>
+    </div>
+  </section>
+
+  <!-- GATE 3 PROGRAM DESIGN -->
+  <section id="program">
+    <div class="sec-label">Gate 03 · Program Design</div>
+    <h2>怎么写代码：约定比聪明更重要</h2>
+    <p class="one-liner">硅谷团队里这句话常说：换人接手时，先读约定，再读实现。下面是 SafePass 的约定。</p>
+
+    <h3>五条铁律（读懂就能审代码）</h3>
+    <div class="rule">
+      <div class="n">1</div>
+      <div>
+        <h4>只有一扇门</h4>
+        <p>业务能力都从 <code>execute_query</code> 进出。不为内部小模块另开「测试后门」去假装测通了。</p>
+      </div>
+    </div>
+    <div class="rule">
+      <div class="n">2</div>
+      <div>
+        <h4>数字归数字，文案归模型</h4>
+        <p>评级、可信度、越界判定是纯规则。模型负责理解问句、路由、写建议——不许改评级颜色。</p>
+      </div>
+    </div>
+    <div class="rule">
+      <div class="n">3</div>
+      <div>
+        <h4>画像不改颜色</h4>
+        <p>你填「女生 / 晚归」只会让建议更贴你，同一条街的评级在所有人眼里必须一样。</p>
+      </div>
+    </div>
+    <div class="rule">
+      <div class="n">4</div>
+      <div>
+        <h4>没数据就认怂</h4>
+        <p>覆盖区外、路径安全、长期趋势：明确说做不了，绝不拿别的区数据硬套。</p>
+      </div>
+    </div>
+    <div class="rule">
+      <div class="n">5</div>
+      <div>
+        <h4>测试必须能离线复现</h4>
+        <p>模型回答用录音带（cassette）回放；阈值不散落在代码魔法数字里。</p>
+      </div>
+    </div>
+
+    <div class="diagram">
+      <div class="cap">图 6 · 代码模块谁找谁（程序设计鸟瞰）</div>
+      <pre class="mermaid">
+flowchart TB
+  P["pipeline.py<br/>总编排"]
+  P --> A["addressing<br/>地名→警区"]
+  P --> R["routing<br/>问什么意图"]
+  P --> E["emergency<br/>紧急"]
+  P --> G["guardrails<br/>负例拒绝"]
+  P --> F["followup<br/>追问"]
+  P --> D["degraded<br/>诚实降级"]
+  P --> DA["data_agent<br/>聚合案件"]
+  P --> RE["rating_engine<br/>算评级"]
+  P --> I["intel_agent<br/>混合检索"]
+  P --> O["output_pipeline<br/>校验契约"]
+  P --> C["contracts.py<br/>对外形状"]
+  FE["frontend<br/>只渲染 C"] --> P
+      </pre>
+    </div>
+
+    <h3>我们用什么测试证明「真的做对了」</h3>
+    <table>
+      <thead><tr><th>证明什么</th><th>怎么证明</th></tr></thead>
+      <tbody>
+        <tr><td>数字没算错</td><td>聚合集 + 评级可复算集（含边界）</td></tr>
+        <tr><td>不会瞎编</td><td>降级行为集 + D12「模型误路由也被改写」</td></tr>
+        <tr><td>紧急够快够稳</td><td>紧急触发集；静态路径零模型调用</td></tr>
+        <tr><td>追问不串戏</td><td>对比/细节承接；换地点必须重置</td></tr>
+        <tr><td>中文地名认得住</td><td>10 个标准地址全对</td></tr>
+        <tr><td>画像不染色</td><td>同区有无画像，评级字段必须相同</td></tr>
+        <tr><td>检索靠谱</td><td>专名 + 语义查询进 top-3</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- GATE 4 SLICES -->
+  <section id="slices">
+    <div class="sec-label">Gate 04 · Vertical Slices</div>
+    <h2>建造顺序：像拍电影一样一镜一镜加</h2>
+    <p class="one-liner">
+      我们不「先做完所有后端再做前端」。每一刀切下去，系统多会一件能演示、能测试的事。
+    </p>
+
+    <div class="diagram">
+      <div class="cap">图 7 · 从空壳到可演示（垂直切片时间线）</div>
+      <pre class="mermaid">
+timeline
+  title SafePass MVP 0→1
+  section 地基
+    接缝空壳 : 能跑测试框架
+    数据三件套 : 案件 / 场所 / 知识库
+  section 会算
+    数据聚合 : 按警区统计
+    评级引擎 : 四级 + 可信度
+    诚实降级 : 没数据就认怂
+  section 会听
+    路由与校验管线 : 听懂问什么
+    紧急双层 : 两秒内求助页
+    追问与对比 : 少打字多深入
+  section 会护 + 会找
+    中文地址与负例 : 拒绝有害问法
+    混合检索 : 社区情报装配
+    前端薄层 : 首页 / 结果 / 紧急
+      </pre>
+    </div>
+
+    <div class="diagram">
+      <div class="cap">图 8 · 为什么叫「垂直」而不是「水平」</div>
+      <pre class="mermaid">
+flowchart LR
+  subgraph BAD["水平建造 · 我们禁止"]
+    B1["全部数据库"] --> B2["全部服务"] --> B3["全部接口"] --> B4["最后才看见界面"]
+  end
+  subgraph GOOD["垂直切片 · 我们采用"]
+    G1["细端到端可点"] --> G2["换上真实聚合"] --> G3["加上紧急/追问"] --> G4["检索 + 前端打磨"]
+  end
+      </pre>
+    </div>
+
+    <h3>每一刀切了什么（对照真实任务编号）</h3>
+    <table>
+      <thead><tr><th>切片</th><th>人话</th><th>任务</th></tr></thead>
+      <tbody>
+        <tr><td>0</td><td>先立大门：空函数也能被测试抓住</td><td>Issue 01</td></tr>
+        <tr><td>1</td><td>准备可复现的假数据与知识文档</td><td>T0</td></tr>
+        <tr><td>2–3</td><td>会统计、会评级</td><td>T1–T2</td></tr>
+        <tr><td>4</td><td>会说「不知道」</td><td>T3</td></tr>
+        <tr><td>5</td><td>会把问题分到正确跑道</td><td>T4</td></tr>
+        <tr><td>6</td><td>会紧急求助</td><td>T5</td></tr>
+        <tr><td>7</td><td>会短追问与双区对比</td><td>T6</td></tr>
+        <tr><td>8</td><td>会认中文地名、会拒绝坏问题</td><td>T7</td></tr>
+        <tr><td>9</td><td>会检索社区情报</td><td>T8</td></tr>
+        <tr><td>10</td><td>网页能点、能看、能应急</td><td>Issue 11–12</td></tr>
+      </tbody>
+    </table>
+
+    <p class="muted">
+      MVP 文档口径的出口：任务勾选完成，<strong>335 个测试全绿</strong>。
+      更后面的真实数据上线、金标评测、部署属于下一阶段，不在本故事里假装已完成。
+    </p>
+  </section>
+</div>
+
+<!-- FILM -->
+<section id="film" style="padding-top:0">
+  <div class="wrap">
+    <div class="sec-label">Visual explainer</div>
+    <h2>视觉讲解片 · 90 秒看懂 0→1</h2>
+    <p class="one-liner">按播放。这是内嵌的讲解动画（单文件、无需外链视频），用六幕把故事讲完。</p>
+  </div>
+
+  <div class="film-shell wide wrap" style="padding:0; max-width: var(--wide);">
+    <div class="film-stage" id="filmStage" aria-live="polite">
+      <div class="film-scene s0 on" data-i="0">
+        <div class="eyebrow">Scene 01 · The problem</div>
+        <h3>纽约很大，中文安全信息很碎</h3>
+        <p>经验贴互相矛盾，官网是英文表格。来留学、移民、探亲的人需要能听懂、能信任、能行动的结论。</p>
+        <div class="visual" aria-hidden="true"></div>
+      </div>
+      <div class="film-scene s1" data-i="1">
+        <div class="eyebrow">Scene 02 · The product</div>
+        <h3>四级评级，算出来的</h3>
+        <p>相对全市均值：偏低相对安全，偏高要警惕。样本太少就显示数据不足——宁可不装懂。</p>
+        <div class="visual" aria-hidden="true"></div>
+      </div>
+      <div class="film-scene s2" data-i="2">
+        <div class="eyebrow">Scene 03 · The seam</div>
+        <h3>整座后端，一扇门</h3>
+        <p>所有能力走 execute_query。网页只负责显示五种结果卡片。测试盯住大门，结果可复现。</p>
+        <div class="visual" aria-hidden="true"></div>
+      </div>
+      <div class="film-scene s3" data-i="3">
+        <div class="eyebrow">Scene 04 · AI’s job</div>
+        <h3>模型写字，规则算数</h3>
+        <p>模型理解问题、写建议；评级、越界、紧急路径由确定性代码接管。画像可以改建议，不能改颜色。</p>
+        <div class="visual" aria-hidden="true"></div>
+      </div>
+      <div class="film-scene s4" data-i="4">
+        <div class="eyebrow">Scene 05 · Honesty &amp; safety</div>
+        <h3>没数据就认怂；出事就直接帮</h3>
+        <p>覆盖区外诚实降级。紧急关键词两秒内出 911 中文引导。有害问题直接拒绝并转向。</p>
+        <div class="visual" aria-hidden="true"></div>
+      </div>
+      <div class="film-scene s5" data-i="5">
+        <div class="eyebrow">Scene 06 · How we built</div>
+        <h3>垂直切片，一刀一刀可演示</h3>
+        <p>从接缝空壳 → 会算 → 会听 → 会护 → 网页可点。出口不是长 diff，是 335 测试全绿。</p>
+        <div class="visual" aria-hidden="true"></div>
+      </div>
+    </div>
+
+    <div class="film-controls">
+      <button type="button" class="film-btn" id="filmToggle" aria-controls="filmStage">播放</button>
+      <div class="film-progress" aria-hidden="true"><span id="filmBar"></span></div>
+      <div class="film-meta" id="filmMeta">01 / 06</div>
+    </div>
+    <div class="film-chapters" id="filmChapters">
+      <button type="button" class="active" data-jump="0"><span class="n">01</span>痛点</button>
+      <button type="button" data-jump="1"><span class="n">02</span>评级</button>
+      <button type="button" data-jump="2"><span class="n">03</span>接缝</button>
+      <button type="button" data-jump="3"><span class="n">04</span>AI 边界</button>
+      <button type="button" data-jump="4"><span class="n">05</span>诚实与紧急</button>
+      <button type="button" data-jump="5"><span class="n">06</span>建造法</button>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <div class="sources">
+      <strong>本页事实来源（可核对，不编造）：</strong>
+      <code>CONTEXT.md</code> ·
+      <code>docs/specs/safepass-nyc-mvp-spec.md</code> ·
+      <code>docs/adr/0001</code> / <code>0002</code> ·
+      <code>docs/archive/ralph-mvp-pool.md</code> ·
+      <code>safepass/pipeline.py</code> ·
+      <code>frontend/README.md</code> ·
+      结构参考
+      <a href="https://gist.github.com/Maciejdziuba/88890d7e0eeefa5a8738bbe9fd5e20b8">Dex Horthy 4-gate playbook</a>
+      （只借框架，内容为已交付回顾）。
+    </div>
+    <footer>SafePass NYC · 0→1 visual brief · Mermaid + explainer reel · UTF-8</footer>
+  </div>
+</section>
+
+<script>
+(function () {
+  const scenes = Array.from(document.querySelectorAll(".film-scene"));
+  const chapters = Array.from(document.querySelectorAll("#filmChapters button"));
+  const toggle = document.getElementById("filmToggle");
+  const bar = document.getElementById("filmBar");
+  const meta = document.getElementById("filmMeta");
+  const DURATION = 4500; // ms per scene
+  let idx = 0;
+  let playing = false;
+  let startedAt = 0;
+  let raf = 0;
+  let sceneStarted = 0;
+
+  function show(i) {
+    idx = (i + scenes.length) % scenes.length;
+    scenes.forEach((s, n) => s.classList.toggle("on", n === idx));
+    chapters.forEach((c, n) => c.classList.toggle("active", n === idx));
+    meta.textContent = String(idx + 1).padStart(2, "0") + " / " + String(scenes.length).padStart(2, "0");
+    sceneStarted = performance.now();
+    bar.style.width = "0%";
+  }
+
+  function tick(now) {
+    if (!playing) return;
+    const elapsed = now - sceneStarted;
+    const p = Math.min(1, elapsed / DURATION);
+    bar.style.width = (p * 100).toFixed(2) + "%";
+    if (p >= 1) {
+      if (idx >= scenes.length - 1) {
+        playing = false;
+        toggle.textContent = "重播";
+        bar.style.width = "100%";
+        return;
+      }
+      show(idx + 1);
+    }
+    raf = requestAnimationFrame(tick);
+  }
+
+  function play() {
+    playing = true;
+    toggle.textContent = "暂停";
+    if (idx >= scenes.length - 1 && parseFloat(bar.style.width) >= 99) {
+      show(0);
+    }
+    sceneStarted = performance.now();
+    cancelAnimationFrame(raf);
+    raf = requestAnimationFrame(tick);
+  }
+
+  function pause() {
+    playing = false;
+    toggle.textContent = "继续";
+    cancelAnimationFrame(raf);
+  }
+
+  toggle.addEventListener("click", () => {
+    if (playing) pause();
+    else play();
+  });
+
+  chapters.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      show(Number(btn.dataset.jump));
+      if (playing) {
+        sceneStarted = performance.now();
+      } else {
+        bar.style.width = "0%";
+        toggle.textContent = "播放";
+      }
+    });
+  });
+
+  show(0);
+})();
+</script>
+</body>
+</html>
