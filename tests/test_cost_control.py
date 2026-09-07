@@ -43,11 +43,11 @@ class _ScriptedFake:
         if "路由助手" in system:
             return ChatResponse(
                 content=json.dumps({"route": "area_safety_query"}, ensure_ascii=False),
-                model="deepseek-chat",
+                model="qwen-flash",
             )
         return ChatResponse(
             content=json.dumps({"area": None, "crowd": None, "time": None}, ensure_ascii=False),
-            model="deepseek-chat",
+            model="qwen-flash",
         )
 
 
@@ -251,7 +251,7 @@ def test_cost_report_jsonl_fields_and_cumulative(tmp_path: Path):
     lines = _report_lines(tmp_path / "cost_report.jsonl")
     assert len(lines) == 2
     for line in lines:
-        assert line["model"] == "deepseek-chat"
+        assert line["model"] == "qwen-flash"
         assert line["calls"] == 1
         assert line["est_cost_usd"] > 0
         assert line["est_input_tokens"] > 0 and line["est_output_tokens"] > 0

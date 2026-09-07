@@ -348,8 +348,7 @@ cost_control:
     # 保证估算是上界近似：宁可高估不低估，熔断提前于破产。
     chars_per_token: 2
     prices_per_1k_tokens:
-      deepseek-chat: { input: 0.00027, output: 0.0011 }   # prod 路由（≈$0.27/$1.10 per 1M）
-      qwen-turbo: { input: 0.00005, output: 0.0002 }      # dev/test 路由（DashScope 估算）
+      qwen-flash: { input: 0.00007, output: 0.00027 }     # 全线路由（DashScope ≈$0.065/$0.26 per 1M，宁高估进位；2026-09-08 统一）
       default: { input: 0.001, output: 0.003 }            # 未列出模型的兜底估算
   degraded_notice: "今日 AI 生成预算已用尽，本回复改由确定性数据与模板生成；安全评级与统计数据不受影响。"
   report_path: "logs/cost_report.jsonl"
@@ -358,8 +357,9 @@ cost_control:
 # ============================================================================
 # 生产模型接线（票 12 / M4，spec v2「生产模型接线」）：OpenAI 兼容端点客户端
 # 的请求超时（秒）。接入点与模型名不进配置——生产经 env 注入
-# （LLM_API_KEY / LLM_BASE_URL / LLM_MODEL，dev/test 用 DashScope Qwen 走
-# cassette，见 eval 节），客户端构造的唯一注入点在 safepass/llm_wiring.py，
+# （LLM_API_KEY / LLM_BASE_URL / LLM_MODEL；2026-09-08 起全线路由统一
+# qwen-flash，生产与 dev 同源；dev/test 走 cassette，见 eval 节），
+# 客户端构造的唯一注入点在 safepass/llm_wiring.py，
 # 且产出必经票 06 的 BudgetFusedClient 包装（不可绕过）。
 # ============================================================================
 llm:
@@ -372,7 +372,7 @@ llm:
 # 全部产出必须带 dev_reference_label 标注——合成用户永不冒充真人证据。
 # ============================================================================
 synthetic_user:
-  model: "qwen-turbo"        # dev 路由（CLAUDE.md 模型路由：dev/test = DashScope Qwen）
+  model: "qwen-flash"        # 全线路由（2026-09-08 统一 qwen-flash：现行最便宜档）
   base_url: "https://dashscope.aliyuncs.com/compatible-mode/v1"
   interview_script: "fixtures/eval/interview_script_v1.json"   # 被预戳的访谈脚本草稿
   # 预检报告落盘：docs/user-research/ 而非 fixtures/（测试资产目录）——
@@ -393,7 +393,7 @@ synthetic_user:
 # 评估基准不随依赖升级或模型切换悄悄漂移。
 # ============================================================================
 eval:
-  judge_model: "qwen-turbo"     # dev/test 考官模型（CLAUDE.md 模型路由：DashScope Qwen 系列）
+  judge_model: "qwen-flash"     # L2 考官（2026-09-08 全线路由统一 qwen-flash；切换模型必须重录 cassette——棘轮表）
   base_url: "https://dashscope.aliyuncs.com/compatible-mode/v1"
   cassette: "tests/cassettes/l2_judge.json"
   pass_threshold: 0.7           # 判定通过分数下界（三项指标同口径）

@@ -31,8 +31,8 @@
 
 | 环境 | 模型 | 说明 |
 |------|------|------|
-| dev / test | DashScope（Qwen 系列） | cassette 与金标以此为准 |
-| prod | DeepSeek `deepseek-chat` | $5/日预算熔断 + 限流（Phase 2 落熔断器） |
+| dev / test | DashScope `qwen-flash` | cassette 与金标以此为准（2026-09-08 起全线统一；原 qwen-turbo 官方已弃用） |
+| prod | DashScope `qwen-flash` | 与 dev 同源（原 DeepSeek `deepseek-chat` 已下架）；$5/日预算熔断 + 限流 |
 
 ## Ralph 特化（Matt Pocock 版 bash 循环）
 

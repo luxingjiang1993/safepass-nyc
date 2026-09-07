@@ -1,11 +1,11 @@
-"""生产模型接线（票 12 / M4，spec v2「生产模型接线」）：env → DeepSeek 客户端。
+"""生产模型接线（票 12 / M4，spec v2「生产模型接线」）：env → OpenAI 兼容客户端。
 
-生产环境经 env 注入 OpenAI 兼容端点（生产路由 = DeepSeek ``deepseek-chat``，
-CLAUDE.md 模型路由表）：
+2026-09-08 起全线路由统一 ``qwen-flash``（现行最便宜档，生产与 dev 同源；
+原生产路由 ``deepseek-chat`` 已下架）。生产环境经 env 注入 OpenAI 兼容端点：
 
 - ``LLM_API_KEY``   ：供应商密钥（绝不进配置/代码，不落盘）
-- ``LLM_BASE_URL``  ：OpenAI 兼容接入点（DeepSeek = https://api.deepseek.com/v1）
-- ``LLM_MODEL``     ：模型名（生产 = deepseek-chat）
+- ``LLM_BASE_URL``  ：OpenAI 兼容接入点（DashScope = https://dashscope.aliyuncs.com/compatible-mode/v1）
+- ``LLM_MODEL``     ：模型名（全线 = qwen-flash）
 
 **单注入点**：``build_llm_client_from_env`` 是全库唯一把真实客户端接进
 ``pipeline.execute_query`` 的构造路径，且产出**必经**票 06 的
@@ -36,7 +36,7 @@ ENV_MODEL = "LLM_MODEL"
 
 
 class OpenAICompatibleClient:
-    """LLMClient 协议适配：OpenAI SDK 走任意 OpenAI 兼容端点（生产 = DeepSeek）。
+    """LLMClient 协议适配：OpenAI SDK 走任意 OpenAI 兼容端点（全线 = DashScope qwen-flash）。
 
     显式 http_client：本仓库 openai==1.51.2 与 httpx>=0.28 的 proxies 参数
     不兼容（venv 实测 TypeError，scripts/record_l2_cassette.py 同款先例），

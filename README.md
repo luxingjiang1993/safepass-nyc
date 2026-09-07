@@ -36,11 +36,11 @@ pip install -r requirements.txt
 | 指标 | 基线 | 口径（分子/分母） | 复算 |
 |------|------|------|------|
 | L1 金标通过率 | 100%（50/50） | 全字段断言通过的金标条目数 / 金标条目总数（契约类型/警区/越界降级分支与金标 expect 逐条一致；命名刻意不叫"路由准确率"——L1 断言的是全契约字段，路由只是其中一轴） | `pytest tests/test_golden_set.py -q` 全绿即 100% |
-| groundedness（L2） | 0.914 | 50 条金标逐条 groundedness judge 分数之和 / 50（分母 = 金标条目数） | `pytest tests/eval -q` cassette 回放，工件 `fixtures/eval/l2_results_v1.json` |
-| 幻觉率（L2） | 0.060 | hallucinated=true 的条目数 / 50（二元判定，judge = qwen-turbo，prompt 版本锁定进 config） | 同上 |
+| groundedness（L2） | 0.980 | 50 条金标逐条 groundedness judge 分数之和 / 50（分母 = 金标条目数） | `pytest tests/eval -q` cassette 回放，工件 `fixtures/eval/l2_results_v1.json` |
+| 幻觉率（L2） | 0.000 | hallucinated=true 的条目数 / 50（二元判定，judge = qwen-flash，prompt 版本锁定进 config） | 同上 |
 
 - L2 套件离线可跑（judge 走 cassette 回放，零真实 API）；录制工件 `fixtures/eval/l2_results_v1.json` 由 `python scripts/record_l2_cassette.py` 一次性产出（需真实 `DASHSCOPE_API_KEY`）。
-- 人工验收尾巴（不阻塞基线）：DeepSeek 生产模型（`deepseek-chat`）兼容性验证需真实 key + 网络，跑同一 L2 套件后在此登记结果。状态：**待登记**。
+- 生产与 dev 同源（2026-09-08 起全线统一 DashScope `qwen-flash`，选型原则 = 总 token 成本最低）：L2 套件指标即生产模型指标，无跨供应商兼容性验证尾巴。
 
 ## 常用命令
 

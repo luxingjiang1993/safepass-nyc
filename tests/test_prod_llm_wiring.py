@@ -34,8 +34,8 @@ _CFG = config_loader.load_config()
 
 FAKE_ENV = {
     "LLM_API_KEY": "sk-fake-test-key",
-    "LLM_BASE_URL": "https://api.deepseek.test/v1",
-    "LLM_MODEL": "deepseek-chat",
+    "LLM_BASE_URL": "https://dashscope.aliyuncs.com/compatible-mode/v1",
+    "LLM_MODEL": "qwen-flash",
 }
 
 
@@ -54,7 +54,7 @@ class _RecordingTransport:
                 "id": "chatcmpl-fake",
                 "object": "chat.completion",
                 "created": 1_700_000_000,
-                "model": "deepseek-chat",
+                "model": "qwen-flash",
                 "choices": [
                     {
                         "index": 0,
@@ -81,11 +81,11 @@ class _ScriptedFake:
         if "路由助手" in system:
             return ChatResponse(
                 content=json.dumps({"route": "area_safety_query"}, ensure_ascii=False),
-                model="deepseek-chat",
+                model="qwen-flash",
             )
         return ChatResponse(
             content=json.dumps({"area": None, "crowd": None, "time": None}, ensure_ascii=False),
-            model="deepseek-chat",
+            model="qwen-flash",
         )
 
 
@@ -97,7 +97,7 @@ class TestEnvInjection:
         "partial",
         [
             {"LLM_API_KEY": "sk-fake"},  # 只有 key
-            {"LLM_BASE_URL": FAKE_ENV["LLM_BASE_URL"], "LLM_MODEL": "deepseek-chat"},  # 缺 key
+            {"LLM_BASE_URL": FAKE_ENV["LLM_BASE_URL"], "LLM_MODEL": "qwen-flash"},  # 缺 key
             {**FAKE_ENV, "LLM_MODEL": "   "},  # 空白视为未配置
         ],
     )
@@ -124,19 +124,19 @@ class TestEnvInjection:
         response = client.chat([{"role": "user", "content": "上东区安全吗"}])
 
         assert response.content == "你好，这里是接线测试"
-        assert response.model == "deepseek-chat"
+        assert response.model == "qwen-flash"
         # 接线验证：请求确实打到 OpenAI 兼容端点的 chat/completions，密钥进头
         (request,) = transport.requests
         assert str(request.url).endswith("/chat/completions")
         assert request.headers["Authorization"] == f"Bearer {FAKE_ENV['LLM_API_KEY']}"
         body = json.loads(request.content.decode("utf-8"))
-        assert body["model"] == "deepseek-chat"
+        assert body["model"] == "qwen-flash"
         # 成本上报（票 06 包装器职责）：JSONL 落盘且字段齐全
         report = tmp_path / _CFG.cost_control.report_path
         lines = [json.loads(l) for l in report.read_text(encoding="utf-8").splitlines() if l]
         assert len(lines) == 1
         entry = lines[0]
-        assert entry["model"] == "deepseek-chat"
+        assert entry["model"] == "qwen-flash"
         assert entry["calls"] == 1
         assert entry["est_cost_usd"] > 0
         assert entry["daily_cumulative_usd"] >= entry["est_cost_usd"]
@@ -151,9 +151,9 @@ class TestEnvInjection:
             timeout_seconds=_CFG.llm.request_timeout_seconds,
             http_client=transport.http_client(),
         )
-        raw.chat([{"role": "user", "content": "hi"}], model="qwen-turbo")
+        raw.chat([{"role": "user", "content": "hi"}], model="qwen-flash")
         body = json.loads(transport.requests[0].content.decode("utf-8"))
-        assert body["model"] == "qwen-turbo"
+        assert body["model"] == "qwen-flash"
 
 
 def _serve(srv):

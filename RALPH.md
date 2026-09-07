@@ -37,8 +37,8 @@
 
 | 环境 | 模型 | 用途 |
 |------|------|------|
-| dev / test | DashScope（Qwen） | 开发、cassette 录制、金标基准 |
-| prod | DeepSeek `deepseek-chat` | 线上全部生成型 Agent |
+| dev / test | DashScope `qwen-flash` | 开发、cassette 录制、金标基准（2026-09-08 全线统一） |
+| prod | DashScope `qwen-flash` | 线上全部生成型 Agent（与 dev 同源；原 deepseek-chat 已下架） |
 
 Ralph 循环本身跑在 dev 模型上；eval 套件负责验证生产模型兼容性（Phase 2）。
 
@@ -59,6 +59,7 @@ Ralph 循环本身跑在 dev 模型上；eval 套件负责验证生产模型兼�
 | 2026-09-04 | MVP T0–T8（ralph-loop 插件时代） | — | ✅ 335 green，归档 |
 | 2026-09-05 | 票 07 真实数据入库 + 路径切换 | 1（人工会话接管秒挂循环） | ✅ 467 green 零 skip；真实数据入 fixtures/nypd_real（11770 条）；city_mean 回填 2769.4118；生产路径切 config runtime_dataset_path，测试世界钉 mock |
 | 2026-09-08 | 票 #18 A3 one_liner 确定性数据钩子化 | 3（headless 秒挂）→ 人工会话接管 1 | ✅ `python -m pytest tests/ -q` 587 green；金标钩子断言入 tests/test_a3_one_liner_hooks.py（允许钩子集合成员 + 与 rating_explainable_basis 逐字一致 + ⚪ 零钩子）；LLM 零参与 one_liner（装配纯函数，suggestion 契约明示不写）；**遗留：L2 cassette 须重录**（judge 请求内嵌 one_liner 随本次变更漂移、指纹失效——棘轮表；重录前 `pytest tests/eval -q` 不可回放） |
+| 2026-09-08 | 全线路由统一 qwen-flash（总 token 成本最低） | — | ✅ 587 绿 + eval 15 绿；A3 遗留的 L2 cassette 在 qwen-flash 上重录（150 交互，judge=flash：groundedness 0.980 / relevance 1.000 / 幻觉率 0.000）；合成预检重跑（24 回答）；README 兼容性尾巴消除（生产=dev 同源） |
 
 ## 优雅失败记录
 

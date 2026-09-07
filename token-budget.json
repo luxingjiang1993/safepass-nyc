@@ -3,5 +3,5 @@
   "max_iterations": 10,
   "daily_token_budget": null,
   "daily_cost_budget_usd": 5,
-  "_phase2": "票 06 已落地：daily_cost_budget_usd=5（生产 DeepSeek 日熔断），熔断/限流/上报在 safepass/cost_control.py；dev DashScope 预算另定。"
+  "_phase2": "票 06 已落地：daily_cost_budget_usd=5（生产日熔断；2026-09-08 起全线路由统一 DashScope qwen-flash），熔断/限流/上报在 safepass/cost_control.py。"
 }

@@ -63,11 +63,11 @@ _Avoid_: 预算告警、花费控制
 ## 模型路由
 
 **生产模型（Production Model）**:
-线上环境调用的 LLM：DeepSeek `deepseek-chat`。承载全部生成型 Agent（意图/检索/建议/追问）。受 $5/日预算熔断与限流约束。
+线上环境调用的 LLM：DashScope（阿里云百炼）`qwen-flash`。承载全部生成型 Agent（意图/检索/建议/追问）。受 $5/日预算熔断与限流约束。2026-09-08 起生产与开发同源（原生产 DeepSeek `deepseek-chat` 已下架；选型原则 = 总 token 成本最低）。
 _Avoid_: 线上模型、正式模型
 
 **开发模型（Dev Model）**:
-开发/测试环境调用的 LLM：DashScope（阿里云百炼）承载的 Qwen 系列。测试金标与 VCR cassette 以开发模型录制为 canonical；生产 DeepSeek 的 eval 兼容性经 eval 套件单独验证。
+开发/测试环境调用的 LLM：DashScope `qwen-flash`（与生产同源；原 qwen-turbo 官方已弃用）。测试金标与 VCR cassette 以开发模型录制为 canonical；生产与 dev 同源后无需单独的兼容性验证。
 _Avoid_: 测试模型、本地模型
 
 ## 检索与生成
