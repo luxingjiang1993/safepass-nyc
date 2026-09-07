@@ -16,6 +16,7 @@
 from __future__ import annotations
 
 import json
+import os
 from dataclasses import asdict
 from pathlib import Path
 from typing import Any
@@ -28,6 +29,15 @@ from safepass.session_state import SessionState
 REPO_ROOT = Path(__file__).resolve().parents[2]
 GOLDEN_PATH = REPO_ROOT / "fixtures" / "eval" / "golden_set_v1.json"
 RESULTS_PATH = REPO_ROOT / "fixtures" / "eval" / "l2_results_v1.json"
+
+# L2 测试世界单一事实源（验收审计问题 #1）：金标期望、L1 复算、cassette 指纹
+# 全部建立在 mock 数据集上（tests/conftest.py 同款钉子，两处同值）。录制脚本
+# 不经 pytest conftest，若任由默认解析（config runtime_dataset_path = 真实
+# 数据集）会同时污染 outputs（execute_query 现场产出）与 evidence（judge 请求
+# 内嵌文本）→ 录出的 cassette 与回放世界漂移、指纹全失效（票 07 事故重演）。
+# 模块导入即钉死：录制/回放两侧共用本 runner，世界一致与入口无关。
+MOCK_DATASET_PATH = REPO_ROOT / "fixtures" / "nypd" / "mock_nypd.csv"
+os.environ[data_agent.DATASET_PATH_ENV] = str(MOCK_DATASET_PATH)
 
 # 固定判定顺序：录制与回放两侧共用，cassette 交互序号 = 条目序 × 3 + 判定序
 JUDGE_ORDER = (
@@ -95,8 +105,12 @@ def _precinct_evidence(precinct: int, cfg: config_loader.AppConfig) -> dict[str,
     字段覆盖回答的全部数据性声明：评级输入（样本量/犯罪率/市均值）、图表
     （top5 类型/昼夜分布）、情报装配（community_info）——judge 逐条核对时
     不因证据缺字段而把真实声明误判为无依据。
+
+    数据输入显式钉 mock 世界快照（MOCK_DATASET_PATH 传参，优先级高于 env），
+    与 execute_query 产出的 outputs 同一世界——录制侧不经 pytest conftest，
+    这是审计问题 #1 的修复点（证据/输出跨世界漂移 → cassette 指纹失效）。
     """
-    records = data_agent.load_dataset()
+    records = data_agent.load_dataset(MOCK_DATASET_PATH)
     stats = data_agent.aggregate_precinct(records, precinct)
     rating_cfg = data_agent.rating_config(records, cfg)
     rated = rating_engine.rate_precinct(stats, rating_cfg)
@@ -115,7 +129,7 @@ def _precinct_evidence(precinct: int, cfg: config_loader.AppConfig) -> dict[str,
             None if rated.confidence is None else round(rated.ratio_to_city_mean, 4)
         ),
         "city_mean_per_100k": rating_cfg.city_mean_per_100k,
-        "time_range": data_agent.load_time_range(),
+        "time_range": data_agent.load_time_range(MOCK_DATASET_PATH),
         "sources": sorted(stats.sources),
         "community_info": intel_agent.build_community_info(precinct, cfg),
     }

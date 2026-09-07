@@ -104,3 +104,26 @@ def test_l2_replay_matches_recorded_results_artifact():
         "回放判定与录制工件不一致：提示词/模板/金标已变更但 cassette 未重新录制"
     )
     assert replayed["metrics"] == artifact["metrics"]
+
+
+def test_l2_world_pinned_to_mock_dataset():
+    """审计问题 #1 护栏：L2 世界（outputs 与 evidence 的数据来源）钉死 mock
+    快照，与进程 env / config runtime_dataset_path 漂移无关。录制脚本不经
+    pytest conftest——放任默认解析会拿到真实数据集，录出的 cassette 与回放
+    世界漂移、指纹全失效（票 07 改 city_mean 的事故重演）。"""
+    import os
+
+    from safepass import data_agent
+
+    assert l2_runner.MOCK_DATASET_PATH.name == "mock_nypd.csv"
+    assert os.environ[data_agent.DATASET_PATH_ENV] == str(l2_runner.MOCK_DATASET_PATH)
+
+    entry = next(e for e in l2_runner.load_golden() if e["expect"]["type"] == "safety")
+    evidence = l2_runner.build_evidence(entry, _CFG)["data"]
+    # 独立复算：显式从 mock 快照重算，证据包必须逐字段一致（跨世界即红）
+    records = data_agent.load_dataset(l2_runner.MOCK_DATASET_PATH)
+    stats = data_agent.aggregate_precinct(records, evidence["precinct"])
+    rating_cfg = data_agent.rating_config(records, _CFG)
+    assert evidence["sample_size"] == stats.sample_size
+    assert evidence["city_mean_per_100k"] == rating_cfg.city_mean_per_100k
+    assert evidence["time_range"] == data_agent.load_time_range(l2_runner.MOCK_DATASET_PATH)

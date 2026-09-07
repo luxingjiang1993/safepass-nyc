@@ -58,6 +58,7 @@
 | FAISS 在中文路径下初始化失败 | FAISS 对非 ASCII 路径不兼容 | 索引必须建在纯 ASCII 路径，路径配置进 `config/app.yaml` |
 | 检索排序被 community_info 干扰 | 把社区信息当检索信号排序 | community_info 只走 meta 警区锚定，不参与检索排序 |
 | 检索结果随依赖版本漂移 | 无锁定查询集 | 14 条查询实测锁定为回归基线（见 `docs/archive/ralph-mvp-pool.md`） |
+| 票 07 改 city_mean 后 L2 套件静默回归 | judge 请求内嵌证据文本随数据世界漂移，cassette 指纹全失效（conftest collect_ignore 藏出默认基线） | L2 世界钉 mock 快照（`tests/eval/l2_runner.py` 模块级钉子）；改影响 judge 请求内容的值（数据世界/提示词/口径）必须重录 L2 cassette 并跑 `pytest tests/eval -q` 验证 |
 
 ## Git 纪律
 
