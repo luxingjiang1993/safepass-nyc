@@ -163,12 +163,18 @@ def test_write_report_roundtrip_carries_label(tmp_path):
 def test_run_script_fails_without_dashscope_key():
     """勾选 4（人工前置）：脚本无 DASHSCOPE_API_KEY 时明确失败并给出提示，不静默。"""
     env = {k: v for k, v in os.environ.items() if k != "DASHSCOPE_API_KEY"}
+    # 中文 Windows（locale=GBK）下子进程输出与父进程解码必须钉同一编码：
+    # 子进程被注入 PYTHONIOENCODING=utf-8，父进程按 UTF-8 解码 + replace 兜底，
+    # 否则 reader 线程 UnicodeDecodeError 会让 stdout/stderr 变 None。
+    env.setdefault("PYTHONIOENCODING", "utf-8")
     result = subprocess.run(
         [sys.executable, str(RUN_SCRIPT)],
         cwd=REPO_ROOT,
         env=env,
         capture_output=True,
         text=True,
+        encoding="utf-8",
+        errors="replace",
         timeout=60,
     )
     assert result.returncode != 0
