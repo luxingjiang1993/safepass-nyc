@@ -25,16 +25,19 @@ GOLDEN_PATH = REPO_ROOT / "fixtures" / "eval" / "golden_set_v1.json"
 RESULTS_PATH = REPO_ROOT / "fixtures" / "eval" / "l2_results_v1.json"
 
 
-def _readme_baseline_cell(metric_label: str) -> str:
-    """README 质量基线表格中某指标行的首个单元格（基线列）。"""
+def _readme_baseline_cell(metric_label: str, column: int = 1) -> str:
+    """README 质量基线表格中某指标行的第 column 个单元格（0 起：0=指标名，
+    1=基线列，2=对照列（B1 两路径对照））。"""
     for line in README_TEXT.splitlines():
         stripped = line.strip()
         if not stripped.startswith("|"):
             continue
         cells = [c.strip() for c in stripped.strip("|").split("|")]
         if cells and cells[0] == metric_label:
-            assert len(cells) >= 2 and cells[1], f"README 基线行缺基线列：{line!r}"
-            return cells[1]
+            assert len(cells) > column and cells[column], (
+                f"README 基线行缺第 {column} 列：{line!r}"
+            )
+            return cells[column]
     raise AssertionError(f"README 质量基线表缺少指标行：{metric_label}")
 
 
@@ -65,6 +68,29 @@ def test_readme_l1_golden_pass_rate_covers_all_golden_entries():
     assert (int(match.group(1)), int(match.group(2))) == (n_entries, n_entries), (
         f"README L1 金标通过率分子分母 {match.groups()} 与金标条目数 {n_entries} 不符"
     )
+
+
+def test_readme_two_path_comparison_column_matches_artifact():
+    """两路径对照列（B1，issue 04）：README 对照列 = 录制工件模板路径同子集
+    指标（主指标列之外的第二列投影）；收口条件（Skill ≥ 模板）由工件
+    comparison.comparison_ok 承载——未收口时本测试先红，README 不得
+    在数字上反着写。"""
+    results = _load_results()
+    comparison = results["comparison"]
+    for key, ok in comparison["comparison_ok"].items():
+        assert ok is True, (
+            f"录制工件收口条件未达成（{key}：Skill 主指标未跑赢模板对照），"
+            "按 B1 定案迭代到打得过再同步 README"
+        )
+    for label, key in (("groundedness（L2）", "groundedness_mean"),
+                       ("幻觉率（L2）", "hallucination_rate"),
+                       ("relevance（L2）", "relevance_mean")):
+        template_cell = _readme_baseline_cell(label, column=2)
+        # README 是 3 位小数投影：对照列按投影口径（四舍五入到 1e-3）对账
+        assert round(float(template_cell), 3) == round(float(comparison["template_metrics"][key]), 3), (
+            f"README {label} 对照列 {template_cell} 与录制工件模板指标 "
+            f"{comparison['template_metrics'][key]:.3f} 不符：套件重录后需同步 README"
+        )
 
 
 def test_readme_baselines_cite_recompute_commands():

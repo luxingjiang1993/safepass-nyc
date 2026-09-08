@@ -395,11 +395,17 @@ synthetic_user:
 eval:
   judge_model: "qwen-flash"     # L2 考官（2026-09-08 全线路由统一 qwen-flash；切换模型必须重录 cassette——棘轮表）
   base_url: "https://dashscope.aliyuncs.com/compatible-mode/v1"
-  cassette: "tests/cassettes/l2_judge.json"
+  cassette: "tests/cassettes/l2_judge.json"           # 主路径（Skill 建议）judge cassette
+  cassette_template: "tests/cassettes/l2_judge_template.json"  # 对照路径（确定性模板）judge cassette
+  cassette_skill: "tests/cassettes/l2_skill.json"     # Skill 路径管线 LLM 调用（提取+建议）cassette
   pass_threshold: 0.7           # 判定通过分数下界（三项指标同口径）
+  skill_coverage_min: 22        # B1 主指标分母护栏：Skill 覆盖子集（24 条 eligible）中
+                                # suggestions_source=skill 的条目数下界。个别条目因 Skill
+                                # 校验耗尽降级模板属设计内路径（进模板降级 marker），
+                                # 低于此数 = Skill 系统性回归，主指标口径不得静默缩水。
   prompt_versions:
-    groundedness: "sp-groundedness-v4"
-    hallucination: "sp-hallucination-v4"
+    groundedness: "sp-groundedness-v5"   # v5（B1）：skill 建议的事实声明参与判定
+    hallucination: "sp-hallucination-v5" # v5（B1）：skill 建议与证据矛盾判幻觉
     relevance: "sp-relevance-v1"
 
 

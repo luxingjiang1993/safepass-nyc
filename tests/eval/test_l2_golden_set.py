@@ -1,9 +1,14 @@
-"""L2 金标判定（issue 03 / M1 勾选三）：50 条金标逐条产出三类 judge 判定结果。
+"""L2 金标判定（issue 03 / M1 起；issue 04 / B1 两路径对照咬合 Skill 输出）。
 
-回放路径：judge 调用走 cassette（tests/cassettes/l2_judge.json），
+回放路径：judge 与 Skill 调用一律走 cassette（tests/cassettes/），
 全程离线、零真实 API 调用（注入 _FailIfCalled 底层客户端守住这条红线）。
 逐条判定结果与录制工件 fixtures/eval/l2_results_v1.json 对账
 （同一 cassette 任何机器上回放必须产出同一结果，Karpathy 宪法②）。
+
+B1 主指标口径：Skill 覆盖子集（suggestions_source=skill 的条目，⊆ 24 条
+eligible new_query 安全查询，覆盖数受 config eval.skill_coverage_min 护栏）；
+模板降级路径单独 marker 不计入主 groundedness；
+收口条件 = 两路径同台对照主指标 Skill ≥ 模板（本套件机器断言，非散文）。
 
 运行（独立套件，不进默认基线）：``pytest tests/eval -q``
 """
@@ -15,7 +20,7 @@ import json
 import json_repair
 import pytest
 
-from safepass import config_loader
+from safepass import config_loader, contracts
 from safepass.llm_client import reset_cassette_cursor
 
 import l2_runner  # 同目录共享 runner（pytest rootdir 插入 tests/eval 至 sys.path）
@@ -24,7 +29,17 @@ pytestmark = pytest.mark.eval
 
 _CFG = config_loader.load_config()
 _CASSETTE = l2_runner.cassette_path(_CFG)
-_EXPECTED_INTERACTIONS = 50 * len(l2_runner.JUDGE_ORDER)
+_CASSETTE_TEMPLATE = l2_runner.template_judge_cassette_path(_CFG)
+_CASSETTE_SKILL = l2_runner.skill_cassette_path(_CFG)
+_EXPECTED_JUDGE_INTERACTIONS = 50 * len(l2_runner.JUDGE_ORDER)
+# 金标 v1.1 派生计数：eligible 子集 = G25–G48（new_query 安全查询）恰 24 条。
+# 交互数理论界与子集形状守卫共用此单一取源，防字面量散布漂移。
+_ELIGIBLE_N = 24
+# Skill 侧 cassette 交互数是录制世界的确定事实（重试按序进 cassette），
+# 权威值 = 录制工件 comparison.skill_cassette_interactions（回放对账同源）；
+# 理论界 = eligible 条数 ×（提取 1..1+max_retries + 建议 1..1+max_retries）。
+_SKILL_INTERACTIONS_LOWER = _ELIGIBLE_N * 2
+_SKILL_INTERACTIONS_UPPER = _ELIGIBLE_N * (2 + 2 * _CFG.max_retries)
 
 
 class _FailIfCalled:
@@ -38,16 +53,15 @@ class _FailIfCalled:
         raise AssertionError("cassette 回放不应触发任何底层客户端调用")
 
 
-def test_l2_cassette_asset_wellformed():
-    """cassette 资产完整性：50 条 × 3 判定 = 150 条交互，指纹与评分载荷齐备。"""
-    assert _CASSETTE.exists(), (
-        f"缺少 {_CASSETTE.name}（一次性录制：python scripts/record_l2_cassette.py，"
+def _judge_cassette_wellformed(path, label: str) -> None:
+    assert path.exists(), (
+        f"缺少 {path.name}（一次性录制：python scripts/record_l2_cassette.py，"
         "需真实 DASHSCOPE_API_KEY；回放不需要）"
     )
-    data = json.loads(_CASSETTE.read_text(encoding="utf-8"))
+    data = json.loads(path.read_text(encoding="utf-8"))
     interactions = data["interactions"]
-    assert len(interactions) == _EXPECTED_INTERACTIONS, (
-        f"L2 cassette 应恰有 {_EXPECTED_INTERACTIONS} 条交互（50 金标 × "
+    assert len(interactions) == _EXPECTED_JUDGE_INTERACTIONS, (
+        f"{label} cassette 应恰有 {_EXPECTED_JUDGE_INTERACTIONS} 条交互（50 金标 × "
         f"{len(l2_runner.JUDGE_ORDER)} 判定），实际 {len(interactions)}"
     )
     assert all(e["fingerprint"] for e in interactions)
@@ -57,39 +71,132 @@ def test_l2_cassette_asset_wellformed():
         assert "reason" in payload and str(payload["reason"]).strip()
 
 
+def test_l2_cassette_assets_wellformed():
+    """cassette 资产完整性：两份 judge cassette 各 150 条交互；Skill 侧
+    cassette 交互数落在理论界内且与录制工件对账（重试按序进 cassette，
+    权威值 = 工件 comparison.skill_cassette_interactions）。"""
+    _judge_cassette_wellformed(_CASSETTE, "主路径（Skill）judge")
+    _judge_cassette_wellformed(_CASSETTE_TEMPLATE, "对照路径（模板）judge")
+    assert _CASSETTE_SKILL.exists(), (
+        f"缺少 {_CASSETTE_SKILL.name}（一次性录制：python scripts/record_l2_cassette.py，"
+        "需真实 DASHSCOPE_API_KEY；回放不需要）"
+    )
+    skill_data = json.loads(_CASSETTE_SKILL.read_text(encoding="utf-8"))
+    n = len(skill_data["interactions"])
+    assert _SKILL_INTERACTIONS_LOWER <= n <= _SKILL_INTERACTIONS_UPPER, (
+        f"Skill 侧 cassette {n} 条交互超出理论界 "
+        f"[{_SKILL_INTERACTIONS_LOWER}, {_SKILL_INTERACTIONS_UPPER}]"
+    )
+    artifact = json.loads(l2_runner.RESULTS_PATH.read_text(encoding="utf-8"))
+    assert n == artifact["comparison"]["skill_cassette_interactions"], (
+        f"Skill 侧 cassette {n} 条与录制工件 "
+        f"{artifact['comparison']['skill_cassette_interactions']} 不符（漂移须重录）"
+    )
+
+
 def _replay_suite() -> dict:
     inner = _FailIfCalled()
     reset_cassette_cursor(_CASSETTE)
+    reset_cassette_cursor(_CASSETTE_TEMPLATE)
+    reset_cassette_cursor(_CASSETTE_SKILL)
     results = l2_runner.run_l2_suite(judge_client=inner, cfg=_CFG)
     assert inner.calls == 0, "cassette 回放必须零底层调用"
     return results
 
 
-def test_l2_all_50_entries_judged_offline():
-    """50 条金标逐条判定：条目齐、判定齐、分数在契约区间内、指标聚合就位。"""
+def test_l2_all_50_entries_judged_offline_both_paths():
+    """两路径各 50 条金标逐条判定：条目齐、判定齐、分数在契约区间内。"""
     results = _replay_suite()
-    entries = results["entries"]
-    assert len(entries) == 50, f"金标应为 50 条，实际 {len(entries)}"
     golden_ids = [e["id"] for e in l2_runner.load_golden()]
-    assert [e["id"] for e in entries] == golden_ids, "判定顺序必须与金标 fixture 一致"
-
-    for entry in entries:
-        verdicts = entry["verdicts"]
-        assert set(verdicts) == set(l2_runner.JUDGE_ORDER), (
-            f"{entry['id']} 判定不全：{set(verdicts)}"
+    for label, entries in (
+        ("主路径（Skill）", results["entries"]),
+        ("对照路径（模板）", results["template_path"]["entries"]),
+    ):
+        assert len(entries) == 50, f"{label} 应为 50 条，实际 {len(entries)}"
+        assert [e["id"] for e in entries] == golden_ids, (
+            f"{label} 判定顺序必须与金标 fixture 一致"
         )
-        for key, verdict in verdicts.items():
-            assert 0.0 <= verdict["score"] <= 1.0, f"{entry['id']}.{key} 分数越界"
-            assert verdict["reason"].strip(), f"{entry['id']}.{key} 缺判定说明"
-            assert verdict["prompt_version"] == _CFG.eval.prompt_versions[key]
-            assert verdict["judge_model"] == _CFG.eval.judge_model
+        for entry in entries:
+            verdicts = entry["verdicts"]
+            assert set(verdicts) == set(l2_runner.JUDGE_ORDER), (
+                f"{entry['id']} 判定不全：{set(verdicts)}"
+            )
+            for key, verdict in verdicts.items():
+                assert 0.0 <= verdict["score"] <= 1.0, f"{entry['id']}.{key} 分数越界"
+                assert verdict["reason"].strip(), f"{entry['id']}.{key} 缺判定说明"
+                assert verdict["prompt_version"] == _CFG.eval.prompt_versions[key]
+                assert verdict["judge_model"] == _CFG.eval.judge_model
 
-    metrics = results["metrics"]
-    assert metrics["n_entries"] == 50
-    for key in ("groundedness_mean", "relevance_mean", "hallucination_rate"):
-        assert metrics[key] is not None and 0.0 <= metrics[key] <= 1.0, (
-            f"指标 {key} 缺失或越界：{metrics[key]}"
+    for label, metrics in (
+        ("主指标", results["metrics"]),
+        ("全量（Skill 路径）", results["metrics_all_entries"]),
+        ("模板降级 marker", results["metrics_template_fallback"]),
+        ("模板对照（子集）", results["template_path"]["metrics"]),
+    ):
+        for key in ("groundedness_mean", "relevance_mean", "hallucination_rate"):
+            assert metrics[key] is not None and 0.0 <= metrics[key] <= 1.0, (
+                f"{label} 指标 {key} 缺失或越界：{metrics[key]}"
+            )
+
+
+def test_l2_main_metrics_bite_on_skill_subset():
+    """主指标口径（B1）：分母 = Skill 路径实际 skill 来源条目（⊆ 24 条
+    eligible new_query 安全查询，覆盖数受 config 护栏）；模板降级路径
+    （结构性不参与 + Skill 校验耗尽降级）带 marker 单列。"""
+    results = _replay_suite()
+    eligible_ids = l2_runner.skill_subset_ids(l2_runner.load_golden())
+    assert len(eligible_ids) == _ELIGIBLE_N, "eligible 子集应恰 24 条（new_query 安全查询）"
+
+    sources = {e["id"]: e["suggestions_source"] for e in results["entries"]}
+    skill_sourced_ids = [
+        e["id"]
+        for e in results["entries"]
+        if e["suggestions_source"] == contracts.SUGGESTIONS_SOURCE_SKILL
+    ]
+    assert set(skill_sourced_ids) <= set(eligible_ids), (
+        f"skill 来源必须 ⊆ eligible：{sorted(set(skill_sourced_ids) - set(eligible_ids))}"
+    )
+    assert len(skill_sourced_ids) >= _CFG.eval.skill_coverage_min, (
+        f"Skill 覆盖 {len(skill_sourced_ids)}/24 低于护栏 {_CFG.eval.skill_coverage_min}"
+    )
+    fallback_ids = [e["id"] for e in l2_runner.load_golden() if e["id"] not in skill_sourced_ids]
+    for entry_id in fallback_ids:
+        assert sources[entry_id] == contracts.SUGGESTIONS_SOURCE_TEMPLATE, (
+            f"{entry_id} 属模板降级路径（结构性不参与或 Skill 校验降级），source 应为 template"
         )
+
+    assert results["metrics"]["n_entries"] == len(skill_sourced_ids), (
+        "主指标分母 = 实际 Skill 来源条目数"
+    )
+    assert results["metrics_template_fallback"]["n_entries"] == len(fallback_ids), (
+        "模板降级 marker = 50 - 实际 Skill 来源条目数"
+    )
+    assert results["comparison"]["skill_eligible_ids"] == eligible_ids
+    assert results["comparison"]["skill_sourced_ids"] == skill_sourced_ids
+    assert sorted(results["comparison"]["fallback_ids"]) == sorted(fallback_ids)
+    # 模板对照路径的同子集对账：对照数字必须来自同一组条目
+    assert results["template_path"]["metrics"]["n_entries"] == len(skill_sourced_ids)
+
+
+def test_l2_two_path_comparison_skill_ge_template():
+    """收口条件（B1 机器判定，非散文）：主指标（Skill 覆盖子集 24 条）与
+    模板路径同子集对照——groundedness/relevance 取 ≥，hallucination 取 ≤。"""
+    results = _replay_suite()
+    ok = results["comparison"]["comparison_ok"]
+    skill_metrics = results["comparison"]["skill_metrics"]
+    template_metrics = results["comparison"]["template_metrics"]
+    assert ok["groundedness"] is True, (
+        f"主指标 groundedness 未跑赢模板对照：Skill {skill_metrics['groundedness_mean']:.3f} "
+        f"< 模板 {template_metrics['groundedness_mean']:.3f}（B1 定案：迭代到打得过再收）"
+    )
+    assert ok["hallucination"] is True, (
+        f"主指标幻觉率高于模板对照：Skill {skill_metrics['hallucination_rate']:.3f} "
+        f"> 模板 {template_metrics['hallucination_rate']:.3f}"
+    )
+    assert ok["relevance"] is True, (
+        f"主指标 relevance 未跑赢模板对照：Skill {skill_metrics['relevance_mean']:.3f} "
+        f"< 模板 {template_metrics['relevance_mean']:.3f}"
+    )
 
 
 def test_l2_replay_matches_recorded_results_artifact():
@@ -100,10 +207,9 @@ def test_l2_replay_matches_recorded_results_artifact():
     )
     artifact = json.loads(artifact_path.read_text(encoding="utf-8"))
     replayed = _replay_suite()
-    assert replayed["entries"] == artifact["entries"], (
+    assert replayed == artifact, (
         "回放判定与录制工件不一致：提示词/模板/金标已变更但 cassette 未重新录制"
     )
-    assert replayed["metrics"] == artifact["metrics"]
 
 
 def test_l2_world_pinned_to_mock_dataset():

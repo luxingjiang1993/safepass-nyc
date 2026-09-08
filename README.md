@@ -31,15 +31,17 @@ pip install -r requirements.txt
 
 ## 质量基线（M1 eval 套件，spec v2）
 
-三项指标随 eval 套件产出，README 只作投影，单一事实源 = 套件工件（改动指标须重跑套件并同步本表，漂移由 `tests/test_readme_baselines.py` 守住）：
+四项指标随 eval 套件产出，README 只作投影，单一事实源 = 套件工件（改动指标须重跑套件并同步本表，漂移由 `tests/test_readme_baselines.py` 守住）：
 
-| 指标 | 基线 | 口径（分子/分母） | 复算 |
-|------|------|------|------|
-| L1 金标通过率 | 100%（50/50） | 全字段断言通过的金标条目数 / 金标条目总数（契约类型/警区/越界降级分支与金标 expect 逐条一致；命名刻意不叫"路由准确率"——L1 断言的是全契约字段，路由只是其中一轴） | `pytest tests/test_golden_set.py -q` 全绿即 100% |
-| groundedness（L2） | 0.980 | 50 条金标逐条 groundedness judge 分数之和 / 50（分母 = 金标条目数） | `pytest tests/eval -q` cassette 回放，工件 `fixtures/eval/l2_results_v1.json` |
-| 幻觉率（L2） | 0.000 | hallucinated=true 的条目数 / 50（二元判定，judge = qwen-flash，prompt 版本锁定进 config） | 同上 |
+| 指标 | 基线（Skill 路径主指标） | 对照（模板路径，同子集） | 口径（分子/分母） | 复算 |
+|------|------|------|------|------|
+| L1 金标通过率 | 100%（50/50） | — | 全字段断言通过的金标条目数 / 金标条目总数（契约类型/警区/越界降级分支与金标 expect 逐条一致；命名刻意不叫"路由准确率"——L1 断言的是全契约字段，路由只是其中一轴） | `pytest tests/test_golden_set.py -q` 全绿即 100% |
+| groundedness（L2） | 1.000 | 0.957 | Skill 路径 groundedness judge 分数之和 / Skill 覆盖子集条目数（B1 口径：分母 = suggestions_source=skill 的条目，eligible 24 条中实际 23 条，覆盖数受 config `eval.skill_coverage_min` 护栏；judge 口径 v5 把 Skill 建议的事实性声明纳入判定，grounds 引文只作依据、不构成声明） | `pytest tests/eval -q` cassette 回放，工件 `fixtures/eval/l2_results_v1.json` |
+| 幻觉率（L2） | 0.000 | 0.000 | hallucinated=true 的条目数 / 同 Skill 覆盖子集条目数（二元判定，judge = qwen-flash，prompt 版本锁定进 config） | 同上 |
+| relevance（L2） | 1.000 | 1.000 | 同 Skill 覆盖子集 relevance judge 分数之和 / 子集条目数 | 同上 |
 
-- L2 套件离线可跑（judge 走 cassette 回放，零真实 API）；录制工件 `fixtures/eval/l2_results_v1.json` 由 `python scripts/record_l2_cassette.py` 一次性产出（需真实 `DASHSCOPE_API_KEY`）。
+- 两路径对照（B1，issue 04）：主指标 = Skill 路径 Skill 覆盖子集（23/24，覆盖数受 config 护栏；模板降级路径 27 条单列 marker、不计入主 groundedness）；对照列 = 同一子集跑确定性模板路径（零管线 LLM）。收口条件 = 主指标 Skill ≥ 模板（hallucination 取 ≤），由 `pytest tests/eval -q` 机器断言（工件 `comparison.comparison_ok`）——打不过就迭代到打得过再收，不修 DoD。
+- L2 套件离线可跑（judge 与 Skill 调用走 cassette 回放，零真实 API）；录制工件 `fixtures/eval/l2_results_v1.json` 由 `python scripts/record_l2_cassette.py` 一次性产出（需真实 `DASHSCOPE_API_KEY`）。
 - 生产与 dev 同源（2026-09-08 起全线统一 DashScope `qwen-flash`，选型原则 = 总 token 成本最低）：L2 套件指标即生产模型指标，无跨供应商兼容性验证尾巴。
 
 ## 常用命令

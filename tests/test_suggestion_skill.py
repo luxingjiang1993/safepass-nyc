@@ -201,6 +201,45 @@ def test_grounds_quote_verbatim_and_doc_id_closed_world():
         )
 
 
+def test_grounds_quote_style_normalized_to_verbatim_span():
+    """引号风格写偏的引文（qwen-flash 复述中文的机械性偏差，issue 04 / B1 录制
+    守卫实测形态）经归一重比后改写为文档原文同跨度子串：透出的 quote 逐字
+    可高亮；归一后仍不命中才判失败（不削弱「逐字可核对」保证）。"""
+    snippets = (
+        SuggestionSnippet(
+            doc_id="d1",
+            text="- 防范要点（经验性建议）：使领馆不会电话要求转账；"
+            '涉及"秘密配合调查"的说法可直接挂断并拨打 911 或向警局核实。',
+        ),
+    )
+    valid = _validate_out(
+        {
+            "suggestions": ["a", "b", "c"],
+            "suggestion_grounds": [
+                _ground(
+                    "d1",
+                    "使领馆不会电话要求转账；涉及'秘密配合调查'的说法"
+                    "可直接挂断并拨打 911 或向警局核实。",
+                )
+            ],
+        },
+        snippets,
+    )
+    assert valid.suggestion_grounds[0].quote == (
+        '使领馆不会电话要求转账；涉及"秘密配合调查"的说法可直接挂断并拨打 911 或向警局核实。'
+    )
+    with pytest.raises(BusinessValidationError, match="逐字"):
+        _validate_out(
+            {
+                "suggestions": ["a", "b", "c"],
+                "suggestion_grounds": [
+                    _ground("d1", "使领馆不会电话要求转账，全部是谣言。")
+                ],
+            },
+            snippets,
+        )
+
+
 def test_generate_preserves_grounds_when_snippets_provided():
     """A2 前置通道自检：有检索摘要时，合法引文经管线通过并透出（A1 恒空）。"""
     snippets = (SuggestionSnippet(doc_id="d1", text="夜间盗窃多发，结伴出行。"),)

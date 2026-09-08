@@ -293,8 +293,14 @@ class EvalConfig:
     """L2 LLM-as-judge 评估套件配置（issue 03 / M1，spec v2「L2」节）。
 
     judge_model/base_url：考官模型与接入点（dev = DashScope Qwen，考官考生同源）；
-    cassette：judge 调用录制回放文件（录制一次性在线，回放离线零调用）；
+    cassette：主路径（Skill 建议）judge 调用录制回放文件（录制一次性在线，
+    回放离线零调用）；
+    cassette_template：对照路径（确定性模板）judge 录制回放文件（B1 两路径对照）；
+    cassette_skill：Skill 路径管线 LLM 调用（三维提取 + 建议生成）录制回放文件
+    （B1：主指标咬合 Skill 输出，回放同一事实源）；
     pass_threshold：判定通过分数下界（三项 L2 指标同口径）；
+    skill_coverage_min：主指标分母护栏（B1）——Skill 覆盖子集中
+    suggestions_source=skill 的条目数下界，低于即 Skill 系统性回归；
     prompt_versions：三类 evaluator 提示词模板版本锁定（键 = feedback_key，
     值 = 版本字符串；改模板必须升版本，否则 cassette 指纹校验直接拒放）。
     """
@@ -302,7 +308,10 @@ class EvalConfig:
     judge_model: str
     base_url: str
     cassette: str
+    cassette_template: str
+    cassette_skill: str
     pass_threshold: float
+    skill_coverage_min: int
     prompt_versions: dict[str, str]
 
 
@@ -709,7 +718,10 @@ def load_config(path: str | Path | None = None) -> AppConfig:
         judge_model=str(_require(eval_raw, "judge_model", "eval")),
         base_url=str(_require(eval_raw, "base_url", "eval")),
         cassette=str(_require(eval_raw, "cassette", "eval")),
+        cassette_template=str(_require(eval_raw, "cassette_template", "eval")),
+        cassette_skill=str(_require(eval_raw, "cassette_skill", "eval")),
         pass_threshold=float(_require(eval_raw, "pass_threshold", "eval")),
+        skill_coverage_min=int(_require(eval_raw, "skill_coverage_min", "eval")),
         prompt_versions={str(k): str(v) for k, v in prompt_versions_raw.items()},
     )
     if not eval_cfg.judge_model.strip():
@@ -718,6 +730,12 @@ def load_config(path: str | Path | None = None) -> AppConfig:
         raise ConfigError("eval.base_url 不得为空（judge 接入点）")
     if not eval_cfg.cassette.strip():
         raise ConfigError("eval.cassette 不得为空（judge 录制回放路径）")
+    if not eval_cfg.cassette_template.strip():
+        raise ConfigError("eval.cassette_template 不得为空（模板对照路径 judge 录制回放路径）")
+    if not eval_cfg.cassette_skill.strip():
+        raise ConfigError("eval.cassette_skill 不得为空（Skill 路径管线调用录制回放路径）")
+    if eval_cfg.skill_coverage_min <= 0:
+        raise ConfigError("eval.skill_coverage_min 必须为正（主指标分母护栏）")
     if not (0.0 < eval_cfg.pass_threshold <= 1.0):
         raise ConfigError("eval.pass_threshold 必须在 (0, 1] 区间")
     if any(not v.strip() for v in eval_cfg.prompt_versions.values()):

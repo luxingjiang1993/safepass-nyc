@@ -146,6 +146,31 @@ def build_messages(
     ]
 
 
+# 引号风格归一表（issue 04 / B1 录制守卫定位的机械性修复）：qwen-flash 复述
+# 中文引文时把直双引号改写为弯单引号/书名号等风格，逐字校验在重试内无法收敛
+# （实测 24 条中 3 条 4 次尝试全部耗尽 → 模板降级）。归一映射仅作用于引号类
+# 字符（等长替换），比对命中后把 ground.quote 改写为文档原文同跨度子串——
+# 用户可见的 quote 仍是文档逐字行（A8 点击溯源可高亮），「逐字可核对」的
+# 产品保证不削弱。
+_QUOTE_FORMS = str.maketrans(
+    {
+        "“": '"',  # 左双引号 “
+        "”": '"',  # 右双引号 ”
+        "‘": '"',  # 左单引号 ‘
+        "’": '"',  # 右单引号 ’
+        "'": '"',  # ASCII 单引号（qwen-flash 把直双引号改写为直单引号的实测形态）
+        "「": '"',  # 左书名号 「
+        "」": '"',  # 右书名号 」
+        "＂": '"',  # 全角双引号 ＂
+    }
+)
+
+
+def _normalized_quote_form(text: str) -> str:
+    """引号字符归一（等长替换）：直/弯/全角/书名号统一到直双引号。"""
+    return text.translate(_QUOTE_FORMS)
+
+
 def make_grounds_validator(
     snippets: tuple[SuggestionSnippet, ...],
 ) -> output_pipeline.Validator:
@@ -153,6 +178,9 @@ def make_grounds_validator(
 
     - 无检索摘要时 grounds 必须为空（禁止凭空引用，A1 现状的强制形态）；
     - quote 必须逐字出现在该 doc_id 的摘要原文里（逐字比对，防改写）；
+      模型把引号风格写偏（弯引号 vs 直引号）时先做引号归一重比：命中则把
+      quote 改写为文档原文同跨度子串（保证透出的引文逐字可高亮），归一后
+      仍不命中才判失败；
     - doc_id 必须属于检索摘要的文档集合（防把引文挂到不存在的文档上）。
     """
 
@@ -170,10 +198,17 @@ def make_grounds_validator(
                 )
             if not ground.quote.strip():
                 raise output_pipeline.BusinessValidationError("grounds.quote 不得为空")
-            if ground.quote not in texts[ground.doc_id]:
+            doc_text = texts[ground.doc_id]
+            if ground.quote in doc_text:
+                continue
+            # 引号归一重比：归一映射是等长替换，命中下标可直接映回原文跨度。
+            normalized = _normalized_quote_form(ground.quote)
+            idx = _normalized_quote_form(doc_text).find(normalized)
+            if idx == -1:
                 raise output_pipeline.BusinessValidationError(
                     f"grounds 引文必须逐字出现在检索摘要里：{ground.quote!r}"
                 )
+            ground.quote = doc_text[idx : idx + len(ground.quote)]
 
     return _validate
 

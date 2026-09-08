@@ -40,8 +40,13 @@ LEGAL_ROUTES = frozenset(
 )
 LEGAL_DEGRADED_CAPABILITIES = frozenset({"path", "trend"})
 
+# 路由提示词锚点：公开常量，_SYSTEM_PROMPT 由此拼接。tests/eval/l2_runner 以同
+# 常量判定路由调用（L2 世界静态兜底）——锚点与提示词同源，改措辞时两侧必然同漂。
+ROUTING_SYSTEM_MARKER = "你是 SafePass NYC 的查询路由助手"
+
 _SYSTEM_PROMPT = (
-    "你是 SafePass NYC 的查询路由助手。把用户查询路由到唯一工具，"
+    ROUTING_SYSTEM_MARKER
+    + "。把用户查询路由到唯一工具，"
     "以 JSON 输出：{\"route\": <工具名>, \"degraded_capability\": <path|trend|null>}。"
     f"合法工具：{ROUTE_AREA_SAFETY}（覆盖区内安全查询）、{ROUTE_AREA_COMPARISON}（双区对比）、"
     f"{ROUTE_DEGRADED}（路径/趋势等开发中能力的降级响应）、{ROUTE_FOLLOW_UP}（承接上轮地点的追问）、"
