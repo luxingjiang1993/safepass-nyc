@@ -12,7 +12,7 @@
 
 每个 Ralph 任务登记时必须写明机器可验证布尔条件，例如：
 
-- [ ] `pytest tests/ -q` 全绿且无新 skip
+- [ ] `python -m pytest tests/ -q` 全绿且无新 skip（禁裸跑 `pytest`——safepass 不在 sys.path，必 ModuleNotFoundError）
 - [ ] 新能力经唯一接缝 `execute_query` 暴露，且有测试覆盖
 - [ ] 无 `config/app.yaml` 之外的新阈值/警区号字面量（grep 自查）
 - [ ] 测试离线可跑（新增 LLM 调用已录 cassette）

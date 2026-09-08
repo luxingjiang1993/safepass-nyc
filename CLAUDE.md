@@ -4,12 +4,12 @@
 
 ## 项目一句话
 
-面向纽约中文用户（留学生、新移民、访客）的 AI 安全情报产品：查询地点 → NYPD 数据 + 混合检索 → 四级安全评级 + 场景化建议。MVP 已完成（335 测试绿），Phase 2 目标 = 真实上线 + 面试/作品集双目标。
+面向纽约中文用户（留学生、新移民、访客）的 AI 安全情报产品：查询地点 → NYPD 数据 + 混合检索 → 四级安全评级 + 场景化建议。MVP 与 Phase 2（真实上线 + 面试/作品集双目标）已关闭；Phase 3 波 1 执行中（见 `docs/specs/safepass-v3-spec.md`），当前测试基线以「唯一判定」为准。
 
 ## 唯一接缝与唯一判定
 
 - **唯一接缝**：`execute_query(查询文本, 会话画像, 会话状态)`（`safepass/pipeline.py`）。后端全部能力经此进入。
-- **唯一判定**：`pytest tests/ -q` 全绿（基线 335）。没有"看起来对了"——测试不过就是没过。
+- **唯一判定**：`python -m pytest tests/ -q` 全绿（基线 641，随票递增）。没有"看起来对了"——测试不过就是没过。**禁止裸跑 `pytest`**：`safepass` 不在 sys.path（pytest.ini 未配 pythonpath），裸跑必 ModuleNotFoundError；L2 eval 套件同理走 `python -m pytest tests/eval -q`。
 
 ## Karpathy 宪法
 
@@ -39,7 +39,7 @@
 - 迭代入口：`./ralph-once.sh "<任务>"`（人工在环，单次迭代）
 - 自治循环：`./afk-ralph.sh "<任务>" [max_iterations]`（默认 10 次上限，`<promise>COMPLETE</promise>` 退出）
 - 任务源：当前 Phase 的 `PRD.md`；跨迭代记忆 = `progress.txt`
-- 完成承诺：机器可验证布尔条件，写进 `RALPH.md`（如 "`pytest tests/ -q` 全绿"）
+- 完成承诺：机器可验证布尔条件，写进 `RALPH.md`（如 "`python -m pytest tests/ -q` 全绿"）
 - **不再使用 ralph-loop 插件**；`.claude/ralph-loop.local.md` 已废弃待删
 
 ## Loop 硬限制
@@ -58,7 +58,7 @@
 | FAISS 在中文路径下初始化失败 | FAISS 对非 ASCII 路径不兼容 | 索引必须建在纯 ASCII 路径，路径配置进 `config/app.yaml` |
 | 检索排序被 community_info 干扰 | 把社区信息当检索信号排序 | community_info 只走 meta 警区锚定，不参与检索排序 |
 | 检索结果随依赖版本漂移 | 无锁定查询集 | 14 条查询实测锁定为回归基线（见 `docs/archive/ralph-mvp-pool.md`） |
-| 票 07 改 city_mean 后 L2 套件静默回归 | judge 请求内嵌证据文本随数据世界漂移，cassette 指纹全失效（conftest collect_ignore 藏出默认基线） | L2 世界钉 mock 快照（`tests/eval/l2_runner.py` 模块级钉子）；改影响 judge 请求内容的值（数据世界/提示词/口径）必须重录 L2 cassette 并跑 `pytest tests/eval -q` 验证 |
+| 票 07 改 city_mean 后 L2 套件静默回归 | judge 请求内嵌证据文本随数据世界漂移，cassette 指纹全失效（conftest collect_ignore 藏出默认基线） | L2 世界钉 mock 快照（`tests/eval/l2_runner.py` 模块级钉子）；改影响 judge 请求内容的值（数据世界/提示词/口径）必须重录 L2 cassette 并跑 `python -m pytest tests/eval -q` 验证 |
 
 ## Git 纪律
 
