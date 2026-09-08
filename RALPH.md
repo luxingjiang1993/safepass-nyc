@@ -27,7 +27,7 @@
 ## Token 预算
 
 - 配置：`token-budget.json`
-- Phase 2 落生产 $5/日成本熔断（DeepSeek）+ dev DashScope 预算，熔断器挂 `safepass/llm_client.py` 接缝
+- 已落地（Phase 2 票 06）：$5/日成本熔断 + 请求级限流 + 成本 JSONL 上报 = `safepass/cost_control.py` 的 BudgetFusedClient 包装器，挂 LLMClient 注入接缝，生产客户端必经（唯一注入点 `safepass/llm_wiring.py` 的 `build_llm_client_from_env`）；2026-09-08 起全线统一 qwen-flash，无分供应商预算
 
 ## 模型路由
 
@@ -36,7 +36,7 @@
 | dev / test | DashScope `qwen-flash` | 开发、cassette 录制、金标基准（2026-09-08 全线统一） |
 | prod | DashScope `qwen-flash` | 线上全部生成型 Agent（与 dev 同源；原 deepseek-chat 已下架） |
 
-Ralph 循环本身跑在 dev 模型上；eval 套件负责验证生产模型兼容性（Phase 2）。
+Ralph 循环本身跑在 dev 模型上；dev/prod 同源（qwen-flash）后，eval 套件不再承担跨供应商兼容性验证尾巴，只产出质量指标（README「质量基线」表，单一事实源 = `fixtures/eval/l2_results_v1.json`）。
 
 ## Back-Pressure（多维止损）
 
