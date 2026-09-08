@@ -32,6 +32,16 @@ issue 12 追加（纯渲染层职责）：
     本身就是结论）；降级横幅首屏可见（header 之后、建议之前，S3 槽位稳定，
     细节后置，不靠聊天流）。
 
+票 07 / D2 追加（追问芯片，S7 明显次级行动）：
+    安全结果页在五槽带之后渲染「想继续问」芯片 = 预填追问链接
+    （/query?q=…，复用 follow_up 预填机制，零新增路由，P6 定案 2）；
+    文案只用金标已覆盖的追问形态（P6 定案 1）——细节「{人群}{时间}呢？」
+    （G19-G24 同款）与对比「和{区域}比呢？」（G14/G17 同款），人群/时间/
+    对比标记与区域词全部来自集中配置（followup 标记表 + 别名表规范名）；
+    细节芯片的人群词随会话画像自适应（性别 → 身份 → 场景标签，未命中标记
+    回退配置首项——不发明后端分类不动的文案）。紧急页不渲染芯片（保持
+    极简）；降级/对比/防线页各有自己的行动区块，同样不叠芯片。
+
 UX 主观项（语气温暖、可信度感知、窄屏实机、无障碍抽验）转人工验收清单。
 """
 
@@ -184,6 +194,78 @@ def _pin_hint(result: contracts.SafetyQueryResult, profile: dict[str, Any] | Non
     <button type="submit">固定到侧边栏</button>
   </form>
 </section>"""
+
+
+# ---------------------------------------------------------------- 追问芯片（票 07 / D2）
+
+def _detail_chip_text(profile: dict[str, Any] | None, cfg: config_loader.AppConfig) -> str | None:
+    """细节追问芯片文案（金标 G19-G24 同款形态「{人群}{时间}呢？」）。
+
+    人群词 = 画像里首个命中配置 crowd_markers 的值（性别 → 身份 → 场景标签，
+    顺序固定 = 结果确定性），无画像/未命中回退标记表首项；时间词 = 标记表
+    首项。文案由配置标记拼成 → followup.classify 构造上必判 KIND_DETAIL
+    （P6 定案 1：不发明新查询类型）。标记表为空时不出芯片（防御，配置校验
+    之外多一道渲染层兜底）。
+    """
+    markers = cfg.followup.crowd_markers
+    if not markers or not cfg.followup.time_markers:
+        return None
+    values: list[str] = []
+    for key in ("gender", "identity"):
+        value = (profile or {}).get(key)
+        if isinstance(value, str):
+            values.append(value)
+    values.extend(_pinned_scene_tags(profile))
+    crowd = next((v for v in values if v in markers), markers[0])
+    return f"{crowd}{cfg.followup.time_markers[0]}呢？"
+
+
+def _comparison_chip_text(precinct: int, cfg: config_loader.AppConfig) -> str | None:
+    """对比追问芯片文案（金标 G14/G17 同款形态「和{区域}比呢？」）。
+
+    区域词 = 配置别名表规范名中首个非当前警区者（addressing.canonical_names，
+    顺序稳定，不硬编码警区）；对比标记取 followup.comparison_markers 前两项
+    （「和」…「比」）→ followup.classify 构造上必判 KIND_COMPARISON 且承接
+    目标 ≠ 本区。无可选目标时不出芯片（防御）。
+    """
+    markers = cfg.followup.comparison_markers
+    if len(markers) < 2:
+        return None
+    target = next(
+        (name for p, name in addressing.canonical_names(cfg).items() if p != precinct),
+        None,
+    )
+    if target is None:
+        return None
+    return f"{markers[0]}{target}{markers[1]}呢？"
+
+
+def _followup_chips(
+    result: contracts.SafetyQueryResult,
+    profile: dict[str, Any] | None,
+    cfg: config_loader.AppConfig,
+) -> str:
+    """追问芯片区块（D2 能力可发现，S7）：预填 follow_up 查询的站内链接，
+    排在首屏五槽带之后（明显次级行动，不插进结论→行动序列）。只进安全结果
+    页——紧急页保持极简（票面禁止项），降级/对比/防线页已有各自行动区块。"""
+    chips = [
+        f'    <a class="chip" href="/query?q={_esc(text)}">{_esc(text)}</a>'
+        for text in (
+            _detail_chip_text(profile, cfg),
+            _comparison_chip_text(result.precinct, cfg),
+        )
+        if text
+    ]
+    if not chips:
+        return ""
+    return (
+        '<section class="chips">\n'
+        "  <h2>💬 想继续问？</h2>\n"
+        '  <div class="chip-row">\n'
+        f"{chr(10).join(chips)}\n"
+        "  </div>\n"
+        "</section>"
+    )
 
 
 # ---------------------------------------------------------------- 首页
@@ -362,8 +444,9 @@ def render_safety(
     票 06 / D1 首屏信息架构（S3）：窄屏一屏内只装结论与行动——
     评级（result-head 结论卡片）→ 人话解释（one-liner 区块）→ 建议（含
     grounds 渲染槽）→ 紧急资源，五槽连排；降级横幅首屏可见（header 之后、
-    建议之前）；pin_hint 与折叠细节排在五槽带之后；图表 / community / 来源
-    与 dimensions / unknowns 默认折叠（⚪ 时 unknowns 例外展开）。
+    建议之前）；追问芯片（票 07 / D2）与 pin_hint、折叠细节排在五槽带之后；
+    图表 / community / 来源与 dimensions / unknowns 默认折叠（⚪ 时 unknowns
+    例外展开）。
     """
     header = (
         f'<header class="result-head hero rating-{_esc(result.rating)}">\n'
@@ -429,7 +512,10 @@ def render_safety(
             # 建议之前）；pin_hint 是查询语境提示，放五槽带之后、折叠细节之前
             # （不插进槽位序列）；其余细节默认折叠（details 不挂 open）
             _back_link(), header, _llm_degraded_banner(result, cfg), one_liner,
-            suggestions, venues, _pin_hint(result, profile),
+            suggestions, venues,
+            # 票 07 / D2：追问芯片 = 五槽带之后的明显次级行动（S7），
+            # 与 pin_hint 同层，不插进槽位序列
+            _followup_chips(result, profile, cfg), _pin_hint(result, profile),
             dimensions, charts, community, unknowns, meta,
             _profile_sidebar(profile, cfg),
             _disclaimer(result.disclaimer),

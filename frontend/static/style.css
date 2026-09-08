@@ -258,6 +258,21 @@ body.theme-emergency .emergency-contacts small { color: #e0a9ac; }
 .profile-clear { margin-top: 0.5rem; }
 .profile-clear button { background: #8a8a8a; }
 
+/* --- 追问芯片（票 07 / D2，S7）：结果页五槽带之后的次级行动 ---
+   胶囊形预填追问链接；语义靠文字（芯片文案本身），不靠颜色传达。
+   窄屏可换行（flex-wrap），与全站"无横向滚动"约束一致。 */
+.chips h2 { font-size: 1rem; color: #555; }
+.chip-row { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.chip {
+  padding: 0.45rem 0.9rem;
+  border: 1px solid #b9cdec;
+  border-radius: 999px;
+  background: #e8f0fb;
+  color: #1a3a66;
+  text-decoration: none;
+  font-size: 0.95rem;
+}
+
 /* --- 固定提示（issue 12）：查询内人群信息的当次作用域提示 --- */
 .pin-hint {
   background: #fff8e6;
