@@ -62,6 +62,18 @@ pip install -r requirements.txt
 - L2 套件离线可跑（judge 与 Skill 调用走 cassette 回放，零真实 API）；录制工件 `fixtures/eval/l2_results_v1.json` 由 `python scripts/record_l2_cassette.py` 一次性产出（需真实 `DASHSCOPE_API_KEY`）。
 - 生产与 dev 同源（2026-09-08 起全线统一 DashScope `qwen-flash`，选型原则 = 总 token 成本最低）：L2 套件指标即生产模型指标，无跨供应商兼容性验证尾巴。
 
+## 审阅者路径（本地 3 命令，Windows 可跑）
+
+装依赖 → 跑 5 条固定 query（安全 + 越界 + 紧急）→ 开本地页。无 key 走确定性路径（one_liner 数据钩子 + 模板建议；grounds 空态打印「通用建议」）；有 key（`LLM_API_KEY` 三件套或 `DASHSCOPE_API_KEY`）走 Suggestion Skill。5 条 query 与金标子集对齐，不读真实 API key、不用非 fixture 数据。
+
+```bash
+pip install -r requirements.txt
+python scripts/demo_queries.py
+python frontend/app.py
+```
+
+`python scripts/demo_queries.py --open` 可在摘要打完后于本进程打开本地页（阻塞；Ctrl+C 停止）。与 E7 共用同一入口，无第二套 demo。
+
 ## 常用命令
 
 ```bash
@@ -69,6 +81,7 @@ python -m pytest tests/ -q       # 全部测试（唯一判定命令；裸跑 py
 python -m pytest tests/ -q -m perf   # 性能断言：查询 P95 < 8s、紧急 P95 < 2s
 python -m pytest tests/eval -q   # L2 eval 套件（judge 走 cassette 离线回放，独立于基线）
 python scripts/generate_fixtures.py   # 重新生成 fixture 三件套（T0 实现后可用；要求同脚本同参数同输出）
+python scripts/demo_queries.py        # N3/E7 审阅者路径：5 条固定 query 打印契约摘要（无 key 确定性）
 ```
 
 ## Ralph loop
@@ -104,7 +117,7 @@ python scripts/generate_fixtures.py   # 重新生成 fixture 三件套（T0 实�
 │   └── eval/               #   L2 eval 套件（LLM-as-judge，cassette 回放；独立运行，不进默认基线）
 ├── scripts/                # 确定性脚本（以实际文件为准）：generate_fixtures（fixture 生成，禁 LLM）、
 │                           #   build_index（检索索引）、fetch_nypd（真实数据 adapter）、
-│                           #   record_l2_cassette（L2 录制）、serve（容器入口）、recompute_city_mean 等
+│                           #   record_l2_cassette（L2 录制）、serve（容器入口）、demo_queries（N3/E7 审阅者路径）、recompute_city_mean 等
 ├── fixtures/               # 数据资产，随仓库版本化（spec D11）
 │   ├── nypd/               #   ①模拟 NYPD 数据集（测试世界钉 mock）
 │   ├── nypd_real/          #   ②真实 NYPD 数据入库（scripts/fetch_nypd.py 产出，生产运行时数据集）

@@ -1,6 +1,6 @@
 # SafePass NYC — CLAUDE.md
 
-面向编码 agent 的宪法与运行配置。领域词汇见 `CONTEXT.md`，架构决策见 `docs/adr/`，issue 流程见 `docs/agents/`。
+面向编码 agent 的宪法与运行配置。Cursor 等工具经根目录 `AGENTS.md` 指向本文。领域词汇见 `CONTEXT.md`，架构决策见 `docs/adr/`，issue 流程见 `docs/agents/`。
 
 ## 项目一句话
 
@@ -9,7 +9,7 @@
 ## 唯一接缝与唯一判定
 
 - **唯一接缝**：`execute_query(查询文本, 会话画像, 会话状态)`（`safepass/pipeline.py`）。后端全部能力经此进入。
-- **唯一判定**：`python -m pytest tests/ -q` 全绿（基线 641，随票递增）。没有"看起来对了"——测试不过就是没过。**禁止裸跑 `pytest`**：`safepass` 不在 sys.path（pytest.ini 未配 pythonpath），裸跑必 ModuleNotFoundError；L2 eval 套件同理走 `python -m pytest tests/eval -q`。
+- **唯一判定**：`python -m pytest tests/ -q` 全绿（基线 663，随票递增）。没有"看起来对了"——测试不过就是没过。**禁止裸跑 `pytest`**：`safepass` 不在 sys.path（pytest.ini 未配 pythonpath），裸跑必 ModuleNotFoundError；L2 eval 套件同理走 `python -m pytest tests/eval -q`。
 
 ## Karpathy 宪法
 
