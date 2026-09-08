@@ -1,9 +1,12 @@
 {
   "comparison": {
     "comparison_ok": {
+      "actionability": true,
+      "contradiction": true,
       "groundedness": true,
       "hallucination": true,
-      "relevance": true
+      "relevance": true,
+      "specificity": true
     },
     "fallback_ids": [
       "G01",
@@ -34,6 +37,18 @@
       "G49",
       "G50"
     ],
+    "quality_skill_metrics": {
+      "actionability_mean": 1.0,
+      "contradiction_rate": 0.0,
+      "n_entries": 23,
+      "specificity_mean": 0.9043478260869565
+    },
+    "quality_template_metrics": {
+      "actionability_mean": 1.0,
+      "contradiction_rate": 0.0,
+      "n_entries": 23,
+      "specificity_mean": 0.0
+    },
     "skill_cassette_interactions": 52,
     "skill_eligible_ids": [
       "G25",
@@ -122,6 +137,7 @@
       "expect_type": "degraded",
       "form": "out_of_coverage",
       "id": "G01",
+      "quality": null,
       "query": "哥大附近安全吗？",
       "scenario": "normal",
       "suggestions_source": "template",
@@ -153,6 +169,7 @@
       "expect_type": "degraded",
       "form": "out_of_coverage",
       "id": "G02",
+      "quality": null,
       "query": "中城晚上安全吗？",
       "scenario": "normal",
       "suggestions_source": "template",
@@ -184,6 +201,7 @@
       "expect_type": "degraded",
       "form": "out_of_coverage",
       "id": "G03",
+      "quality": null,
       "query": "哥伦比亚大学附近安全吗？",
       "scenario": "normal",
       "suggestions_source": "template",
@@ -215,6 +233,7 @@
       "expect_type": "degraded",
       "form": "out_of_coverage",
       "id": "G04",
+      "quality": null,
       "query": "哥大附近租房安全吗？",
       "scenario": "normal",
       "suggestions_source": "template",
@@ -246,6 +265,7 @@
       "expect_type": "degraded",
       "form": "out_of_coverage",
       "id": "G05",
+      "quality": null,
       "query": "Midtown 安全吗",
       "scenario": "normal",
       "suggestions_source": "template",
@@ -277,6 +297,7 @@
       "expect_type": "degraded",
       "form": "out_of_coverage",
       "id": "G06",
+      "quality": null,
       "query": "中城和法拉盛比呢",
       "scenario": "normal",
       "suggestions_source": "template",
@@ -308,6 +329,7 @@
       "expect_type": "degraded",
       "form": "out_of_coverage",
       "id": "G07",
+      "quality": null,
       "query": "时代广场安全吗？",
       "scenario": "normal",
       "suggestions_source": "template",
@@ -339,6 +361,7 @@
       "expect_type": "degraded",
       "form": "out_of_coverage",
       "id": "G08",
+      "quality": null,
       "query": "哥大附近晚上安全吗？",
       "scenario": "normal",
       "suggestions_source": "template",
@@ -370,6 +393,7 @@
       "expect_type": "degraded",
       "form": "out_of_coverage",
       "id": "G09",
+      "quality": null,
       "query": "中城现在能去吗？",
       "scenario": "normal",
       "suggestions_source": "template",
@@ -401,6 +425,7 @@
       "expect_type": "degraded",
       "form": "out_of_coverage",
       "id": "G10",
+      "quality": null,
       "query": "上西区安全吗？",
       "scenario": "normal",
       "suggestions_source": "template",
@@ -432,6 +457,7 @@
       "expect_type": "comparison",
       "form": "comparison_followup",
       "id": "G11",
+      "quality": null,
       "query": "那和威廉斯堡比呢？",
       "scenario": "normal",
       "suggestions_source": "template",
@@ -463,6 +489,7 @@
       "expect_type": "comparison",
       "form": "comparison_followup",
       "id": "G12",
+      "quality": null,
       "query": "和法拉盛相比哪个更安全？",
       "scenario": "normal",
       "suggestions_source": "template",
@@ -494,6 +521,7 @@
       "expect_type": "comparison",
       "form": "comparison_followup",
       "id": "G13",
+      "quality": null,
       "query": "那跟唐人街比呢？",
       "scenario": "normal",
       "suggestions_source": "template",
@@ -525,6 +553,7 @@
       "expect_type": "comparison",
       "form": "comparison_followup",
       "id": "G14",
+      "quality": null,
       "query": "和布鲁克林 Heights 比呢？",
       "scenario": "low_sample",
       "suggestions_source": "template",
@@ -556,6 +585,7 @@
       "expect_type": "comparison",
       "form": "comparison_followup",
       "id": "G15",
+      "quality": null,
       "query": "那和唐人街比哪个更安全",
       "scenario": "normal",
       "suggestions_source": "template",
@@ -587,6 +617,7 @@
       "expect_type": "comparison",
       "form": "comparison_followup",
       "id": "G16",
+      "quality": null,
       "query": "跟威廉斯堡相比呢？",
       "scenario": "normal",
       "suggestions_source": "template",
@@ -618,6 +649,7 @@
       "expect_type": "comparison",
       "form": "comparison_followup",
       "id": "G17",
+      "quality": null,
       "query": "和布鲁克林高地比呢？",
       "scenario": "low_sample",
       "suggestions_source": "template",
@@ -649,6 +681,7 @@
       "expect_type": "comparison",
       "form": "comparison_followup",
       "id": "G18",
+      "quality": null,
       "query": "那和威廉斯堡比呢？",
       "scenario": "low_sample",
       "suggestions_source": "template",
@@ -680,6 +713,12 @@
       "expect_type": "safety",
       "form": "detail_followup",
       "id": "G19",
+      "quality": {
+        "actionability": 1.0,
+        "contradictions": [],
+        "n_suggestions": 5,
+        "specificity": 0.0
+      },
       "query": "女生晚上呢？",
       "scenario": "normal",
       "suggestions_source": "template",
@@ -711,6 +750,12 @@
       "expect_type": "safety",
       "form": "detail_followup",
       "id": "G20",
+      "quality": {
+        "actionability": 1.0,
+        "contradictions": [],
+        "n_suggestions": 5,
+        "specificity": 0.0
+      },
       "query": "留学生晚上呢？",
       "scenario": "normal",
       "suggestions_source": "template",
@@ -742,6 +787,12 @@
       "expect_type": "safety",
       "form": "detail_followup",
       "id": "G21",
+      "quality": {
+        "actionability": 1.0,
+        "contradictions": [],
+        "n_suggestions": 5,
+        "specificity": 0.0
+      },
       "query": "一个人晚上呢？",
       "scenario": "normal",
       "suggestions_source": "template",
@@ -773,6 +824,12 @@
       "expect_type": "safety",
       "form": "detail_followup",
       "id": "G22",
+      "quality": {
+        "actionability": 1.0,
+        "contradictions": [],
+        "n_suggestions": 5,
+        "specificity": 0.0
+      },
       "query": "周末晚上呢？",
       "scenario": "profile_sensitive",
       "suggestions_source": "template",
@@ -804,6 +861,12 @@
       "expect_type": "safety",
       "form": "detail_followup",
       "id": "G23",
+      "quality": {
+        "actionability": 1.0,
+        "contradictions": [],
+        "n_suggestions": 5,
+        "specificity": 0.0
+      },
       "query": "晚上呢？",
       "scenario": "low_sample",
       "suggestions_source": "template",
@@ -835,6 +898,12 @@
       "expect_type": "safety",
       "form": "detail_followup",
       "id": "G24",
+      "quality": {
+        "actionability": 1.0,
+        "contradictions": [],
+        "n_suggestions": 5,
+        "specificity": 0.0
+      },
       "query": "带娃周末呢？",
       "scenario": "profile_sensitive",
       "suggestions_source": "template",
@@ -866,6 +935,12 @@
       "expect_type": "safety",
       "form": "new_query",
       "id": "G25",
+      "quality": {
+        "actionability": 1.0,
+        "contradictions": [],
+        "n_suggestions": 3,
+        "specificity": 1.0
+      },
       "query": "上东区晚上安全吗？",
       "scenario": "normal",
       "suggestions_source": "skill",
@@ -897,6 +972,12 @@
       "expect_type": "safety",
       "form": "new_query",
       "id": "G26",
+      "quality": {
+        "actionability": 1.0,
+        "contradictions": [],
+        "n_suggestions": 3,
+        "specificity": 0.6666666666666666
+      },
       "query": "Upper East Side 安全吗",
       "scenario": "normal",
       "suggestions_source": "skill",
@@ -928,6 +1009,12 @@
       "expect_type": "safety",
       "form": "new_query",
       "id": "G27",
+      "quality": {
+        "actionability": 1.0,
+        "contradictions": [],
+        "n_suggestions": 5,
+        "specificity": 1.0
+      },
       "query": "上东区安全吗",
       "scenario": "profile_sensitive",
       "suggestions_source": "skill",
@@ -959,6 +1046,12 @@
       "expect_type": "safety",
       "form": "new_query",
       "id": "G28",
+      "quality": {
+        "actionability": 1.0,
+        "contradictions": [],
+        "n_suggestions": 3,
+        "specificity": 1.0
+      },
       "query": "上东区周末白天安全吗",
       "scenario": "normal",
       "suggestions_source": "skill",
@@ -990,6 +1083,12 @@
       "expect_type": "safety",
       "form": "new_query",
       "id": "G29",
+      "quality": {
+        "actionability": 1.0,
+        "contradictions": [],
+        "n_suggestions": 3,
+        "specificity": 1.0
+      },
       "query": "上东区凌晨安全吗",
       "scenario": "normal",
       "suggestions_source": "skill",
@@ -1021,6 +1120,12 @@
       "expect_type": "safety",
       "form": "new_query",
       "id": "G30",
+      "quality": {
+        "actionability": 1.0,
+        "contradictions": [],
+        "n_suggestions": 3,
+        "specificity": 0.6666666666666666
+      },
       "query": "UES 安全吗",
       "scenario": "normal",
       "suggestions_source": "skill",
@@ -1052,6 +1157,12 @@
       "expect_type": "safety",
       "form": "new_query",
       "id": "G31",
+      "quality": {
+        "actionability": 1.0,
+        "contradictions": [],
+        "n_suggestions": 3,
+        "specificity": 1.0
+      },
       "query": "法拉盛晚上安全吗？",
       "scenario": "normal",
       "suggestions_source": "skill",
@@ -1083,6 +1194,12 @@
       "expect_type": "safety",
       "form": "new_query",
       "id": "G32",
+      "quality": {
+        "actionability": 1.0,
+        "contradictions": [],
+        "n_suggestions": 3,
+        "specificity": 1.0
+      },
       "query": "Flushing 安全吗",
       "scenario": "normal",
       "suggestions_source": "skill",
@@ -1114,6 +1231,12 @@
       "expect_type": "safety",
       "form": "new_query",
       "id": "G33",
+      "quality": {
+        "actionability": 1.0,
+        "contradictions": [],
+        "n_suggestions": 5,
+        "specificity": 0.8
+      },
       "query": "法拉盛安全吗",
       "scenario": "profile_sensitive",
       "suggestions_source": "skill",
@@ -1145,6 +1268,12 @@
       "expect_type": "safety",
       "form": "new_query",
       "id": "G34",
+      "quality": {
+        "actionability": 1.0,
+        "contradictions": [],
+        "n_suggestions": 3,
+        "specificity": 1.0
+      },
       "query": "法拉盛地铁站附近安全吗",
       "scenario": "normal",
       "suggestions_source": "skill",
@@ -1176,6 +1305,12 @@
       "expect_type": "safety",
       "form": "new_query",
       "id": "G35",
+      "quality": {
+        "actionability": 1.0,
+        "contradictions": [],
+        "n_suggestions": 3,
+        "specificity": 1.0
+      },
       "query": "法拉盛傍晚安全吗",
       "scenario": "normal",
       "suggestions_source": "skill",
@@ -1207,6 +1342,12 @@
       "expect_type": "safety",
       "form": "new_query",
       "id": "G36",
+      "quality": {
+        "actionability": 1.0,
+        "contradictions": [],
+        "n_suggestions": 4,
+        "specificity": 1.0
+      },
       "query": "唐人街晚上安全吗？",
       "scenario": "normal",
       "suggestions_source": "skill",
@@ -1238,6 +1379,12 @@
       "expect_type": "safety",
       "form": "new_query",
       "id": "G37",
+      "quality": {
+        "actionability": 1.0,
+        "contradictions": [],
+        "n_suggestions": 3,
+        "specificity": 1.0
+      },
       "query": "Chinatown 安全吗",
       "scenario": "normal",
       "suggestions_source": "skill",
@@ -1269,6 +1416,12 @@
       "expect_type": "safety",
       "form": "new_query",
       "id": "G38",
+      "quality": {
+        "actionability": 1.0,
+        "contradictions": [],
+        "n_suggestions": 4,
+        "specificity": 0.0
+      },
       "query": "华埠安全吗",
       "scenario": "profile_sensitive",
       "suggestions_source": "skill",
@@ -1300,6 +1453,12 @@
       "expect_type": "safety",
       "form": "new_query",
       "id": "G39",
+      "quality": {
+        "actionability": 1.0,
+        "contradictions": [],
+        "n_suggestions": 5,
+        "specificity": 1.0
+      },
       "query": "唐人街安全吗",
       "scenario": "profile_sensitive",
       "suggestions_source": "skill",
@@ -1331,6 +1490,12 @@
       "expect_type": "safety",
       "form": "new_query",
       "id": "G40",
+      "quality": {
+        "actionability": 1.0,
+        "contradictions": [],
+        "n_suggestions": 5,
+        "specificity": 0.0
+      },
       "query": "唐人街凌晨两点安全吗",
       "scenario": "normal",
       "suggestions_source": "template",
@@ -1362,6 +1527,12 @@
       "expect_type": "safety",
       "form": "new_query",
       "id": "G41",
+      "quality": {
+        "actionability": 1.0,
+        "contradictions": [],
+        "n_suggestions": 5,
+        "specificity": 1.0
+      },
       "query": "威廉斯堡晚上安全吗？",
       "scenario": "normal",
       "suggestions_source": "skill",
@@ -1393,6 +1564,12 @@
       "expect_type": "safety",
       "form": "new_query",
       "id": "G42",
+      "quality": {
+        "actionability": 1.0,
+        "contradictions": [],
+        "n_suggestions": 3,
+        "specificity": 1.0
+      },
       "query": "Williamsburg 安全吗",
       "scenario": "normal",
       "suggestions_source": "skill",
@@ -1424,6 +1601,12 @@
       "expect_type": "safety",
       "form": "new_query",
       "id": "G43",
+      "quality": {
+        "actionability": 1.0,
+        "contradictions": [],
+        "n_suggestions": 5,
+        "specificity": 1.0
+      },
       "query": "威廉斯堡安全吗",
       "scenario": "profile_sensitive",
       "suggestions_source": "skill",
@@ -1455,6 +1638,12 @@
       "expect_type": "safety",
       "form": "new_query",
       "id": "G44",
+      "quality": {
+        "actionability": 1.0,
+        "contradictions": [],
+        "n_suggestions": 5,
+        "specificity": 1.0
+      },
       "query": "威廉斯堡周末安全吗",
       "scenario": "normal",
       "suggestions_source": "skill",
@@ -1486,6 +1675,12 @@
       "expect_type": "safety",
       "form": "new_query",
       "id": "G45",
+      "quality": {
+        "actionability": 1.0,
+        "contradictions": [],
+        "n_suggestions": 4,
+        "specificity": 1.0
+      },
       "query": "布鲁克林高地安全吗？",
       "scenario": "low_sample",
       "suggestions_source": "skill",
@@ -1517,6 +1712,12 @@
       "expect_type": "safety",
       "form": "new_query",
       "id": "G46",
+      "quality": {
+        "actionability": 1.0,
+        "contradictions": [],
+        "n_suggestions": 3,
+        "specificity": 1.0
+      },
       "query": "Brooklyn Heights 安全吗",
       "scenario": "low_sample",
       "suggestions_source": "skill",
@@ -1548,6 +1749,12 @@
       "expect_type": "safety",
       "form": "new_query",
       "id": "G47",
+      "quality": {
+        "actionability": 1.0,
+        "contradictions": [],
+        "n_suggestions": 3,
+        "specificity": 0.6666666666666666
+      },
       "query": "布鲁克林 Heights 晚上安全吗",
       "scenario": "low_sample",
       "suggestions_source": "skill",
@@ -1579,6 +1786,12 @@
       "expect_type": "safety",
       "form": "new_query",
       "id": "G48",
+      "quality": {
+        "actionability": 1.0,
+        "contradictions": [],
+        "n_suggestions": 4,
+        "specificity": 1.0
+      },
       "query": "布鲁克林高地周末安全吗",
       "scenario": "low_sample",
       "suggestions_source": "skill",
@@ -1610,6 +1823,7 @@
       "expect_type": "comparison",
       "form": "new_query",
       "id": "G49",
+      "quality": null,
       "query": "唐人街和威廉斯堡哪个更安全？",
       "scenario": "normal",
       "suggestions_source": "template",
@@ -1641,6 +1855,7 @@
       "expect_type": "comparison",
       "form": "new_query",
       "id": "G50",
+      "quality": null,
       "query": "法拉盛还是上东区更安全",
       "scenario": "normal",
       "suggestions_source": "template",
@@ -1715,12 +1930,27 @@
     "relevance_mean": 1.0,
     "relevance_pass_rate": 1.0
   },
+  "quality": {
+    "main": {
+      "actionability_mean": 1.0,
+      "contradiction_rate": 0.0,
+      "n_entries": 23,
+      "specificity_mean": 0.9043478260869565
+    },
+    "template": {
+      "actionability_mean": 1.0,
+      "contradiction_rate": 0.0,
+      "n_entries": 23,
+      "specificity_mean": 0.0
+    }
+  },
   "template_path": {
     "entries": [
       {
         "expect_type": "degraded",
         "form": "out_of_coverage",
         "id": "G01",
+        "quality": null,
         "query": "哥大附近安全吗？",
         "scenario": "normal",
         "suggestions_source": "template",
@@ -1752,6 +1982,7 @@
         "expect_type": "degraded",
         "form": "out_of_coverage",
         "id": "G02",
+        "quality": null,
         "query": "中城晚上安全吗？",
         "scenario": "normal",
         "suggestions_source": "template",
@@ -1783,6 +2014,7 @@
         "expect_type": "degraded",
         "form": "out_of_coverage",
         "id": "G03",
+        "quality": null,
         "query": "哥伦比亚大学附近安全吗？",
         "scenario": "normal",
         "suggestions_source": "template",
@@ -1814,6 +2046,7 @@
         "expect_type": "degraded",
         "form": "out_of_coverage",
         "id": "G04",
+        "quality": null,
         "query": "哥大附近租房安全吗？",
         "scenario": "normal",
         "suggestions_source": "template",
@@ -1845,6 +2078,7 @@
         "expect_type": "degraded",
         "form": "out_of_coverage",
         "id": "G05",
+        "quality": null,
         "query": "Midtown 安全吗",
         "scenario": "normal",
         "suggestions_source": "template",
@@ -1876,6 +2110,7 @@
         "expect_type": "degraded",
         "form": "out_of_coverage",
         "id": "G06",
+        "quality": null,
         "query": "中城和法拉盛比呢",
         "scenario": "normal",
         "suggestions_source": "template",
@@ -1907,6 +2142,7 @@
         "expect_type": "degraded",
         "form": "out_of_coverage",
         "id": "G07",
+        "quality": null,
         "query": "时代广场安全吗？",
         "scenario": "normal",
         "suggestions_source": "template",
@@ -1938,6 +2174,7 @@
         "expect_type": "degraded",
         "form": "out_of_coverage",
         "id": "G08",
+        "quality": null,
         "query": "哥大附近晚上安全吗？",
         "scenario": "normal",
         "suggestions_source": "template",
@@ -1969,6 +2206,7 @@
         "expect_type": "degraded",
         "form": "out_of_coverage",
         "id": "G09",
+        "quality": null,
         "query": "中城现在能去吗？",
         "scenario": "normal",
         "suggestions_source": "template",
@@ -2000,6 +2238,7 @@
         "expect_type": "degraded",
         "form": "out_of_coverage",
         "id": "G10",
+        "quality": null,
         "query": "上西区安全吗？",
         "scenario": "normal",
         "suggestions_source": "template",
@@ -2031,6 +2270,7 @@
         "expect_type": "comparison",
         "form": "comparison_followup",
         "id": "G11",
+        "quality": null,
         "query": "那和威廉斯堡比呢？",
         "scenario": "normal",
         "suggestions_source": "template",
@@ -2062,6 +2302,7 @@
         "expect_type": "comparison",
         "form": "comparison_followup",
         "id": "G12",
+        "quality": null,
         "query": "和法拉盛相比哪个更安全？",
         "scenario": "normal",
         "suggestions_source": "template",
@@ -2093,6 +2334,7 @@
         "expect_type": "comparison",
         "form": "comparison_followup",
         "id": "G13",
+        "quality": null,
         "query": "那跟唐人街比呢？",
         "scenario": "normal",
         "suggestions_source": "template",
@@ -2124,6 +2366,7 @@
         "expect_type": "comparison",
         "form": "comparison_followup",
         "id": "G14",
+        "quality": null,
         "query": "和布鲁克林 Heights 比呢？",
         "scenario": "low_sample",
         "suggestions_source": "template",
@@ -2155,6 +2398,7 @@
         "expect_type": "comparison",
         "form": "comparison_followup",
         "id": "G15",
+        "quality": null,
         "query": "那和唐人街比哪个更安全",
         "scenario": "normal",
         "suggestions_source": "template",
@@ -2186,6 +2430,7 @@
         "expect_type": "comparison",
         "form": "comparison_followup",
         "id": "G16",
+        "quality": null,
         "query": "跟威廉斯堡相比呢？",
         "scenario": "normal",
         "suggestions_source": "template",
@@ -2217,6 +2462,7 @@
         "expect_type": "comparison",
         "form": "comparison_followup",
         "id": "G17",
+        "quality": null,
         "query": "和布鲁克林高地比呢？",
         "scenario": "low_sample",
         "suggestions_source": "template",
@@ -2248,6 +2494,7 @@
         "expect_type": "comparison",
         "form": "comparison_followup",
         "id": "G18",
+        "quality": null,
         "query": "那和威廉斯堡比呢？",
         "scenario": "low_sample",
         "suggestions_source": "template",
@@ -2279,6 +2526,12 @@
         "expect_type": "safety",
         "form": "detail_followup",
         "id": "G19",
+        "quality": {
+          "actionability": 1.0,
+          "contradictions": [],
+          "n_suggestions": 5,
+          "specificity": 0.0
+        },
         "query": "女生晚上呢？",
         "scenario": "normal",
         "suggestions_source": "template",
@@ -2310,6 +2563,12 @@
         "expect_type": "safety",
         "form": "detail_followup",
         "id": "G20",
+        "quality": {
+          "actionability": 1.0,
+          "contradictions": [],
+          "n_suggestions": 5,
+          "specificity": 0.0
+        },
         "query": "留学生晚上呢？",
         "scenario": "normal",
         "suggestions_source": "template",
@@ -2341,6 +2600,12 @@
         "expect_type": "safety",
         "form": "detail_followup",
         "id": "G21",
+        "quality": {
+          "actionability": 1.0,
+          "contradictions": [],
+          "n_suggestions": 5,
+          "specificity": 0.0
+        },
         "query": "一个人晚上呢？",
         "scenario": "normal",
         "suggestions_source": "template",
@@ -2372,6 +2637,12 @@
         "expect_type": "safety",
         "form": "detail_followup",
         "id": "G22",
+        "quality": {
+          "actionability": 1.0,
+          "contradictions": [],
+          "n_suggestions": 5,
+          "specificity": 0.0
+        },
         "query": "周末晚上呢？",
         "scenario": "profile_sensitive",
         "suggestions_source": "template",
@@ -2403,6 +2674,12 @@
         "expect_type": "safety",
         "form": "detail_followup",
         "id": "G23",
+        "quality": {
+          "actionability": 1.0,
+          "contradictions": [],
+          "n_suggestions": 5,
+          "specificity": 0.0
+        },
         "query": "晚上呢？",
         "scenario": "low_sample",
         "suggestions_source": "template",
@@ -2434,6 +2711,12 @@
         "expect_type": "safety",
         "form": "detail_followup",
         "id": "G24",
+        "quality": {
+          "actionability": 1.0,
+          "contradictions": [],
+          "n_suggestions": 5,
+          "specificity": 0.0
+        },
         "query": "带娃周末呢？",
         "scenario": "profile_sensitive",
         "suggestions_source": "template",
@@ -2465,6 +2748,12 @@
         "expect_type": "safety",
         "form": "new_query",
         "id": "G25",
+        "quality": {
+          "actionability": 1.0,
+          "contradictions": [],
+          "n_suggestions": 5,
+          "specificity": 0.0
+        },
         "query": "上东区晚上安全吗？",
         "scenario": "normal",
         "suggestions_source": "template",
@@ -2496,6 +2785,12 @@
         "expect_type": "safety",
         "form": "new_query",
         "id": "G26",
+        "quality": {
+          "actionability": 1.0,
+          "contradictions": [],
+          "n_suggestions": 5,
+          "specificity": 0.0
+        },
         "query": "Upper East Side 安全吗",
         "scenario": "normal",
         "suggestions_source": "template",
@@ -2527,6 +2822,12 @@
         "expect_type": "safety",
         "form": "new_query",
         "id": "G27",
+        "quality": {
+          "actionability": 1.0,
+          "contradictions": [],
+          "n_suggestions": 5,
+          "specificity": 0.0
+        },
         "query": "上东区安全吗",
         "scenario": "profile_sensitive",
         "suggestions_source": "template",
@@ -2558,6 +2859,12 @@
         "expect_type": "safety",
         "form": "new_query",
         "id": "G28",
+        "quality": {
+          "actionability": 1.0,
+          "contradictions": [],
+          "n_suggestions": 5,
+          "specificity": 0.0
+        },
         "query": "上东区周末白天安全吗",
         "scenario": "normal",
         "suggestions_source": "template",
@@ -2589,6 +2896,12 @@
         "expect_type": "safety",
         "form": "new_query",
         "id": "G29",
+        "quality": {
+          "actionability": 1.0,
+          "contradictions": [],
+          "n_suggestions": 5,
+          "specificity": 0.0
+        },
         "query": "上东区凌晨安全吗",
         "scenario": "normal",
         "suggestions_source": "template",
@@ -2620,6 +2933,12 @@
         "expect_type": "safety",
         "form": "new_query",
         "id": "G30",
+        "quality": {
+          "actionability": 1.0,
+          "contradictions": [],
+          "n_suggestions": 5,
+          "specificity": 0.0
+        },
         "query": "UES 安全吗",
         "scenario": "normal",
         "suggestions_source": "template",
@@ -2651,6 +2970,12 @@
         "expect_type": "safety",
         "form": "new_query",
         "id": "G31",
+        "quality": {
+          "actionability": 1.0,
+          "contradictions": [],
+          "n_suggestions": 5,
+          "specificity": 0.0
+        },
         "query": "法拉盛晚上安全吗？",
         "scenario": "normal",
         "suggestions_source": "template",
@@ -2682,6 +3007,12 @@
         "expect_type": "safety",
         "form": "new_query",
         "id": "G32",
+        "quality": {
+          "actionability": 1.0,
+          "contradictions": [],
+          "n_suggestions": 5,
+          "specificity": 0.0
+        },
         "query": "Flushing 安全吗",
         "scenario": "normal",
         "suggestions_source": "template",
@@ -2713,6 +3044,12 @@
         "expect_type": "safety",
         "form": "new_query",
         "id": "G33",
+        "quality": {
+          "actionability": 1.0,
+          "contradictions": [],
+          "n_suggestions": 5,
+          "specificity": 0.0
+        },
         "query": "法拉盛安全吗",
         "scenario": "profile_sensitive",
         "suggestions_source": "template",
@@ -2744,6 +3081,12 @@
         "expect_type": "safety",
         "form": "new_query",
         "id": "G34",
+        "quality": {
+          "actionability": 1.0,
+          "contradictions": [],
+          "n_suggestions": 5,
+          "specificity": 0.0
+        },
         "query": "法拉盛地铁站附近安全吗",
         "scenario": "normal",
         "suggestions_source": "template",
@@ -2775,6 +3118,12 @@
         "expect_type": "safety",
         "form": "new_query",
         "id": "G35",
+        "quality": {
+          "actionability": 1.0,
+          "contradictions": [],
+          "n_suggestions": 5,
+          "specificity": 0.0
+        },
         "query": "法拉盛傍晚安全吗",
         "scenario": "normal",
         "suggestions_source": "template",
@@ -2806,6 +3155,12 @@
         "expect_type": "safety",
         "form": "new_query",
         "id": "G36",
+        "quality": {
+          "actionability": 1.0,
+          "contradictions": [],
+          "n_suggestions": 5,
+          "specificity": 0.0
+        },
         "query": "唐人街晚上安全吗？",
         "scenario": "normal",
         "suggestions_source": "template",
@@ -2837,6 +3192,12 @@
         "expect_type": "safety",
         "form": "new_query",
         "id": "G37",
+        "quality": {
+          "actionability": 1.0,
+          "contradictions": [],
+          "n_suggestions": 5,
+          "specificity": 0.0
+        },
         "query": "Chinatown 安全吗",
         "scenario": "normal",
         "suggestions_source": "template",
@@ -2868,6 +3229,12 @@
         "expect_type": "safety",
         "form": "new_query",
         "id": "G38",
+        "quality": {
+          "actionability": 1.0,
+          "contradictions": [],
+          "n_suggestions": 5,
+          "specificity": 0.0
+        },
         "query": "华埠安全吗",
         "scenario": "profile_sensitive",
         "suggestions_source": "template",
@@ -2899,6 +3266,12 @@
         "expect_type": "safety",
         "form": "new_query",
         "id": "G39",
+        "quality": {
+          "actionability": 1.0,
+          "contradictions": [],
+          "n_suggestions": 5,
+          "specificity": 0.0
+        },
         "query": "唐人街安全吗",
         "scenario": "profile_sensitive",
         "suggestions_source": "template",
@@ -2930,6 +3303,12 @@
         "expect_type": "safety",
         "form": "new_query",
         "id": "G40",
+        "quality": {
+          "actionability": 1.0,
+          "contradictions": [],
+          "n_suggestions": 5,
+          "specificity": 0.0
+        },
         "query": "唐人街凌晨两点安全吗",
         "scenario": "normal",
         "suggestions_source": "template",
@@ -2961,6 +3340,12 @@
         "expect_type": "safety",
         "form": "new_query",
         "id": "G41",
+        "quality": {
+          "actionability": 1.0,
+          "contradictions": [],
+          "n_suggestions": 5,
+          "specificity": 0.0
+        },
         "query": "威廉斯堡晚上安全吗？",
         "scenario": "normal",
         "suggestions_source": "template",
@@ -2992,6 +3377,12 @@
         "expect_type": "safety",
         "form": "new_query",
         "id": "G42",
+        "quality": {
+          "actionability": 1.0,
+          "contradictions": [],
+          "n_suggestions": 5,
+          "specificity": 0.0
+        },
         "query": "Williamsburg 安全吗",
         "scenario": "normal",
         "suggestions_source": "template",
@@ -3023,6 +3414,12 @@
         "expect_type": "safety",
         "form": "new_query",
         "id": "G43",
+        "quality": {
+          "actionability": 1.0,
+          "contradictions": [],
+          "n_suggestions": 5,
+          "specificity": 0.0
+        },
         "query": "威廉斯堡安全吗",
         "scenario": "profile_sensitive",
         "suggestions_source": "template",
@@ -3054,6 +3451,12 @@
         "expect_type": "safety",
         "form": "new_query",
         "id": "G44",
+        "quality": {
+          "actionability": 1.0,
+          "contradictions": [],
+          "n_suggestions": 5,
+          "specificity": 0.0
+        },
         "query": "威廉斯堡周末安全吗",
         "scenario": "normal",
         "suggestions_source": "template",
@@ -3085,6 +3488,12 @@
         "expect_type": "safety",
         "form": "new_query",
         "id": "G45",
+        "quality": {
+          "actionability": 1.0,
+          "contradictions": [],
+          "n_suggestions": 5,
+          "specificity": 0.0
+        },
         "query": "布鲁克林高地安全吗？",
         "scenario": "low_sample",
         "suggestions_source": "template",
@@ -3116,6 +3525,12 @@
         "expect_type": "safety",
         "form": "new_query",
         "id": "G46",
+        "quality": {
+          "actionability": 1.0,
+          "contradictions": [],
+          "n_suggestions": 5,
+          "specificity": 0.0
+        },
         "query": "Brooklyn Heights 安全吗",
         "scenario": "low_sample",
         "suggestions_source": "template",
@@ -3147,6 +3562,12 @@
         "expect_type": "safety",
         "form": "new_query",
         "id": "G47",
+        "quality": {
+          "actionability": 1.0,
+          "contradictions": [],
+          "n_suggestions": 5,
+          "specificity": 0.0
+        },
         "query": "布鲁克林 Heights 晚上安全吗",
         "scenario": "low_sample",
         "suggestions_source": "template",
@@ -3178,6 +3599,12 @@
         "expect_type": "safety",
         "form": "new_query",
         "id": "G48",
+        "quality": {
+          "actionability": 1.0,
+          "contradictions": [],
+          "n_suggestions": 5,
+          "specificity": 0.0
+        },
         "query": "布鲁克林高地周末安全吗",
         "scenario": "low_sample",
         "suggestions_source": "template",
@@ -3209,6 +3636,7 @@
         "expect_type": "comparison",
         "form": "new_query",
         "id": "G49",
+        "quality": null,
         "query": "唐人街和威廉斯堡哪个更安全？",
         "scenario": "normal",
         "suggestions_source": "template",
@@ -3240,6 +3668,7 @@
         "expect_type": "comparison",
         "form": "new_query",
         "id": "G50",
+        "quality": null,
         "query": "法拉盛还是上东区更安全",
         "scenario": "normal",
         "suggestions_source": "template",

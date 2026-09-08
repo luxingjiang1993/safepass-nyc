@@ -31,7 +31,7 @@ pip install -r requirements.txt
 
 ## 质量基线（M1 eval 套件，spec v2）
 
-四项指标随 eval 套件产出，README 只作投影，单一事实源 = 套件工件（改动指标须重跑套件并同步本表，漂移由 `tests/test_readme_baselines.py` 守住）：
+七项指标随 eval 套件产出，README 只作投影，单一事实源 = 套件工件（改动指标须重跑套件并同步本表，漂移由 `tests/test_readme_baselines.py` 守住）：
 
 | 指标 | 基线（Skill 路径主指标） | 对照（模板路径，同子集） | 口径（分子/分母） | 复算 |
 |------|------|------|------|------|
@@ -39,8 +39,12 @@ pip install -r requirements.txt
 | groundedness（L2） | 1.000 | 0.957 | Skill 路径 groundedness judge 分数之和 / Skill 覆盖子集条目数（B1 口径：分母 = suggestions_source=skill 的条目，eligible 24 条中实际 23 条，覆盖数受 config `eval.skill_coverage_min` 护栏；judge 口径 v5 把 Skill 建议的事实性声明纳入判定，grounds 引文只作依据、不构成声明） | `pytest tests/eval -q` cassette 回放，工件 `fixtures/eval/l2_results_v1.json` |
 | 幻觉率（L2） | 0.000 | 0.000 | hallucinated=true 的条目数 / 同 Skill 覆盖子集条目数（二元判定，judge = qwen-flash，prompt 版本锁定进 config） | 同上 |
 | relevance（L2） | 1.000 | 1.000 | 同 Skill 覆盖子集 relevance judge 分数之和 / 子集条目数 | 同上 |
+| actionability（B2） | 1.000 | 1.000 | 命中动作词表的建议条目占比（确定性规则特征，词表 = config `eval.quality.action_verbs`；下限护栏——模板通用建议同款命中，此维度不区分两路径） | 同上 |
+| specificity（B2） | 0.904 | 0.000 | 建议条目与任一 grounds 引文共享 ≥ config `eval.quality.anchor_min_chars` 字公共子串的占比（确定性 union 匹配；纯最长公共子串不校验类别——地名/作案手法/通用措辞都计命中，保守的「本区情报锚定覆盖下限」；模板路径无 grounds 恒 0） | 同上 |
+| 矛盾率（B2） | 0.000 | 0.000 | 夜间方向断言与 charts 昼夜计数矛盾的条目占比（确定性算术核对，LLM 零参与，P6 定案 2；否定表达与疑问句豁免） | 同上 |
 
-- 两路径对照（B1，issue 04）：主指标 = Skill 路径 Skill 覆盖子集（23/24，覆盖数受 config 护栏；模板降级路径 27 条单列 marker、不计入主 groundedness）；对照列 = 同一子集跑确定性模板路径（零管线 LLM）。收口条件 = 主指标 Skill ≥ 模板（hallucination 取 ≤），由 `pytest tests/eval -q` 机器断言（工件 `comparison.comparison_ok`）——打不过就迭代到打得过再收，不修 DoD。
+- 两路径对照（B1，issue 04）：主指标 = Skill 路径 Skill 覆盖子集（23/24，覆盖数受 config 护栏；模板降级路径 27 条单列 marker、不计入主 groundedness）；对照列 = 同一子集跑确定性模板路径（零管线 LLM）。收口条件 = 主指标 Skill ≥ 模板（hallucination/矛盾率取 ≤），由 `pytest tests/eval -q` 机器断言（工件 `comparison.comparison_ok`）——打不过就迭代到打得过再收，不修 DoD。
+- B2 质量维度（issue 05）：actionability/specificity/矛盾率三维全部确定性实现（规则特征 + 算术核对，LLM 零参与——宪法①⑤ + P6 定案 2），不新增 judge 调用、未重录 cassette（P6 定案 1）；回归门 = config `eval.quality` 的 min_*/max_*，由 `pytest tests/eval -q` 机器断言。
 - L2 套件离线可跑（judge 与 Skill 调用走 cassette 回放，零真实 API）；录制工件 `fixtures/eval/l2_results_v1.json` 由 `python scripts/record_l2_cassette.py` 一次性产出（需真实 `DASHSCOPE_API_KEY`）。
 - 生产与 dev 同源（2026-09-08 起全线统一 DashScope `qwen-flash`，选型原则 = 总 token 成本最低）：L2 套件指标即生产模型指标，无跨供应商兼容性验证尾巴。
 

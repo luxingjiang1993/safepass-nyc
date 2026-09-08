@@ -93,6 +93,26 @@ def test_readme_two_path_comparison_column_matches_artifact():
         )
 
 
+def test_readme_b2_quality_rows_match_artifact():
+    """B2 质量维度行（issue 05）：基线列 = 主路径同子集聚合、对照列 = 模板
+    路径同子集聚合（3 位小数投影口径，与 judge 对照列同款）。"""
+    results = _load_results()
+    quality = results["quality"]
+    for label, key in (("actionability（B2）", "actionability_mean"),
+                       ("specificity（B2）", "specificity_mean"),
+                       ("矛盾率（B2）", "contradiction_rate")):
+        baseline_cell = _readme_baseline_cell(label, column=1)
+        template_cell = _readme_baseline_cell(label, column=2)
+        assert round(float(baseline_cell), 3) == round(float(quality["main"][key]), 3), (
+            f"README {label} 基线列 {baseline_cell} 与录制工件主指标 "
+            f"{quality['main'][key]:.3f} 不符：套件重录后需同步 README"
+        )
+        assert round(float(template_cell), 3) == round(float(quality["template"][key]), 3), (
+            f"README {label} 对照列 {template_cell} 与录制工件模板指标 "
+            f"{quality['template'][key]:.3f} 不符：套件重录后需同步 README"
+        )
+
+
 def test_readme_baselines_cite_recompute_commands():
     """三项指标都必须带可复算路径（跑哪个套件、读哪份工件）。"""
     for needle in ("pytest tests/test_golden_set.py", "pytest tests/eval -q",

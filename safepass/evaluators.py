@@ -29,14 +29,16 @@
 
 from __future__ import annotations
 
+import difflib
 import json
 import math
+import re
 from dataclasses import dataclass
 from typing import Any, Callable, Sequence
 
 import json_repair
 
-from safepass import config_loader
+from safepass import config_loader, contracts
 from safepass.llm_client import LLMClient, chat_with_cassette
 
 # 三类 evaluator 的 feedback_key（spec v2 指标：groundedness / 幻觉率 / 建议相关性）。
@@ -342,4 +344,150 @@ def aggregate(
         "relevance_pass_rate": _pass_rate(FEEDBACK_RELEVANCE),
         "hallucination_rate": hallucination_rate,
         "pass_threshold": pass_threshold,
+    }
+
+
+# ---------------------------------------------------------------------------
+# B2 确定性质量维度（issue 05 / B2）：actionability + specificity + 矛盾检测
+# ---------------------------------------------------------------------------
+# 灵感改写自 ragas / deepeval 的质量维度说明（execution-plan §1.2.8 B1/B2 行：
+# faithfulness / 矛盾维度），不引入其运行时（票 05 禁止项）。全部确定性实现
+# （规则特征 + 算术核对），LLM 零参与——宪法①⑤（能用规则/查表/算术判定的
+# 不经 LLM）；矛盾核对按 P6 定案 2：数据事实 vs 建议文本的确定性比对，
+# 不许 LLM 判定。词表与阈值只活 config eval.quality（红线 1）。
+#
+# 口径（README 质量基线表同源）：
+# - actionability（能照做）= 命中动作词表的建议条目占比（动作词 = 祈使/行为
+#   动词；模板路径通用建议同款命中，此维度是下限护栏，不是两路径区分维度）；
+# - specificity（提到本区数据）= 建议条目与任一 grounds 引文共享 ≥
+#   anchor_min_chars 字公共子串的条目占比（grounds 是 top-3 注入的池对齐
+#   而非逐条对齐，故 union 匹配）。实现是纯最长公共子串、不校验子串类别
+#   （地名/作案手法/通用措辞都计命中）——保守的「本区情报锚定覆盖下限」，
+#   模板路径无 grounds 恒 0；
+# - 矛盾（不与 charts 矛盾）= 句子内夜间时间词 + 方向断言 → 与 charts
+#   day/night 计数算术核对：声称更安全需 night ≤ day、更危险需 night ≥ day；
+#   更安全/更危险同句 = 歧义跳过；方向词前带否定词（如「并非夜间更危险」）
+#   或整句为疑问 = 非断言跳过。命中即矛盾记录，逐条进工件。
+
+
+def _longest_common_len(a: str, b: str) -> int:
+    """两字符串最长公共子串长度（difflib，autojunk=False 防长文本误判）。"""
+    match = difflib.SequenceMatcher(None, a, b, autojunk=False).find_longest_match(
+        0, len(a), 0, len(b)
+    )
+    return match.size
+
+
+def actionability_scores(
+    suggestions: Sequence[str], action_verbs: Sequence[str]
+) -> tuple[bool, ...]:
+    """能照做：每条建议是否命中 ≥1 个动作词（词表 = config eval.quality.action_verbs）。"""
+    return tuple(any(verb in text for verb in action_verbs) for text in suggestions)
+
+
+def specificity_scores(
+    suggestions: Sequence[str],
+    ground_quotes: Sequence[str],
+    anchor_min_chars: int,
+) -> tuple[bool, ...]:
+    """提到本区数据：建议与任一 grounds 引文共享 ≥ anchor_min_chars 字的情报锚点。
+
+    grounds 是检索 top-3 的池注入（A2），与建议条目不是逐条对齐——
+    union 匹配：条目命中任一引文的锚点即视为本区数据锚定。无 grounds
+    （模板路径 / 检索降级）恒 False。
+    """
+    scores: list[bool] = []
+    for text in suggestions:
+        anchored = any(
+            quote and _longest_common_len(text, quote) >= anchor_min_chars
+            for quote in ground_quotes
+        )
+        scores.append(anchored)
+    return tuple(scores)
+
+
+def _negated(segment: str, word: str, negation_words: Sequence[str]) -> bool:
+    """方向词前 4 字窗口内出现否定词 = 否定表达（「并非夜间更危险」非断言）。"""
+    pos = segment.find(word)
+    return pos >= 0 and any(n in segment[max(0, pos - 4) : pos] for n in negation_words)
+
+
+def detect_contradictions(
+    suggestions: Sequence[str],
+    day: int,
+    night: int,
+    *,
+    quality_cfg: config_loader.EvalQualityConfig,
+) -> list[str]:
+    """矛盾检测（确定性算术核对）：夜间方向断言 vs charts 昼夜计数。
+
+    句子为核对单元（方向断言只在其所在句内成立）：声称「夜间更安全」但
+    night > day、声称「夜间更危险」但 night < day → 矛盾记录（含违规句子
+    与两侧数字）。豁免：更安全/更危险同句 = 歧义跳过；方向词前 4 字窗口内
+    带否定词（「并非夜间更危险」）或整句为疑问 = 非断言跳过。词表（夜间
+    时间词/更安全/更危险/否定词）全部来自 config eval.quality。
+    """
+    contradictions: list[str] = []
+    for i, text in enumerate(suggestions):
+        # 问号不进分隔符：疑问句保留问号以在下方整句豁免（问号入句不影响词匹配）
+        for sentence in re.split(r"[。；！!\n]", text):
+            if "？" in sentence or "?" in sentence:
+                continue  # 疑问句不是断言
+            has_night = any(w in sentence for w in quality_cfg.night_time_words)
+            has_safer = has_night and any(
+                w in sentence and not _negated(sentence, w, quality_cfg.negation_words)
+                for w in quality_cfg.safer_words
+            )
+            has_danger = has_night and any(
+                w in sentence and not _negated(sentence, w, quality_cfg.negation_words)
+                for w in quality_cfg.danger_words
+            )
+            if has_safer == has_danger:
+                continue  # 无方向断言，或更安全/更危险同句（歧义跳过）
+            if has_safer and night > day:
+                contradictions.append(
+                    f"建议[{i}]声称夜间更安全，但 charts 夜间 {night} 起 > 日间 {day} 起：{sentence}"
+                )
+            elif has_danger and night < day:
+                contradictions.append(
+                    f"建议[{i}]声称夜间更危险，但 charts 夜间 {night} 起 < 日间 {day} 起：{sentence}"
+                )
+    return contradictions
+
+
+def quality_dimensions(
+    result: Any,
+    evidence: dict[str, Any],
+    cfg: config_loader.AppConfig,
+) -> dict[str, Any] | None:
+    """B2 三维逐条计算（issue 05）：只有 safety 形态的覆盖内安全查询有质量面。
+
+    evidence = l2_runner.build_evidence 的产物；非 safety 形态（对比/降级/
+    越界）返回 None（质量维度只评估建议质量，不问契约形态）。
+    """
+    if not isinstance(result, contracts.SafetyQueryResult):
+        return None
+    if evidence.get("kind") != "safety":
+        return None
+    data = evidence["data"]
+    quality_cfg = cfg.eval.quality
+    suggestions = result.suggestions
+    n = len(suggestions)
+    action_hits = actionability_scores(suggestions, quality_cfg.action_verbs)
+    specific_hits = specificity_scores(
+        suggestions,
+        [g.quote for g in result.suggestion_grounds],
+        quality_cfg.anchor_min_chars,
+    )
+    contradictions = detect_contradictions(
+        suggestions,
+        data["day_night"]["day"],
+        data["day_night"]["night"],
+        quality_cfg=quality_cfg,
+    )
+    return {
+        "actionability": (sum(action_hits) / n) if n else 0.0,
+        "specificity": (sum(specific_hits) / n) if n else 0.0,
+        "contradictions": contradictions,
+        "n_suggestions": n,
     }

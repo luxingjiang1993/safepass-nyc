@@ -301,6 +301,8 @@ class EvalConfig:
     pass_threshold：判定通过分数下界（三项 L2 指标同口径）；
     skill_coverage_min：主指标分母护栏（B1）——Skill 覆盖子集中
     suggestions_source=skill 的条目数下界，低于即 Skill 系统性回归；
+    quality：B2 确定性质量维度（actionability/specificity/矛盾检测）
+    词表与回归门；
     prompt_versions：三类 evaluator 提示词模板版本锁定（键 = feedback_key，
     值 = 版本字符串；改模板必须升版本，否则 cassette 指纹校验直接拒放）。
     """
@@ -312,7 +314,29 @@ class EvalConfig:
     cassette_skill: str
     pass_threshold: float
     skill_coverage_min: int
+    quality: EvalQualityConfig
     prompt_versions: dict[str, str]
+
+
+@dataclass(frozen=True)
+class EvalQualityConfig:
+    """B2 确定性质量维度配置（issue 05，与 EvalConfig 平级的 eval.quality 节）。
+
+    词表与阈值只活 config/app.yaml（红线 1）：action_verbs = actionability
+    动作词表；anchor_min_chars = specificity 情报锚点最短公共子串长度；
+    night_time_words/safer_words/danger_words = 矛盾检测的方向断言词表；
+    min_actionability/min_specificity/max_contradiction_rate = 回归门。
+    """
+
+    action_verbs: tuple[str, ...]
+    anchor_min_chars: int
+    night_time_words: tuple[str, ...]
+    safer_words: tuple[str, ...]
+    danger_words: tuple[str, ...]
+    negation_words: tuple[str, ...]
+    min_actionability: float
+    min_specificity: float
+    max_contradiction_rate: float
 
 
 @dataclass(frozen=True)
@@ -714,6 +738,7 @@ def load_config(path: str | Path | None = None) -> AppConfig:
     prompt_versions_raw = _require(eval_raw, "prompt_versions", "eval")
     if not isinstance(prompt_versions_raw, dict) or not prompt_versions_raw:
         raise ConfigError("eval.prompt_versions 必须是非空映射（feedback_key → 版本）")
+    quality_raw = _require(eval_raw, "quality", "eval")
     eval_cfg = EvalConfig(
         judge_model=str(_require(eval_raw, "judge_model", "eval")),
         base_url=str(_require(eval_raw, "base_url", "eval")),
@@ -722,6 +747,35 @@ def load_config(path: str | Path | None = None) -> AppConfig:
         cassette_skill=str(_require(eval_raw, "cassette_skill", "eval")),
         pass_threshold=float(_require(eval_raw, "pass_threshold", "eval")),
         skill_coverage_min=int(_require(eval_raw, "skill_coverage_min", "eval")),
+        quality=EvalQualityConfig(
+            action_verbs=tuple(
+                str(v) for v in _require(quality_raw, "action_verbs", "eval.quality")
+            ),
+            anchor_min_chars=int(
+                _require(quality_raw, "anchor_min_chars", "eval.quality")
+            ),
+            night_time_words=tuple(
+                str(v) for v in _require(quality_raw, "night_time_words", "eval.quality")
+            ),
+            safer_words=tuple(
+                str(v) for v in _require(quality_raw, "safer_words", "eval.quality")
+            ),
+            danger_words=tuple(
+                str(v) for v in _require(quality_raw, "danger_words", "eval.quality")
+            ),
+            negation_words=tuple(
+                str(v) for v in _require(quality_raw, "negation_words", "eval.quality")
+            ),
+            min_actionability=float(
+                _require(quality_raw, "min_actionability", "eval.quality")
+            ),
+            min_specificity=float(
+                _require(quality_raw, "min_specificity", "eval.quality")
+            ),
+            max_contradiction_rate=float(
+                _require(quality_raw, "max_contradiction_rate", "eval.quality")
+            ),
+        ),
         prompt_versions={str(k): str(v) for k, v in prompt_versions_raw.items()},
     )
     if not eval_cfg.judge_model.strip():
@@ -740,6 +794,21 @@ def load_config(path: str | Path | None = None) -> AppConfig:
         raise ConfigError("eval.pass_threshold 必须在 (0, 1] 区间")
     if any(not v.strip() for v in eval_cfg.prompt_versions.values()):
         raise ConfigError("eval.prompt_versions 的值（版本字符串）不得为空")
+    quality = eval_cfg.quality
+    if not quality.action_verbs or any(not w.strip() for w in quality.action_verbs):
+        raise ConfigError("eval.quality.action_verbs 必须是非空词表（actionability 规则特征）")
+    if quality.anchor_min_chars < 2:
+        raise ConfigError("eval.quality.anchor_min_chars 必须 ≥ 2（情报锚点最短公共子串）")
+    if not quality.night_time_words or not quality.safer_words or not quality.danger_words:
+        raise ConfigError("eval.quality 矛盾检测三组方向词表必须非空")
+    if not quality.negation_words:
+        raise ConfigError("eval.quality.negation_words 必须非空（否定豁免词表）")
+    if not (0.0 <= quality.min_actionability <= 1.0):
+        raise ConfigError("eval.quality.min_actionability 必须在 [0, 1] 区间")
+    if not (0.0 <= quality.min_specificity <= 1.0):
+        raise ConfigError("eval.quality.min_specificity 必须在 [0, 1] 区间")
+    if not (0.0 <= quality.max_contradiction_rate <= 1.0):
+        raise ConfigError("eval.quality.max_contradiction_rate 必须在 [0, 1] 区间")
 
     # one_liner 钩子词典（issue 18 / A3）：词典与阈值只活在本节，loader 只搬运校验。
     # 装配分支的判别键（与 pipeline._one_liner_hook_text 的 id 分支一一对应）；

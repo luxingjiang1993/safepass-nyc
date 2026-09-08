@@ -10,6 +10,10 @@ eligible new_query 安全查询，覆盖数受 config eval.skill_coverage_min �
 模板降级路径单独 marker 不计入主 groundedness；
 收口条件 = 两路径同台对照主指标 Skill ≥ 模板（本套件机器断言，非散文）。
 
+B2（issue 05）质量维度：actionability/specificity/矛盾率三维确定性实现
+（LLM 零参与），同一 Skill 覆盖子集聚合（主路径 + 模板对照同子集），
+回归门 = config eval.quality 的 min_*/max_*（本套件断言），收口条件扩三维。
+
 运行（独立套件，不进默认基线）：``pytest tests/eval -q``
 """
 
@@ -179,8 +183,9 @@ def test_l2_main_metrics_bite_on_skill_subset():
 
 
 def test_l2_two_path_comparison_skill_ge_template():
-    """收口条件（B1 机器判定，非散文）：主指标（Skill 覆盖子集 24 条）与
-    模板路径同子集对照——groundedness/relevance 取 ≥，hallucination 取 ≤。"""
+    """收口条件（B1/B2 机器判定，非散文）：主指标（Skill 覆盖子集 24 条）与
+    模板路径同子集对照——groundedness/relevance/actionability/specificity
+    取 ≥，hallucination/矛盾率取 ≤。"""
     results = _replay_suite()
     ok = results["comparison"]["comparison_ok"]
     skill_metrics = results["comparison"]["skill_metrics"]
@@ -196,6 +201,77 @@ def test_l2_two_path_comparison_skill_ge_template():
     assert ok["relevance"] is True, (
         f"主指标 relevance 未跑赢模板对照：Skill {skill_metrics['relevance_mean']:.3f} "
         f"< 模板 {template_metrics['relevance_mean']:.3f}"
+    )
+    # B2 质量维度收口（issue 05）：同子集确定性三维对照
+    quality_skill = results["comparison"]["quality_skill_metrics"]
+    quality_template = results["comparison"]["quality_template_metrics"]
+    assert ok["actionability"] is True, (
+        f"主指标 actionability 未跑赢模板对照：Skill "
+        f"{quality_skill['actionability_mean']:.3f} < 模板 {quality_template['actionability_mean']:.3f}"
+    )
+    assert ok["specificity"] is True, (
+        f"主指标 specificity 未跑赢模板对照：Skill "
+        f"{quality_skill['specificity_mean']:.3f} < 模板 {quality_template['specificity_mean']:.3f}"
+    )
+    assert ok["contradiction"] is True, (
+        f"主指标矛盾率高于模板对照：Skill {quality_skill['contradiction_rate']:.3f} "
+        f"> 模板 {quality_template['contradiction_rate']:.3f}"
+    )
+
+
+def test_l2_quality_dimensions_b2():
+    """B2 质量维度（issue 05）：逐条 quality 形状 + 主指标回归门（config
+    eval.quality 的 min_*/max_*，机器断言非散文）+ 两路径同子集聚合。"""
+    results = _replay_suite()
+    for label, entries in (
+        ("主路径（Skill）", results["entries"]),
+        ("对照路径（模板）", results["template_path"]["entries"]),
+    ):
+        for entry in entries:
+            quality = entry["quality"]
+            if entry["expect_type"] == "safety":
+                assert quality is not None, f"{label} {entry['id']} 缺 quality"
+                assert set(quality) == {
+                    "actionability",
+                    "specificity",
+                    "contradictions",
+                    "n_suggestions",
+                }, f"{entry['id']} quality 键漂移：{sorted(quality)}"
+                assert 0.0 <= quality["actionability"] <= 1.0
+                assert 0.0 <= quality["specificity"] <= 1.0
+                assert isinstance(quality["contradictions"], list)
+                assert quality["n_suggestions"] >= 0
+            else:
+                assert quality is None, (
+                    f"{label} {entry['id']} 非 safety 形态不应有质量面"
+                )
+
+    q = results["quality"]
+    assert set(q) == {"main", "template"}
+    for label, metrics in (("main", q["main"]), ("template", q["template"])):
+        assert set(metrics) == {
+            "actionability_mean",
+            "specificity_mean",
+            "contradiction_rate",
+            "n_entries",
+        }
+        assert 0.0 <= metrics["actionability_mean"] <= 1.0
+        assert 0.0 <= metrics["specificity_mean"] <= 1.0
+        assert 0.0 <= metrics["contradiction_rate"] <= 1.0
+
+    # 回归门（主指标 = Skill 路径；config eval.quality 单一事实源）
+    gates = _CFG.eval.quality
+    assert q["main"]["actionability_mean"] >= gates.min_actionability, (
+        f"actionability 主指标 {q['main']['actionability_mean']:.3f} 低于回归门 "
+        f"{gates.min_actionability}（Skill 产出非行动性建议的系统性回归）"
+    )
+    assert q["main"]["specificity_mean"] >= gates.min_specificity, (
+        f"specificity 主指标 {q['main']['specificity_mean']:.3f} 低于回归门 "
+        f"{gates.min_specificity}（建议失去本区数据锚定的系统性回归）"
+    )
+    assert q["main"]["contradiction_rate"] <= gates.max_contradiction_rate, (
+        f"矛盾率 {q['main']['contradiction_rate']:.3f} 高于回归门 "
+        f"{gates.max_contradiction_rate}（建议与 charts 昼夜数据矛盾）"
     )
 
 

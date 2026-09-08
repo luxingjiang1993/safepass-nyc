@@ -24,6 +24,13 @@ B1（两路径对照，禁止测模板自嗨，P6 开赛定案）：
 - 两路径对照数字进 fixtures/eval/l2_results_v1.json 与 README（票 04），
   收口条件 = 主指标 Skill ≥ 模板（tests/eval 断言，非散文）。
 
+B2（issue 05，质量维度扩表）：
+- actionability/specificity/矛盾三维全部确定性实现（evaluators.py B2 节，
+  LLM 零参与），逐条 quality 进 entries[i].quality，不新增 judge 调用、
+  不动 cassette、不改 judge 提示词（P6 定案 1：本票只扩维度不重录）；
+- quality 聚合 = 与主指标同一 Skill 覆盖子集（主路径 + 模板对照同子集），
+  收口条件扩三维（actionability/specificity ≥、矛盾率 ≤，机器断言）。
+
 本目录刻意不进 pytest 默认基线（tests/conftest.py collect_ignore）：L2 套件
 依赖 cassette 资产，基线 L1（tests/test_golden_set.py）保持零 cassette 依赖、
 两侧互不惊扰。运行：``pytest tests/eval -q``。
@@ -331,8 +338,10 @@ def _run_path(
                 f"{entry['expect']['type']!r} 不一致（Skill 路径路由/管线漂移）"
             )
         outputs = _outputs_json(result)
-        evidence = evaluators.dumps_slot(build_evidence(entry, cfg))
+        evidence_dict = build_evidence(entry, cfg)
+        evidence = evaluators.dumps_slot(evidence_dict)
         reference = evaluators.dumps_slot(build_reference(entry))
+        quality = evaluators.quality_dimensions(result, evidence_dict, cfg)
         verdicts: dict[str, Any] = {}
         for feedback_key in JUDGE_ORDER:
             evaluator = evaluators.build_evaluator(
@@ -361,6 +370,7 @@ def _run_path(
                 "expect_type": entry["expect"]["type"],
                 "suggestions_source": suggestions_source,
                 "verdicts": verdicts,
+                "quality": quality,  # B2 确定性三维；非 safety 形态为 null
             }
         )
 
@@ -387,6 +397,34 @@ def _subset_metrics(
     metrics = evaluators.aggregate(verdicts, pass_threshold=cfg.eval.pass_threshold)
     metrics["n_entries"] = len(ids)
     return metrics
+
+
+def _quality_metrics(
+    per_entry: Sequence[dict[str, Any]],
+    *,
+    subset_ids: Sequence[str],
+) -> dict[str, Any]:
+    """B2 质量维度聚合（issue 05）：条目子集内 quality 非空的条目。
+
+    actionability/specificity = 条目均值；contradiction_rate = 含 ≥1 条
+    矛盾的条目占比；n_entries = 有质量面的条目数（非 safety 形态为 null，
+    不计入，不静默）。
+    """
+    ids = set(subset_ids)
+    rows = [
+        e["quality"]
+        for e in per_entry
+        if e["id"] in ids and e["quality"] is not None
+    ]
+    n = len(rows)
+    return {
+        "actionability_mean": None if not n else sum(r["actionability"] for r in rows) / n,
+        "specificity_mean": None if not n else sum(r["specificity"] for r in rows) / n,
+        "contradiction_rate": (
+            None if not n else sum(1 for r in rows if r["contradictions"]) / n
+        ),
+        "n_entries": n,
+    }
 
 
 def run_l2_suite(
@@ -470,6 +508,32 @@ def run_l2_suite(
             main_metrics["relevance_mean"] >= template_metrics["relevance_mean"]
         ),
     }
+    # B2 质量维度（issue 05）：同一 Skill 覆盖子集的确定性三维聚合与收口。
+    quality_main = _quality_metrics(skill["entries"], subset_ids=skill_sourced_ids)
+    quality_template = _quality_metrics(
+        template["entries"], subset_ids=skill_sourced_ids
+    )
+    if quality_main["n_entries"] != len(skill_sourced_ids) or quality_template[
+        "n_entries"
+    ] != len(skill_sourced_ids):
+        raise AssertionError(
+            "B2 质量面缺失：主/对照子集条目应全部有 quality（safety 形态必有建议），"
+            f"实际 main={quality_main['n_entries']} template={quality_template['n_entries']} "
+            f"/ {len(skill_sourced_ids)}"
+        )
+    comparison_ok.update(
+        {
+            "actionability": (
+                quality_main["actionability_mean"] >= quality_template["actionability_mean"]
+            ),
+            "specificity": (
+                quality_main["specificity_mean"] >= quality_template["specificity_mean"]
+            ),
+            "contradiction": (
+                quality_main["contradiction_rate"] <= quality_template["contradiction_rate"]
+            ),
+        }
+    )
     return {
         "golden_version": json.loads(GOLDEN_PATH.read_text(encoding="utf-8"))["version"],
         "metrics": main_metrics,
@@ -481,6 +545,10 @@ def run_l2_suite(
             "metrics_all_entries": template["metrics"],
             "entries": template["entries"],
         },
+        "quality": {
+            "main": quality_main,
+            "template": quality_template,
+        },
         "comparison": {
             "skill_eligible_ids": eligible_ids,
             "skill_sourced_ids": skill_sourced_ids,
@@ -488,6 +556,8 @@ def run_l2_suite(
             "skill_cassette_interactions": skill_client.cassette_calls,
             "skill_metrics": main_metrics,
             "template_metrics": template_metrics,
+            "quality_skill_metrics": quality_main,
+            "quality_template_metrics": quality_template,
             "comparison_ok": comparison_ok,
         },
     }

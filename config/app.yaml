@@ -403,6 +403,31 @@ eval:
                                 # suggestions_source=skill 的条目数下界。个别条目因 Skill
                                 # 校验耗尽降级模板属设计内路径（进模板降级 marker），
                                 # 低于此数 = Skill 系统性回归，主指标口径不得静默缩水。
+  # B2 确定性质量维度（issue 05）：词表与阈值只活本处，代码零字面量。
+  # 全部确定性实现（规则特征 + 算术核对），LLM 零参与——宪法①⑤、P6 定案 2。
+  quality:
+    # actionability「能照做」：建议条目命中任一动作词的占比（规则特征）。
+    action_verbs: ["务必", "避免", "注意", "警惕", "选择", "拨打", "挂断", "核实",
+      "不要", "立即", "尽量", "结伴", "携带", "使用", "保持", "联系",
+      "切勿", "看管", "照看", "防范", "确保", "留存", "约定", "优先",
+      "告知", "放在", "查看", "前往", "求助", "远离", "拒绝", "应",
+      "勿", "握", "提前", "将"]
+    # specificity「提到本区数据」：建议条目与任一 grounds 引文共享 ≥ 本长度
+    # 的公共子串（difflib 最长公共子串；情报锚点 = 街道/场所/作案手法短语）
+    anchor_min_chars: 4
+    # 矛盾检测「不与 charts 矛盾」：句子内夜间时间词 + 方向断言 → 与
+    # charts day/night 计数确定性核对（更安全需 night ≤ day；更危险需
+    # night ≥ day；两者同句 = 歧义跳过）
+    night_time_words: ["夜间", "深夜", "晚上", "夜里", "夜晚", "凌晨"]
+    safer_words: ["更安全", "安全一些", "相对安全", "更安心"]
+    danger_words: ["更危险", "更不安全", "更乱", "更糟"]
+    # 否定豁免：方向词前 4 字窗口内命中即视为否定表达（「并非夜间更危险」）
+    # 非断言，不判矛盾
+    negation_words: ["并非", "不是", "没有", "不会", "不存在", "绝非"]
+    # 回归门（tests/eval 断言：录制工件的聚合指标不得低于/高于本处）
+    min_actionability: 0.6
+    min_specificity: 0.5
+    max_contradiction_rate: 0.0
   prompt_versions:
     groundedness: "sp-groundedness-v5"   # v5（B1）：skill 建议的事实声明参与判定
     hallucination: "sp-hallucination-v5" # v5（B1）：skill 建议与证据矛盾判幻觉
