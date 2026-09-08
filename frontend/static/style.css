@@ -70,10 +70,33 @@ body {
 /* --- 结果页通用 --- */
 .back { display: inline-block; margin-bottom: 0.5rem; color: #2b5ea7; text-decoration: none; }
 
+/* 首屏信息架构（票 06 / D1，S3）：评级槽 = 结论卡片——先结论档与行动，
+   细节后置。hero 修饰类只在安全结果页首屏头使用，其余页面的 result-head
+   （对比/降级/防线/法律页/紧急主题）保持原有极简形态 */
+.result-head.hero {
+  background: #fff;
+  border: 1px solid #e2e2e2;
+  border-radius: 0.6rem;
+  padding: 0.75rem 1rem;
+  margin: 0.5rem 0;
+}
 .result-head h1 { margin: 0.2rem 0; }
+.result-head.hero .rating { font-size: 1.3rem; }
 .rating { font-size: 1.15rem; font-weight: 700; margin: 0.2rem 0; }
 .precinct, .sample, .basis { color: #555; margin: 0.2rem 0; }
 .stars { letter-spacing: 0.1em; }
+
+/* 建议依据渲染槽（票 06 / D1）：建议区固定槽位，A4 波 2 填 UI 文案 */
+.suggestion-grounds {
+  margin-top: 0.5rem;
+  padding-top: 0.5rem;
+  border-top: 1px dashed #ddd;
+}
+.ground-quote {
+  margin: 0.25rem 0;
+  font-size: 0.85rem;
+  color: #666;
+}
 
 section, details {
   margin: 1rem 0;
@@ -270,11 +293,16 @@ body.theme-emergency .emergency-contacts small { color: #e0a9ac; }
 .sources li, .community li, .community a, .venues a { overflow-wrap: anywhere; }
 
 /* --- 窄屏打磨（票 09）：30rem 以下显式收紧，保持单列无横向滚动 --- */
+/* 票 06 / D1：首屏五槽在窄屏收紧间距——一屏内可见评级+one_liner+3 条建议 */
 @media (max-width: 30rem) {
   .page { padding: 0.75rem 0.6rem 1.5rem; }
   .bar-label { flex: 0 0 4.5rem; font-size: 0.85rem; }
   .call-911-big a { padding: 1rem 0.5rem; font-size: 1.4rem; }
   .error-code { font-size: 2.2rem; }
+  .result-head.hero, section, details { padding: 0.6rem 0.75rem; margin: 0.6rem 0; }
+  .result-head.hero h1 { font-size: 1.35rem; }
+  .result-head.hero .rating { font-size: 1.15rem; }
+  .suggestions li { margin: 0.15rem 0; }
 }
 
 /* --- 排版（票 09）：标题换行平衡 + 段落孤词控制（渐进增强，不支持时无退化） --- */

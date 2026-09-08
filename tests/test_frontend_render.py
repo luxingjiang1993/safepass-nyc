@@ -116,8 +116,10 @@ class TestSafetyResult:
         assert "上东区整体安全" in render.render_result(make_safety(), CFG)
 
     def test_rating_basis_rendered_when_present(self):
+        # 倍数保留一位小数（票 06 / D1）：与 one_liner city_relative 钩子
+        # 同精度同口径，同区块内不出现「0.7 倍」与「0.67 倍」打架
         html = render.render_result(make_safety(rating_explainable_basis=0.62), CFG)
-        assert "0.62" in html and "市均值" in html
+        assert "0.6" in html and "市均值" in html
 
     def test_suggestions_3_to_5_rendered(self):
         html = render.render_result(make_safety(), CFG)

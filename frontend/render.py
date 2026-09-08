@@ -22,6 +22,16 @@ issue 12 追加（纯渲染层职责）：
     「可固定到侧边栏」提示（POST /profile add_scene）；提示是附加横幅，
     评级区块原样渲染（ADR-0002）。
 
+票 06 / D1 追加（首屏信息架构，S3 Crisis24 简报槽）：
+    首屏五槽 = 评级（result-head 结论卡片）→ 人话解释（one-liner 区块：
+    one_liner 数据钩子 + 评级依据，C1 rating_rationale 落地前的确定性拼装
+    占位，波 2 换真 C1）→ 建议（suggestions 常驻区块 + grounds 渲染槽，
+    A4 波 2 填 UI 文案）→ 紧急资源；
+    图表 / community / 来源默认折叠（details 不挂 open）；dimensions /
+    unknowns 同样折叠（⚪ 数据不足时 unknowns 例外展开——「为什么没评级」
+    本身就是结论）；降级横幅首屏可见（header 之后、建议之前，S3 槽位稳定，
+    细节后置，不靠聊天流）。
+
 UX 主观项（语气温暖、可信度感知、窄屏实机、无障碍抽验）转人工验收清单。
 """
 
@@ -274,8 +284,11 @@ def _confidence_block(result: contracts.SafetyQueryResult, cfg: config_loader.Ap
 
 
 def _community_info_block(info: dict[str, Any]) -> str:
-    """华人社区信息（AC-015 渲染侧）：逐字段透出，未记载项的统一标注原样呈现。"""
-    parts = ['<section class="community"><h2>🏮 华人社区信息</h2>']
+    """华人社区信息（AC-015 渲染侧）：逐字段透出，未记载项的统一标注原样呈现。
+
+    票 06 / D1：默认折叠（details 不挂 open）——首屏五槽之外，细节后置（S3）。
+    """
+    parts = ['<details class="community"><summary>🏮 华人社区信息</summary>']
     if info.get("hate_crime"):
         parts.append(f'<p>仇恨犯罪记录：{_esc(info["hate_crime"])}</p>')
     alerts = info.get("scam_alerts") or []
@@ -292,7 +305,7 @@ def _community_info_block(info: dict[str, Any]) -> str:
             for r in resources
         )
         parts.append(f'  <h3>社区资源</h3>\n  <ul>\n{items}\n  </ul>')
-    parts.append("</section>")
+    parts.append("</details>")
     return "\n".join(parts)
 
 
@@ -321,6 +334,21 @@ def _llm_degraded_banner(result: Any, cfg: config_loader.AppConfig) -> str:
     return f'<p class="llm-degraded-banner" role="status">⚠️ {_esc(notice)}</p>'
 
 
+def _suggestion_grounds_block(result: contracts.SafetyQueryResult) -> str:
+    """建议依据渲染槽（票 06 / D1，P6 定案 3）：建议区固定槽位，本票先留
+    结构与最小渲染——grounds 非空时逐条渲染引文（data-doc-id 供 A8 点击
+    溯源），空时不渲染（无依据不装成有依据，S1）。A4（波 2）负责 UI 文案
+    与「通用建议」标注，槽位与类名不漂。
+    """
+    if not result.suggestion_grounds:
+        return ""
+    quotes = "\n".join(
+        f'    <p class="ground-quote" data-doc-id="{_esc(g.doc_id)}">“{_esc(g.quote)}”</p>'
+        for g in result.suggestion_grounds
+    )
+    return f'<div class="suggestion-grounds" role="note">\n{quotes}\n</div>'
+
+
 def render_safety(
     result: contracts.SafetyQueryResult,
     cfg: config_loader.AppConfig,
@@ -330,55 +358,79 @@ def render_safety(
 
     profile = 会话画像：只用于侧边栏回填与固定提示（纯渲染），评级区块
     与画像零相关（ADR-0002 的渲染侧体现）。
+
+    票 06 / D1 首屏信息架构（S3）：窄屏一屏内只装结论与行动——
+    评级（result-head 结论卡片）→ 人话解释（one-liner 区块）→ 建议（含
+    grounds 渲染槽）→ 紧急资源，五槽连排；降级横幅首屏可见（header 之后、
+    建议之前）；pin_hint 与折叠细节排在五槽带之后；图表 / community / 来源
+    与 dimensions / unknowns 默认折叠（⚪ 时 unknowns 例外展开）。
     """
     header = (
-        f'<header class="result-head rating-{_esc(result.rating)}">\n'
+        f'<header class="result-head hero rating-{_esc(result.rating)}">\n'
         f'  <p class="rating">{_esc(RATING_LABELS[result.rating])}</p>\n'
         f'  <h1>{_esc(result.area)}</h1>\n'
         f'  <p class="precinct">警区 {_esc(result.precinct)} · 基于本次查询命中的 {_esc(result.sample_size)} 条记录</p>\n'
         f'{_confidence_block(result, cfg)}\n'
         f'</header>'
     )
-    # 评级可解释依据：per-100k 与市均值倍数（⚪ 时契约为 null，不渲染）
+    # 首屏「人话解释」占位（票 06 / D1，S3 槽位 2）：C1 rating_rationale 落地前
+    # 用现有字段确定性拼装 = one_liner（A3 数据钩子）+ 评级依据（per-100k
+    # 与市均值倍数，⚪ 时契约为 null 不渲染）；波 2 换真 C1。
+    # 倍数保留一位小数：与 A3 one_liner city_relative 钩子同精度同口径
+    # （同区块内不得出现「0.7 倍」与「0.67 倍」打架）。
     basis = ""
     if result.rating_explainable_basis is not None:
         basis = (
             f'<p class="basis">评级依据：该警区犯罪率（per 100k）约为全市均值的 '
-            f'{result.rating_explainable_basis:.2f} 倍</p>'
+            f'{result.rating_explainable_basis:.1f} 倍</p>'
         )
-    one_liner = f'<section class="one-liner"><h2>📋 一句话总结</h2><p>{_esc(result.one_liner)}</p></section>'
+    one_liner = (
+        f'<section class="one-liner"><h2>📋 一句话总结</h2>'
+        f'<p>{_esc(result.one_liner)}</p>{basis}\n</section>'
+    )
 
     dimensions = ""
     if result.dimensions:
         items = "\n".join(f"    <li><strong>{_esc(d.get('dimension', ''))}</strong>：{_esc(d.get('value', ''))}</li>" for d in result.dimensions)
-        dimensions = f'<details class="dimensions" open><summary>📊 具体情况</summary>\n  <ul>\n{items}\n  </ul>\n</details>'
+        dimensions = f'<details class="dimensions"><summary>📊 具体情况</summary>\n  <ul>\n{items}\n  </ul>\n</details>'
 
     suggestions = ""
     if result.suggestions:
         items = "\n".join(f"    <li>✅ {_esc(s)}</li>" for s in result.suggestions)
-        suggestions = f'<details class="suggestions" open><summary>💡 贴心建议</summary>\n  <ul>\n{items}\n  </ul>\n</details>'
+        suggestions = (
+            f'<section class="suggestions"><h2>💡 贴心建议</h2>\n  <ul>\n{items}\n  </ul>\n'
+            f'{_suggestion_grounds_block(result)}\n</section>'
+        )
 
     charts = _charts_block(result.charts) if result.charts is not None else ""
 
     unknowns = ""
     if result.unknowns:
+        # ⚪（数据不足）时「为什么没有评级」本身就是结论：默认展开；
+        # 其余默认折叠（首屏细节后置）
+        open_attr = " open" if result.rating == contracts.RATING_INSUFFICIENT else ""
         items = "\n".join(f"    <li>{_esc(u)}</li>" for u in result.unknowns)
-        unknowns = f'<details class="unknowns" open><summary>🤷 我不知道的</summary>\n  <ul>\n{items}\n  </ul>\n</details>'
+        unknowns = f'<details class="unknowns"{open_attr}><summary>🤷 我不知道的</summary>\n  <ul>\n{items}\n  </ul>\n</details>'
 
     community = _community_info_block(result.community_info) if result.community_info else ""
     venues = _venues_block("🚨 紧急资源", result.emergency_resources)
 
     sources_items = "\n".join(f"    <li>{_esc(s)}</li>" for s in result.sources)
     meta = (
-        f'<section class="sources"><h2>数据来源与覆盖时间</h2>\n'
-        f'  <p>覆盖时间：{_esc(result.time_range)}</p>\n  <ul>\n{sources_items}\n  </ul>\n</section>'
+        f'<details class="sources"><summary>数据来源与覆盖时间</summary>\n'
+        f'  <p>覆盖时间：{_esc(result.time_range)}</p>\n  <ul>\n{sources_items}\n  </ul>\n</details>'
     )
 
     body = "\n".join(
         part
         for part in (
-            _back_link(), header, _llm_degraded_banner(result, cfg), basis, _pin_hint(result, profile), one_liner, dimensions,
-            suggestions, charts, community, unknowns, venues, meta,
+            # 首屏五槽（S3，槽位稳定不靠聊天流）：评级（header）→ 人话解释
+            # （one-liner）→ 建议 → 紧急资源；降级横幅首屏可见（header 之后、
+            # 建议之前）；pin_hint 是查询语境提示，放五槽带之后、折叠细节之前
+            # （不插进槽位序列）；其余细节默认折叠（details 不挂 open）
+            _back_link(), header, _llm_degraded_banner(result, cfg), one_liner,
+            suggestions, venues, _pin_hint(result, profile),
+            dimensions, charts, community, unknowns, meta,
             _profile_sidebar(profile, cfg),
             _disclaimer(result.disclaimer),
         )
