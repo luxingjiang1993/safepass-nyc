@@ -57,13 +57,13 @@ _Avoid_: 模拟器、虚拟用户
 _Avoid_: 数据同步、ETL 管道
 
 **成本熔断（Cost Fuse）**:
-挂在 `safepass/llm_client.py` 接缝的日预算熔断器，配置在 `token-budget.json`（生产 $5/日）。超限当日剩余请求走无 LLM 降级模式（结构化数据照出、建议降级为模板文本），降级响应必须明示，不静默。
+挂在 LLMClient 注入接缝的日预算熔断器（`safepass/cost_control.py` 的 BudgetFusedClient 包装器，生产客户端必经），预算配置在 `token-budget.json`（生产 $5/日）。超限当日剩余请求走无 LLM 降级模式（结构化数据照出、建议降级为模板文本），降级响应必须明示，不静默。
 _Avoid_: 预算告警、花费控制
 
 ## 模型路由
 
 **生产模型（Production Model）**:
-线上环境调用的 LLM：DashScope（阿里云百炼）`qwen-flash`。承载全部生成型 Agent（意图/检索/建议/追问）。受 $5/日预算熔断与限流约束。2026-09-08 起生产与开发同源（原生产 DeepSeek `deepseek-chat` 已下架；选型原则 = 总 token 成本最低）。
+线上环境调用的 LLM：DashScope（阿里云百炼）`qwen-flash`。承载运行时全部三类 LLM 触点：FC 意图路由、三维提取、建议 Skill（建议正文）；评级/检索/追问细分/one_liner 全部确定性零 LLM（ADR-0003）。受 $5/日预算熔断与限流约束。2026-09-08 起生产与开发同源（原生产 DeepSeek `deepseek-chat` 已下架；选型原则 = 总 token 成本最低）。
 _Avoid_: 线上模型、正式模型
 
 **开发模型（Dev Model）**:

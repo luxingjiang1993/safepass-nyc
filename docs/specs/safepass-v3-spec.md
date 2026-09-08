@@ -1,6 +1,6 @@
 # SafePass NYC — Phase 3 Spec v3（波 1：真 AI 建议 + 质量咬合 + 首屏决策 + T2 杀手锏）
 
-> 状态：**执行中**。A1(#16)/A2(#17)/A3(#18) 已合并（commit 5bbbedf/1d651c8/b6e5e71，基线 587 green）；B1(#19)/B2(#20)/D1(#21)/D2(#22)/E1(#23)/N1(#24)/N3(#25) 待做。停点 = 波 1 全票 + P4 演示门闩。
+> 状态：**执行中**。A1(#16)/A2(#17)/A3(#18)/B1(#19)/B2(#20)/D1(#21)/D2(#22) 已合并（commit 5bbbedf/1d651c8/b6e5e71/45cb84f/0d145d3/a9937b9/6e41751，基线 641 green）；E1(#23) 本票收口（叙事对齐，无代码改动）；N1(#24)/N3(#25) 待做。停点 = 波 1 全票 + P4 演示门闩。
 > 输入：10 张票（GitHub #16–#25，本地镜像 `.scratch/safepass-phase3-tickets/issues/`）+ `docs/portfolio-100-execution-plan.md`（唯一执行主轴，仅参考；未切票部分以该文为准）文首补丁 P6（Phase 3 开赛定案，grilling 2026-09-07）+ `docs/adr/0003-suggestion-generation-architecture.md`。
 > **权威顺序：票 > 本 spec > 执行计划正文**。切票时逐张经 grill-me-with-docs 复盘，票文 = 派票瞬间的最终裁决；本 spec 只是 10 张票的可读总览与执行投影，不是独立契约——与票冲突处以票为准，票与执行计划冲突处亦以票为准（执行计划 §2/§2.9/§7 原文可能未被切票逐字采纳）。
 > 前身：`docs/specs/safepass-v2-spec.md`（M1–M4 已交付）为历史档案，正文不动；本文件是其 Phase 3 续篇。
