@@ -1,6 +1,6 @@
 # SafePass NYC — 工程骨架与环境说明
 
-> 产品文档：MVP 以 `docs/specs/safepass-nyc-mvp-spec.md`（v1.2，历史档案）为准；Phase 2 见 `docs/specs/safepass-v2-spec.md`（M1–M4，已交付）；Phase 3 波 1 见 `docs/specs/safepass-v3-spec.md`（执行中）。MVP 任务池（已归档）见 `docs/archive/ralph-mvp-pool.md`；领域词汇见 CONTEXT.md；架构决策见 `docs/adr/`。
+> 产品文档：MVP 以 `docs/specs/safepass-nyc-mvp-spec.md`（v1.2，历史档案）为准；Phase 2 见 `docs/specs/safepass-v2-spec.md`（M1–M4，已交付）；Phase 3 波 1 见 `docs/specs/safepass-v3-spec.md`（**已收口**，GitHub `#16`–`#25` 已关）。MVP 任务池（已归档）见 `docs/archive/ralph-mvp-pool.md`；领域词汇见 CONTEXT.md；架构决策见 `docs/adr/`。
 > 本文档只回答：**产品主路径是什么、目录里有什么、环境怎么搭、命令怎么跑**。
 
 ## 产品主路径（叙事与代码对齐，E1/ADR-0003）
@@ -64,7 +64,9 @@ pip install -r requirements.txt
 
 ## 审阅者路径（本地 3 命令，Windows 可跑）
 
-装依赖 → 跑 5 条固定 query（安全 + 越界 + 紧急）→ 开本地页。无 key 走确定性路径（one_liner 数据钩子 + 模板建议；grounds 空态打印「通用建议」）；有 key（`LLM_API_KEY` 三件套或 `DASHSCOPE_API_KEY`）走 Suggestion Skill。5 条 query 与金标子集对齐，不读真实 API key、不用非 fixture 数据。
+装依赖 → 跑 5 条固定 query（安全 + 越界 + 紧急）→ 开本地页。无 key 走确定性路径（one_liner 数据钩子 + 模板建议；grounds 空态打印「通用建议」）；有 key（`LLM_API_KEY` 三件套或 `DASHSCOPE_API_KEY`）走 Suggestion Skill。5 条 query 文本与金标子集对齐，不读真实 API key、不用非 fixture 数据。
+
+直跑 demo / 前端走运行时数据集 `fixtures/nypd_real`（`config data_source.runtime_dataset_path`）；pytest 钉 mock。两边评级可以不同，**不要把 demo 改钉 mock**（两套数据世界是票 07 定案）。
 
 ```bash
 pip install -r requirements.txt

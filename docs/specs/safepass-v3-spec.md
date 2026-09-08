@@ -1,6 +1,6 @@
 # SafePass NYC — Phase 3 Spec v3（波 1：真 AI 建议 + 质量咬合 + 首屏决策 + T2 杀手锏）
 
-> 状态：**执行中**。A1(#16)/A2(#17)/A3(#18)/B1(#19)/B2(#20)/D1(#21)/D2(#22) 已合并（commit 5bbbedf/1d651c8/b6e5e71/45cb84f/0d145d3/a9937b9/6e41751，基线 641 green）；E1(#23) 本票收口（叙事对齐，无代码改动）；N1(#24)/N3(#25) 待做。停点 = 波 1 全票 + P4 演示门闩。
+> 状态：**波 1 已收口**（2026-09-09）。GitHub `#16`–`#25` 十张票全部关闭；唯一判定 `python -m pytest tests/ -q` = **663** 绿。P4 演示门闩 `#1/#2/#3/#6/#16/#18` 为真；`#17`（N2 基线对照）按计划不阻塞、属波 2。HEAD 收口提交：N1 `1cf5295`、N3 `b0b0f27`。**禁止再开/再做 N1 骨架或 N3 一键复现。** 波 2 起按面试日程滚动决策（P6），未经用户点名不得自行开票。
 > 输入：10 张票（GitHub #16–#25，本地镜像 `.scratch/safepass-phase3-tickets/issues/`）+ `docs/portfolio-100-execution-plan.md`（唯一执行主轴，仅参考；未切票部分以该文为准）文首补丁 P6（Phase 3 开赛定案，grilling 2026-09-07）+ `docs/adr/0003-suggestion-generation-architecture.md`。
 > **权威顺序：票 > 本 spec > 执行计划正文**。切票时逐张经 grill-me-with-docs 复盘，票文 = 派票瞬间的最终裁决；本 spec 只是 10 张票的可读总览与执行投影，不是独立契约——与票冲突处以票为准，票与执行计划冲突处亦以票为准（执行计划 §2/§2.9/§7 原文可能未被切票逐字采纳）。
 > 前身：`docs/specs/safepass-v2-spec.md`（M1–M4 已交付）为历史档案，正文不动；本文件是其 Phase 3 续篇。
@@ -8,7 +8,7 @@
 
 ## Problem Statement
 
-MVP + Phase 2 已把产品推到「数据评级 + eval + 真实运营」的确定性高地上（587 测试绿），但从作品集轴看还有五个过不去的坎：
+MVP + Phase 2 已把产品推到「数据评级 + eval + 真实运营」的确定性高地上（波 1 开工时约 587 测试绿），但从作品集轴看当时还有五个过不去的坎：
 
 1. **用户看不到「AI」**：建议仍是 `safety_general` 配置模板的重排，one_liner 是「区域：灯色」；`intel.search(query)` 可测但用户感不到。产品在观众眼里是数据仪表盘，不是 AI 应用（Hamel/Karpathy）。
 2. **质量度量测错对象**：L2 groundedness/幻觉率测的是模板路径的输出，Skill/生成物一旦接入，现有度量就「测模板自嗨」；指标只有单个维度，没有 actionability / specificity / 矛盾检测。
@@ -29,7 +29,7 @@ MVP + Phase 2 已把产品推到「数据评级 + eval + 真实运营」的确�
 - **E1 — 波 1 收口票**：skills/、CONTEXT.md、README 三处对建议主路径的描述一致；隐私页口径与 ADR-0003 一致（一字不改）。
 - **N 组 — T2 杀手锏骨架**：**N1** ≥3 条「话术改不了 rating」攻击金标断言 + 拦截率报表工件（独立于主金标）；**N3** 一条命令 Windows 无 key 跑通 5 条固定 query（安全 + 越界 + 紧急）。
 
-**出口标准（P4 演示门闩，波 1 收口判定）**：验收看板 #1（建议来自 Skill 且检索可测改变建议）、#2（评级/越界/紧急零 LLM，画像不变评级有自动证明）、#3（L2 测生成物 + 三新维度）、#6（首屏可决策 + 芯片可发现）、#16（N1 骨架绿）、#18（N3 一键复现）为真；#17（N2 基线对照）演示日前尽量有初稿，无则口头说明并记 issue，不阻塞收口。波 2 起按面试日程滚动决策（P6 停点），波 3/4 不预支。
+**出口标准（P4 演示门闩）**：波 1 收口日（2026-09-09）验收看板 #1/#2/#3/#6/#16/#18 已为真；#17（N2）按计划不阻塞。波 2 起按面试日程滚动决策（P6 停点），波 3/4 不预支。未经用户点名不得把 N2/N4–N6 或波 2 票当「还没做的波 1」。
 
 ## User Stories
 
@@ -107,7 +107,7 @@ MVP + Phase 2 已把产品推到「数据评级 + eval + 真实运营」的确�
 
 ## Testing Decisions
 
-- **唯一判定不变**：行为回归 `python -m pytest tests/ -q` 全绿（基线 587，含 A3 one_liner 钩子断言 `tests/test_a3_one_liner_hooks.py` 四类：金标精确相等/允许钩子集合成员/与 `rating_explainable_basis` 逐字一致/⚪ 零钩子）。基线按 conftest `collect_ignore` 不含 `tests/eval`。
+- **唯一判定不变**：行为回归 `python -m pytest tests/ -q` 全绿（波 1 收口基线 **663**，随票递增；含 A3 one_liner 钩子断言 `tests/test_a3_one_liner_hooks.py` 四类：金标精确相等/允许钩子集合成员/与 `rating_explainable_basis` 逐字一致/⚪ 零钩子）。基线按 conftest `collect_ignore` 不含 `tests/eval`。
 - **L2 套件**：`python -m pytest tests/eval -q` 独立跑（judge 走 cassette 离线回放；qwen-flash 重录后 groundedness 0.980 / relevance 1.000 / 幻觉率 0.000）。B1 合并后主指标咬合 Skill 输出；重录必须遵守 cassette 棘轮。
 - **每票 DoD 布尔化**：Ralph 任务登记 `RALPH.md` 时引用本 spec 出口标准；N3 完成承诺 = Windows 无 key 实跑 `python scripts/demo_queries.py`（与 E7 合并设计避免双入口）。
 - **负向验证先行**：N1「话术改不了 rating」须演示放松校验 → 攻击金标红；B1 模板降级路径不计主指标。
@@ -118,7 +118,7 @@ MVP + Phase 2 已把产品推到「数据评级 + eval + 真实运营」的确�
 本 spec 只承诺波 1（10 张票）目标态。以下均不在承诺内：
 
 - **执行计划 §3–§5 波 2–4 全部**（A4 溯源行、A5 画像差异、B3–B5、C1–C8、D3–D9、E2–E7、F1–F4、G1–G4，约 40 项）与 §7 未切包（N2 基线对照、N4–N6）——P6 停点：波 2 起按面试日程滚动决策；原文仍在 `portfolio-100-execution-plan.md`，随时可按 §9 模板补票。
-- N1 完整注入报表（武器/间接注入/覆盖免责等攻击类别）——波 1 末–波 2 补满，本 spec 只承诺骨架。
+- N1 攻击类别再扩面（骨架已交付：9 条金标 + `docs/n1-injection-report.md`，issue #24）——完整分类学仍属波 2 可选，不是缺口。
 - roadmap.md「Phase 3」旧条目（地理编码扩覆盖 / Langfuse 自托管 / 金标 50→150）——另行 grilling 后才会进场。
 - 非代码轴：公开 URL 运维、真人访谈、demo 口播（执行计划明示不含；M4 已交付项归 v2 spec）。
 - 换前端栈、扩警区、ADR-0001 评级公式修订、服务型数据库、运行时直连外部数据 API（P5 / 红线 / v2 spec Out of Scope 同款）。
@@ -127,6 +127,6 @@ MVP + Phase 2 已把产品推到「数据评级 + eval + 真实运营」的确�
 ## Further Notes
 
 - **拆票已完成**：GitHub issues #16–#25（10 张），本地镜像 `.scratch/safepass-phase3-tickets/issues/`（`publish.sh` 同步）；与执行计划 §2/§2.9/§7 原文的对应关系 + P6 四定案见各票「来源」。Craft（S#/T#）已按票绑定（A1/A3→S2、A2/B1→S1、D1→S3、D2→S7、N1→T1），借鉴细则只读执行计划 §1.1/§1.2 对应行，禁止整份 1100+ 行计划塞 agent 上下文（P0）。
-- **现状台账**：A1/A2/A3 已合并（commit 5bbbedf / 1d651c8 / b6e5e71）；A3 遗留的 L2 cassette 已在 qwen-flash 重录并清棘轮表；基线 587 + eval 15 绿；模型全线 qwen-flash（dev = prod 同源，commit e629adf）。
+- **现状台账**：波 1 十票均已合并并关 GitHub issue。L2 cassette 已按 qwen-flash 重录（勿再把 `progress.txt` 里 A3 时代的「cassette 失效」当现状）。模型全线 qwen-flash（dev = prod 同源）。唯一判定 663 绿。下一动作 = 用户点名的波 2（N2 等），不是回头补波 1。
 - **golden 口径**：B1 修订 golden_set_v1.json 时，优先覆盖现有金标已覆盖的追问形态（细节/对比），不发明新查询类型（D2 芯片文案同源）。
 - **完成承诺对齐**：RALPH.md 登记新任务时，完成承诺引用本 spec 的出口标准与「唯一判定」命令（`python -m pytest tests/ -q`，直跑 `pytest` 会 ModuleNotFoundError）。

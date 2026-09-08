@@ -15,8 +15,10 @@ cookie 载体，零持久化。
 ## 运行
 
 ```bash
-python -m frontend.app        # http://127.0.0.1:8000
+python frontend/app.py        # http://127.0.0.1:8000
 ```
+
+不要用 `python -m frontend.app`：`frontend/__init__.py` 会预导入 `app`，触发 runpy RuntimeWarning。与仓库根 README 审阅者路径第三步同一入口。
 
 路由（全部薄胶水）：
 

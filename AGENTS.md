@@ -4,6 +4,10 @@
 
 Cursor / Codex / 其他编码 agent 开会话先读宪法，再动手。本文件与 `CLAUDE.md` 冲突时以 `CLAUDE.md` 为准。
 
+## 当前阶段（先读，避免把已做的票再做一遍）
+
+Phase 3 **波 1 已收口**（2026-09-09）：GitHub `#16`–`#25` 已全部关闭。不要再实现 N1 注入骨架或 N3 一键复现；不要把 demo 钉到 mock 数据集。波 2（N2 等）只在用户明确点名后动手。权威现状：`docs/specs/safepass-v3-spec.md` 文首状态行 + git log + `python -m pytest tests/ -q`。
+
 ## 唯一接缝与唯一判定
 
 - 唯一接缝：`execute_query(查询文本, 会话画像, 会话状态)`（`safepass/pipeline.py`）。
@@ -18,4 +22,4 @@ Cursor / Codex / 其他编码 agent 开会话先读宪法，再动手。本文�
 - **Git**：push 由用户自己执行（需 VPN）；agent 只 commit。`git add` 用显式路径，禁止 `git add -A`。commit 末尾带 `Co-Authored-By: Claude Code <noreply@anthropic.com>`。
 - **不要跑 headless ralph 循环**（`afk-ralph.sh` 已有优雅失败记录）；机械票人工接管。
 - **Windows**：控制台 GBK 下 Python 中文乱码是显示问题；`git show | python` 管道会损坏 UTF-8，必须重定向文件。
-- **`progress.txt` 已过期**，不要当现状。现状以 `CLAUDE.md` + git log + 实跑唯一判定为准。
+- **`progress.txt` 正文从 A3 段起是历史**，文首「现状」节才有效。不要把旧「cassette 失效」当待办。
