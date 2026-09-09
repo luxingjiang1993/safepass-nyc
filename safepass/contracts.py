@@ -24,7 +24,7 @@ from __future__ import annotations
 
 from typing import Literal, Union
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 
 # 评级枚举（CONTEXT.md 词汇：安全评级；不出现自由文本评级）
 RATING_GREEN = "green"
@@ -150,6 +150,8 @@ class SafetyQueryResult(BaseModel):
     suggestion_grounds：数据依据（可先空但字段必须立，P6 验收硬项）；
     suggestions_source：建议来源明示标记（B1 两路径对照与模板降级路径的
     判别字段；"template" = 模板/降级，"skill" = 受约束生成通过校验）；
+    rating_rationale：覆盖内确定性「评级依据」人话（C1a）；按灯色填配置模板，
+    四档必非空；不进 Skill 输出、不进建议依据列表。
     数据不足（⚪）时 unknowns 非空、charts 为 null、不给评级数值与可信度。
     """
 
@@ -158,6 +160,7 @@ class SafetyQueryResult(BaseModel):
     precinct: int
     rating: RatingEnum
     rating_explainable_basis: float | None = None  # per-100k 与市均值倍数
+    rating_rationale: str = Field(min_length=1)
     confidence_tier: str | None = None
     sample_size: int
     one_liner: str = Field(max_length=30)  # ≤30 字核心结论（AC-005；契约层结构断言）
@@ -179,6 +182,14 @@ class SafetyQueryResult(BaseModel):
     emergency_resources: list[Venue] = Field(default_factory=list)
     profile_notice: str = Field(min_length=1)  # AC-023 画像声明（会话级、关闭即删除）
     disclaimer: str = Field(min_length=1)
+
+    @field_validator("rating_rationale")
+    @classmethod
+    def _rating_rationale_not_blank(cls, value: str) -> str:
+        stripped = value.strip()
+        if not stripped:
+            raise ValueError("rating_rationale 不得为空或空白")
+        return stripped
 
 
 class AreaSummary(BaseModel):

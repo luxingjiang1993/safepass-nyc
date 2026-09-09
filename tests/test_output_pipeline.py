@@ -97,6 +97,7 @@ def _safety_payload(rating: str = "yellow") -> dict[str, Any]:
         "rating": rating,
         "sample_size": 120,
         "one_liner": "上东区：🟡 需注意",
+        "rating_rationale": "相对全市约 1.0 倍，处于需注意区间，数据量充足。",
         "extracted": {"area": None, "crowd": None, "time": None},  # AC-002（issue 09）
         "profile_notice": "画像仅在本次会话生效，关闭页面即删除",  # AC-023（issue 09）
         "sources": ["模拟数据"],
@@ -290,6 +291,7 @@ def test_legal_ratings_anchor_matches_config_forced_tier():
         lambda: contracts.SafetyQueryResult(
             area="上东区", precinct=19, rating="yellow", sample_size=120,
             one_liner="上东区：🟡 需注意",
+            rating_rationale="相对全市约 1.0 倍，处于需注意区间，数据量充足。",
             extracted={"area": None, "crowd": None, "time": None},
             profile_notice="画像仅在本次会话生效，关闭页面即删除",
             sources=["模拟数据"],

@@ -90,3 +90,29 @@ def rate_precinct(
         explanation=template.format(n=stats.sample_size),
         sample_size=stats.sample_size,
     )
+
+
+def format_rating_rationale(
+    rated: RatingResult, cfg: config_loader.AppConfig
+) -> str:
+    """按灯色填配置模板，产出覆盖内「评级依据」人话。零 LLM。
+
+    倍数保留一位小数，与 one_liner city_relative 钩子同口径；⚪ 不填倍数。
+    """
+    template = cfg.rating_rationale.templates.get(rated.rating)
+    if template is None:
+        raise config_loader.ConfigError(
+            f"rating.rating_rationale.templates 缺少灯色 {rated.rating}"
+        )
+    if "{ratio}" not in template:
+        return template.format(n=rated.sample_size)
+    tier_label = cfg.rating_rationale.sample_tier_labels.get(rated.confidence)
+    if tier_label is None:
+        raise config_loader.ConfigError(
+            f"rating.rating_rationale.sample_tier_labels 缺少档位 {rated.confidence}"
+        )
+    return template.format(
+        ratio=f"{rated.ratio_to_city_mean:.1f}",
+        sample_tier=tier_label,
+        n=rated.sample_size,
+    )

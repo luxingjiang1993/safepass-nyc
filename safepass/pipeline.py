@@ -88,6 +88,7 @@ from safepass import (
     guardrails,
     intel_agent,
     output_pipeline,
+    rating_engine,
     routing,
 )
 from safepass.llm_client import LLMClient
@@ -570,6 +571,7 @@ def _build_safety_result(
             rated.ratio_to_city_mean,
             cfg,
         ),
+        rating_rationale=rating_engine.format_rating_rationale(rated, cfg),
         extracted=contracts.ExtractedDimensions(
             area=None if extracted is None else extracted.area,
             crowd=None if extracted is None else extracted.crowd,

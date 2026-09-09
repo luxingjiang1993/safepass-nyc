@@ -2,7 +2,7 @@
 
 首屏（窄屏一屏内）只装结论与行动：
     评级槽（result-head 结论卡片）→ 人话解释槽（one-liner 区块：one_liner
-    数据钩子 + 评级依据，C1 落地前的确定性拼装占位）→ 建议槽（suggestions
+    数据钩子 + 评级依据 rating_rationale）→ 建议槽（suggestions
     常驻区块 + grounds 渲染槽）→ 紧急资源槽，五槽连排（pin-hint 查询语境
     提示排五槽带之后，不插进槽位序列）；
     图表 / community / 来源默认折叠（details 不挂 open）；dimensions /
@@ -33,6 +33,7 @@ def make_safety(**overrides) -> contracts.SafetyQueryResult:
         area="上东区", precinct=19, rating="green",
         rating_explainable_basis=0.62, confidence_tier="HIGH", sample_size=312,
         one_liner="上东区：相对安全",
+        rating_rationale="相对全市约 0.6 倍，数据量充足。",
         extracted=contracts.ExtractedDimensions(area="上东区", crowd=None, time=None),
         dimensions=[{"dimension": "夜间风险", "value": "22:00 后建议走主干道"}],
         suggestions=[
@@ -127,6 +128,7 @@ class TestFirstScreenHierarchy:
         result = make_safety(
             rating="insufficient_data", rating_explainable_basis=None,
             confidence_tier=None, sample_size=6, charts=None,
+            rating_rationale="样本量未过显著性门槛（命中 6 条），因此不评级。",
             unknowns=["该区域过去 12 个月的有效记录过少，暂不足以给出可靠评级。"],
         )
         html = render.render_result(result, CFG)
@@ -138,16 +140,21 @@ class TestFirstScreenHierarchy:
         assert '<details class="unknowns" open>' not in html
 
     def test_rating_explanation_assembly_in_one_liner_slot(self):
-        # 人话解释占位 = one_liner + 评级依据同区块（C1 波 2 换真 rating_rationale）；
-        # 倍数保留一位小数，与 one_liner city_relative 钩子同精度（不打架）
-        html = render.render_result(make_safety(rating_explainable_basis=0.62), CFG)
+        # 人话解释 = one_liner + 唯一一行评级依据（C1a rating_rationale）
+        html = render.render_result(
+            make_safety(rating_rationale="相对全市约 0.6 倍，数据量充足。"),
+            CFG,
+        )
         block = html[
             _index_of(html, 'class="one-liner"') :
             html.index("</section>", _index_of(html, 'class="one-liner"'))
         ]
         assert "一句话总结" in block
-        assert "0.6" in block and "市均值" in block
+        assert "评级依据" in block
+        assert "相对全市约 0.6 倍" in block
         assert "0.62" not in block
+        assert "该警区犯罪率（per 100k）" not in html
+        assert block.index("上东区：相对安全") < block.index("评级依据")
 
     def test_degraded_banner_first_screen_between_rating_and_suggestions(self):
         result = make_safety(llm_degraded=True, degradation_notice=NOTICE)

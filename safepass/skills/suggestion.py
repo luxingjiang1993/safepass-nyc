@@ -91,7 +91,8 @@ class SuggestionSkillOut(BaseModel):
     """建议 Skill 的结构化输出契约（P2 契约草案的落地，issue 16 / A1）。
 
     P6 定案：one_liner 不在本契约（A3 确定性票，LLM 不写 one_liner）；
-    rating / confidence / 越界判定是禁止字段（红线 2，确定性引擎专写）。
+    rating / confidence / 越界判定 / rating_rationale 是禁止字段
+    （红线 2，确定性引擎专写；C1a 评级依据同样零 LLM）。
     """
 
     suggestions: list[str]

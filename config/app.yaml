@@ -26,6 +26,21 @@ rating:
     MODERATE: "基于本次查询命中的 {n} 条记录，数据量适中"
     HIGH: "基于本次查询命中的 {n} 条记录，数据量充足"
 
+  # 评级依据人话（C1a）：按灯色四套模板，装配层纯函数填空，LLM 不写。
+  # {ratio} = 相对全市倍数（一位小数，与 one_liner city_relative 同口径）；
+  # {sample_tier} = sample_tier_labels 对外中文；{n} = 真实命中数。
+  # insufficient_data 不得含倍数占位。
+  rating_rationale:
+    templates:
+      green: "相对全市约 {ratio} 倍，{sample_tier}。"
+      yellow: "相对全市约 {ratio} 倍，处于需注意区间，{sample_tier}。"
+      red: "相对全市约 {ratio} 倍，处于高风险区间，{sample_tier}。"
+      insufficient_data: "样本量未过显著性门槛（命中 {n} 条），因此不评级。"
+    sample_tier_labels:
+      LOW: "数据量有限"
+      MODERATE: "数据量适中"
+      HIGH: "数据量充足"
+
 coverage:
   # 核心警区（CONTEXT.md）：19 上东区 / 109 法拉盛 / 5 唐人街 / 90 威廉斯堡 / 84 布鲁克林高地
   precincts: [19, 109, 5, 90, 84]

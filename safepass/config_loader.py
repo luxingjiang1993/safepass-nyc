@@ -16,6 +16,8 @@ from typing import Any
 
 import yaml
 
+from safepass import contracts
+
 # 项目根：safepass/config_loader.py -> 项目根
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 # config/app.yaml 相对项目根
@@ -75,6 +77,18 @@ class SampleSizeTier:
     max: int | None
     rating: str | None
     confidence: str | None
+
+
+@dataclass(frozen=True)
+class RatingRationaleConfig:
+    """评级依据人话模板（C1a）：按灯色填空，字面量只活在配置。
+
+    templates 键必须覆盖合法评级枚举；绿/黄/红含 {ratio}/{sample_tier}；
+    ⚪ 含 {n}、禁止 {ratio}。sample_tier_labels 把可信度档映射为对外中文。
+    """
+
+    templates: dict[str, str]
+    sample_tier_labels: dict[str, str]
 
 
 @dataclass(frozen=True)
@@ -344,6 +358,7 @@ class AppConfig:
     thresholds: RatingThresholds
     sample_size_tiers: tuple[SampleSizeTier, ...]
     confidence_explanations: dict[str, str]
+    rating_rationale: RatingRationaleConfig
     covered_precincts: frozenset[int]
     excluded_precincts: frozenset[int]
     precinct_populations: dict[int, int]
@@ -421,6 +436,46 @@ def load_config(path: str | Path | None = None) -> AppConfig:
     explanations = _require(rating, "confidence_explanations", "rating")
     if not isinstance(explanations, dict) or not explanations:
         raise ConfigError("rating.confidence_explanations 必须是非空映射")
+
+    rationale_raw = _require(rating, "rating_rationale", "rating")
+    if not isinstance(rationale_raw, dict):
+        raise ConfigError("rating.rating_rationale 必须是映射")
+    templates_raw = _require(rationale_raw, "templates", "rating.rating_rationale")
+    labels_raw = _require(rationale_raw, "sample_tier_labels", "rating.rating_rationale")
+    if not isinstance(templates_raw, dict) or not isinstance(labels_raw, dict):
+        raise ConfigError("rating.rating_rationale.templates / sample_tier_labels 必须是映射")
+    templates = {str(k): str(v) for k, v in templates_raw.items()}
+    sample_tier_labels = {str(k): str(v) for k, v in labels_raw.items()}
+    expected_ratings = set(contracts.LEGAL_RATINGS)
+    if set(templates) != expected_ratings:
+        raise ConfigError(
+            "rating.rating_rationale.templates 的键必须恰好等于合法评级枚举"
+            f"（多配 {sorted(set(templates) - expected_ratings)}，"
+            f"少配 {sorted(expected_ratings - set(templates))}）"
+        )
+    if any(not text.strip() for text in templates.values()):
+        raise ConfigError("rating.rating_rationale.templates 的人话不得为空")
+    for rating_key, text in templates.items():
+        if rating_key == contracts.RATING_INSUFFICIENT:
+            if "{ratio}" in text:
+                raise ConfigError("insufficient_data 模板不得含 {ratio} 倍数占位")
+            if "{n}" not in text:
+                raise ConfigError("insufficient_data 模板必须含 {n} 命中数占位")
+        else:
+            if "{ratio}" not in text:
+                raise ConfigError(f"{rating_key} 模板必须含 {{ratio}} 倍数占位")
+            if "{sample_tier}" not in text:
+                raise ConfigError(f"{rating_key} 模板必须含 {{sample_tier}} 样本档占位")
+    expected_confidences = {t.confidence for t in tiers if t.confidence is not None}
+    if set(sample_tier_labels) != expected_confidences:
+        raise ConfigError(
+            "rating.rating_rationale.sample_tier_labels 的键必须恰好等于样本量档的可信度"
+        )
+    if any(not label.strip() for label in sample_tier_labels.values()):
+        raise ConfigError("rating.rating_rationale.sample_tier_labels 的中文不得为空")
+    rating_rationale = RatingRationaleConfig(
+        templates=templates, sample_tier_labels=sample_tier_labels
+    )
 
     coverage = _require(data, "coverage", "root")
     covered = frozenset(int(p) for p in _require(coverage, "precincts", "coverage"))
@@ -877,6 +932,7 @@ def load_config(path: str | Path | None = None) -> AppConfig:
         thresholds=thresholds,
         sample_size_tiers=tiers,
         confidence_explanations=dict(explanations),
+        rating_rationale=rating_rationale,
         covered_precincts=covered,
         excluded_precincts=excluded,
         precinct_populations=precinct_populations,

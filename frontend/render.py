@@ -24,8 +24,7 @@ issue 12 追加（纯渲染层职责）：
 
 票 06 / D1 追加（首屏信息架构，S3 Crisis24 简报槽）：
     首屏五槽 = 评级（result-head 结论卡片）→ 人话解释（one-liner 区块：
-    one_liner 数据钩子 + 评级依据，C1 rating_rationale 落地前的确定性拼装
-    占位，波 2 换真 C1）→ 建议（suggestions 常驻区块 + grounds 渲染槽：
+    one_liner 数据钩子 + 评级依据 rating_rationale）→ 建议（suggestions 常驻区块 + grounds 渲染槽：
     有依据小号「建议依据」，无依据标「通用建议」）→ 紧急资源；
     图表 / community / 来源默认折叠（details 不挂 open）；dimensions /
     unknowns 同样折叠（⚪ 数据不足时 unknowns 例外展开——「为什么没评级」
@@ -462,20 +461,12 @@ def render_safety(
         f'{_confidence_block(result, cfg)}\n'
         f'</header>'
     )
-    # 首屏「人话解释」占位（票 06 / D1，S3 槽位 2）：C1 rating_rationale 落地前
-    # 用现有字段确定性拼装 = one_liner（A3 数据钩子）+ 评级依据（per-100k
-    # 与市均值倍数，⚪ 时契约为 null 不渲染）；波 2 换真 C1。
-    # 倍数保留一位小数：与 A3 one_liner city_relative 钩子同精度同口径
-    # （同区块内不得出现「0.7 倍」与「0.67 倍」打架）。
-    basis = ""
-    if result.rating_explainable_basis is not None:
-        basis = (
-            f'<p class="basis">评级依据：该警区犯罪率（per 100k）约为全市均值的 '
-            f'{result.rating_explainable_basis:.1f} 倍</p>'
-        )
+    # 首屏「人话解释」（C1a）：核心结论行 + 唯一一行评级依据（配置模板填空）。
+    # 倍数口径由装配层与 one_liner city_relative 钩子对齐，本层只渲染字段。
     one_liner = (
         f'<section class="one-liner"><h2>📋 一句话总结</h2>'
-        f'<p>{_esc(result.one_liner)}</p>{basis}\n</section>'
+        f'<p>{_esc(result.one_liner)}</p>'
+        f'<p class="basis">评级依据：{_esc(result.rating_rationale)}</p>\n</section>'
     )
 
     dimensions = ""

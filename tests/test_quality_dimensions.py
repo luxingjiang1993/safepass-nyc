@@ -30,6 +30,7 @@ def _safety_result(
         rating="green",
         sample_size=105,
         one_liner="上东区：🟢 相对安全",
+        rating_rationale="相对全市约 0.6 倍，数据量充足。",
         extracted=contracts.ExtractedDimensions(),
         suggestions=suggestions,
         suggestion_grounds=[
