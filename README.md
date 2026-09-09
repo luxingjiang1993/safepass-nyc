@@ -80,6 +80,8 @@ python frontend/app.py
 
 `python scripts/demo_queries.py --open` 可在摘要打完后于本进程打开本地页（阻塞；Ctrl+C 停止）。与 E7 共用同一入口，无第二套 demo。
 
+换机器不漂（依赖 `==` 钉、pickle protocol=5、embedding 标识、FAISS ASCII 路径、cassette/judge 指针）见 [`docs/reproducibility.md`](docs/reproducibility.md)。该页不重做上述三命令。
+
 ## 常用命令
 
 ```bash
