@@ -267,27 +267,68 @@ def _followup_chips(
     )
 
 
+# ---------------------------------------------------------------- 覆盖清单（D5/C6：单一事实源 = 配置别名表）
+
+def _coverage_names_joined(cfg: config_loader.AppConfig) -> str:
+    """覆盖警区规范中文名顿号连接，顺序与 addressing.canonical_names 一致。"""
+    return "、".join(addressing.canonical_names(cfg).values())
+
+
+def _coverage_scope_block(
+    cfg: config_loader.AppConfig, hit_area: str, hit_precinct: int
+) -> str:
+    """覆盖内结果页：覆盖清单 + 本次命中，与首页同源。"""
+    names = _coverage_names_joined(cfg)
+    return (
+        f'<p class="coverage-scope">'
+        f"我们覆盖这些区：{_esc(names)}。"
+        f"本次命中的是{_esc(hit_area)}（警区 {_esc(hit_precinct)}）。"
+        f"</p>"
+    )
+
+
+def _in_coverage_structure_sketch(cfg: config_loader.AppConfig) -> str:
+    """越界页结构示意：只标覆盖内槽位，不写该地点灯色或犯罪率。"""
+    names = _coverage_names_joined(cfg)
+    return (
+        '<section class="in-coverage-structure">\n'
+        "  <h2>若在覆盖内你会看到什么</h2>\n"
+        f"  <p>覆盖范围：{_esc(names)}。"
+        "下面是覆盖内结果的空槽结构，不是本查询地点的灯色或案件数字。</p>\n"
+        "  <ul class=\"structure-slots\">\n"
+        "    <li><span class=\"slot-label\">安全评级</span>"
+        "<span class=\"slot-empty\">空槽</span></li>\n"
+        "    <li><span class=\"slot-label\">核心结论行</span>"
+        "<span class=\"slot-empty\">空槽</span></li>\n"
+        "    <li><span class=\"slot-label\">场景化建议</span>"
+        "<span class=\"slot-empty\">空槽</span></li>\n"
+        "  </ul>\n"
+        "</section>"
+    )
+
+
 # ---------------------------------------------------------------- 首页
 
 def render_home(cfg: config_loader.AppConfig, profile: dict[str, Any] | None = None) -> str:
-    """首页（PRD §6.2 线框 1）：问候 + 查询输入 + 五个核心警区一键快速查询
-    + 画像侧边栏（会话级，可选）。
+    """首页（PRD §6.2 线框 1）：价值主张 + 查询输入 + 五个核心警区一键快速查询
+    + 覆盖诚实 + 画像侧边栏（会话级，可选）。
 
     快速查询按钮是零输入查询链接（`/query?q=<规范中文名>`），区域清单来自
-    配置别名表（addressing.canonical_names，顺序稳定），不硬编码警区。
+    配置别名表（addressing.canonical_names，顺序稳定），不硬编码警区号。
     """
     names = addressing.canonical_names(cfg)
     buttons = "\n".join(
         f'    <a class="quick-btn" href="/query?q={_esc(name)}">📍 {_esc(name)}</a>'
         for name in names.values()
     )
+    coverage_list = _esc(_coverage_names_joined(cfg))
     body = f"""<header class="hero">
-  <h1>🛡️ SafePass NYC</h1>
-  <p class="tagline">你的纽约安全管家</p>
+  <h1>SafePass NYC</h1>
+  <p class="tagline">中文安全情报；数据评级，AI 只建议</p>
 </header>
-<section class="greeting">
-  <p>你好呀 👋</p>
-  <p>不管是租房、通勤还是晚上回家，<br>有安全方面的疑问都可以问我～</p>
+<section class="coverage-honesty">
+  <p>目前只覆盖五个核心警区：{coverage_list}。</p>
+  <p>查询这些区域以外的地点时，我们会诚实降级：告知没有本区数据，不编灯。</p>
 </section>
 <form class="query-form" action="/query" method="get">
   <input type="text" name="q" placeholder="比如：上东区晚上安全吗？我是女生" aria-label="输入你的安全问题" required>
@@ -514,6 +555,8 @@ def render_safety(
             # （不插进槽位序列）；其余细节默认折叠（details 不挂 open）
             _back_link(), header, _llm_degraded_banner(result, cfg), one_liner,
             suggestions, venues,
+            # 票 05 / C6：覆盖清单与命中警区，排在五槽带之后（不插进首屏槽位）
+            _coverage_scope_block(cfg, result.area, result.precinct),
             # 票 07 / D2：追问芯片 = 五槽带之后的明显次级行动（S7），
             # 与 pin_hint 同层，不插进槽位序列
             _followup_chips(result, profile, cfg), _pin_hint(result, profile),
@@ -614,6 +657,11 @@ def render_degraded(
         f'    <a class="quick-btn" href="/query?q={_esc(name)}">📍 {_esc(name)}</a>'
         for name in names.values()
     )
+    structure_sketch = (
+        _in_coverage_structure_sketch(cfg)
+        if result.degraded_capability == contracts.CAPABILITY_OUT_OF_COVERAGE
+        else ""
+    )
     invitation = (
         f'<section class="reselect"><h2>🧭 重新选择</h2>\n'
         f'  <p>{_esc(result.reselection_invitation)}</p>\n'
@@ -639,6 +687,7 @@ def render_degraded(
             f'<header class="result-head degraded"><h1>🛠️ 暂时无法给出完整分析</h1></header>',
             f'<section class="degraded-message"><p>{_esc(result.message)}</p></section>',
             _llm_degraded_banner(result, cfg),
+            structure_sketch,
             alternative_block, invitation, suggestions, venues, sources,
             _profile_sidebar(profile, cfg),
             _disclaimer(result.disclaimer),

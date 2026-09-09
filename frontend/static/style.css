@@ -24,7 +24,25 @@ body {
 /* --- 首页 --- */
 .hero h1 { margin-bottom: 0; }
 .tagline { margin-top: 0.25rem; color: #666; }
-.greeting p { margin: 0.4rem 0; }
+.coverage-honesty p { margin: 0.4rem 0; color: #444; }
+.coverage-scope { margin: 0.75rem 0; color: #444; font-size: 0.95rem; }
+.in-coverage-structure {
+  background: #fff;
+  border: 1px dashed #ccc;
+  border-radius: 0.5rem;
+  padding: 0.75rem 1rem;
+  margin: 1rem 0;
+}
+.in-coverage-structure h2 { font-size: 1rem; margin: 0 0 0.4rem; }
+.structure-slots { list-style: none; padding: 0; margin: 0.5rem 0 0; }
+.structure-slots li {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.35rem 0;
+  border-top: 1px solid #eee;
+}
+.slot-empty { color: #888; }
 
 .query-form {
   display: flex;
