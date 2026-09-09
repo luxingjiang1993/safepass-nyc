@@ -1,0 +1,166 @@
+{
+  "version": "v1",
+  "description": "B4 混合检索回归标注（issue 31）。约 20 条 query → 应命中文档标识，钉在 mock 索引世界（fixtures/index + fixtures/knowledge）。查询优先复用金标覆盖内问法、A2 召回探针与情报检索集知识锚点。改名单或改坏索引必须让 tests/test_b4_retrieval_regression.py 变红。",
+  "entries": [
+    {
+      "id": "B4-01",
+      "query": "法拉盛晚上安全吗？",
+      "expected_doc_ids": ["p109_overview"],
+      "precinct": 109,
+      "theme": "overview",
+      "source": "golden G31"
+    },
+    {
+      "id": "B4-02",
+      "query": "法拉盛 换汇诈骗",
+      "expected_doc_ids": ["p109_scam"],
+      "precinct": 109,
+      "theme": "scam",
+      "source": "intel RETRIEVAL_CASES"
+    },
+    {
+      "id": "B4-03",
+      "query": "法拉盛 中文警员",
+      "expected_doc_ids": ["p109_emergency"],
+      "precinct": 109,
+      "theme": "emergency",
+      "source": "a2 GOLDEN_FACT_PROBES"
+    },
+    {
+      "id": "B4-04",
+      "query": "法拉盛最近有什么针对华人的骗局要小心吗",
+      "expected_doc_ids": ["p109_scam"],
+      "precinct": 109,
+      "theme": "scam",
+      "source": "a2 GOLDEN_FACT_PROBES"
+    },
+    {
+      "id": "B4-05",
+      "query": "flushing 缅街 商业区 扒窃",
+      "expected_doc_ids": ["p109_overview"],
+      "precinct": 109,
+      "theme": "overview",
+      "source": "intel RETRIEVAL_CASES"
+    },
+    {
+      "id": "B4-06",
+      "query": "上东区晚上安全吗？",
+      "expected_doc_ids": ["p19_overview"],
+      "precinct": 19,
+      "theme": "overview",
+      "source": "golden G25"
+    },
+    {
+      "id": "B4-07",
+      "query": "上东区 仇恨犯罪",
+      "expected_doc_ids": ["p19_overview"],
+      "precinct": 19,
+      "theme": "overview",
+      "source": "intel RETRIEVAL_CASES / a2"
+    },
+    {
+      "id": "B4-08",
+      "query": "上东区 钓鱼短信 银行账户冻结",
+      "expected_doc_ids": ["p19_scam"],
+      "precinct": 19,
+      "theme": "scam",
+      "source": "intel RETRIEVAL_CASES"
+    },
+    {
+      "id": "B4-09",
+      "query": "上东区夜里一个人走路回家要注意什么",
+      "expected_doc_ids": ["p19_overview"],
+      "precinct": 19,
+      "theme": "overview",
+      "source": "a2 GOLDEN_FACT_PROBES"
+    },
+    {
+      "id": "B4-10",
+      "query": "唐人街晚上安全吗？",
+      "expected_doc_ids": ["p5_overview"],
+      "precinct": 5,
+      "theme": "overview",
+      "source": "golden G36"
+    },
+    {
+      "id": "B4-11",
+      "query": "唐人街 冒充使领馆诈骗",
+      "expected_doc_ids": ["p5_scam"],
+      "precinct": 5,
+      "theme": "scam",
+      "source": "intel RETRIEVAL_CASES"
+    },
+    {
+      "id": "B4-12",
+      "query": "唐人街 免费法律援助",
+      "expected_doc_ids": ["p5_emergency"],
+      "precinct": 5,
+      "theme": "emergency",
+      "source": "a2 GOLDEN_FACT_PROBES"
+    },
+    {
+      "id": "B4-13",
+      "query": "唐人街老人总接到奇怪的电话怎么办",
+      "expected_doc_ids": ["p5_scam"],
+      "precinct": 5,
+      "theme": "scam",
+      "source": "a2 GOLDEN_FACT_PROBES"
+    },
+    {
+      "id": "B4-14",
+      "query": "威廉斯堡晚上安全吗？",
+      "expected_doc_ids": ["p90_overview"],
+      "precinct": 90,
+      "theme": "overview",
+      "source": "golden G41"
+    },
+    {
+      "id": "B4-15",
+      "query": "威廉斯堡 租房 押金诈骗",
+      "expected_doc_ids": ["p90_scam"],
+      "precinct": 90,
+      "theme": "scam",
+      "source": "a2 GOLDEN_FACT_PROBES"
+    },
+    {
+      "id": "B4-16",
+      "query": "williamsburg 夜间 娱乐场所 纠纷",
+      "expected_doc_ids": ["p90_emergency"],
+      "precinct": 90,
+      "theme": "emergency",
+      "source": "intel RETRIEVAL_CASES"
+    },
+    {
+      "id": "B4-17",
+      "query": "布鲁克林高地安全吗？",
+      "expected_doc_ids": ["p84_overview"],
+      "precinct": 84,
+      "theme": "overview",
+      "source": "golden G45"
+    },
+    {
+      "id": "B4-18",
+      "query": "布鲁克林高地 租房 押金 骗局",
+      "expected_doc_ids": ["p84_scam"],
+      "precinct": 84,
+      "theme": "scam",
+      "source": "intel RETRIEVAL_CASES"
+    },
+    {
+      "id": "B4-19",
+      "query": "布鲁克林高地 急诊 医院",
+      "expected_doc_ids": ["p84_emergency"],
+      "precinct": 84,
+      "theme": "emergency",
+      "source": "intel RETRIEVAL_CASES"
+    },
+    {
+      "id": "B4-20",
+      "query": "布鲁克林 大桥公园 走散 集合点",
+      "expected_doc_ids": ["p84_emergency"],
+      "precinct": 84,
+      "theme": "emergency",
+      "source": "intel RETRIEVAL_CASES"
+    }
+  ]
+}
