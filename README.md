@@ -1,6 +1,6 @@
 # SafePass NYC — 工程骨架与环境说明
 
-> 产品文档：MVP 以 `docs/specs/safepass-nyc-mvp-spec.md`（v1.2，历史档案）为准；Phase 2 见 `docs/specs/safepass-v2-spec.md`（M1–M4，已交付）；Phase 3 波 1 见 `docs/specs/safepass-v3-spec.md`（**已收口**，GitHub `#16`–`#25` 已关）。MVP 任务池（已归档）见 `docs/archive/ralph-mvp-pool.md`；领域词汇见 CONTEXT.md；架构决策见 `docs/adr/`。
+> 产品文档：MVP 以 `docs/specs/safepass-nyc-mvp-spec.md`（v1.2，历史档案）为准；Phase 2 见 `docs/specs/safepass-v2-spec.md`（M1–M4，已交付）；Phase 3 波 1 见 `docs/specs/safepass-v3-spec.md`（**已收口**）；波 2 第二刀见 `docs/specs/safepass-v3-wave2-second-knife-spec.md`（**已收口**，GitHub `#16`–`#34` 已关）。MVP 任务池（已归档）见 `docs/archive/ralph-mvp-pool.md`；领域词汇见 CONTEXT.md；架构决策见 `docs/adr/`。
 > 本文档只回答：**产品主路径是什么、目录里有什么、环境怎么搭、命令怎么跑**。
 
 ## 产品主路径（叙事与代码对齐，E1/ADR-0003）

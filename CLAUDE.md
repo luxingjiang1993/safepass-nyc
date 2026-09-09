@@ -4,12 +4,12 @@
 
 ## 项目一句话
 
-面向纽约中文用户（留学生、新移民、访客）的 AI 安全情报产品：查询地点 → NYPD 数据 + 混合检索 → 四级安全评级 + 场景化建议。MVP 与 Phase 2 已关闭；Phase 3 **波 1 已收口**；**波 2 第一刀已收口**（GitHub `#16`–`#28` 已关，见 `docs/specs/safepass-v3-spec.md`）。波 2 其余未经用户点名不得开票。测试基线以「唯一判定」为准。
+面向纽约中文用户（留学生、新移民、访客）的 AI 安全情报产品：查询地点 → NYPD 数据 + 混合检索 → 四级安全评级 + 场景化建议。MVP 与 Phase 2 已关闭；Phase 3 **波 1 已收口**；**波 2 第一刀已收口**；**波 2 第二刀已收口**（GitHub `#16`–`#34` 已关，见 `docs/specs/safepass-v3-wave2-second-knife-spec.md`）。波 2 其余未经用户点名不得开票。测试基线以「唯一判定」为准。
 
 ## 唯一接缝与唯一判定
 
 - **唯一接缝**：`execute_query(查询文本, 会话画像, 会话状态)`（`safepass/pipeline.py`）。后端全部能力经此进入。
-- **唯一判定**：`python -m pytest tests/ -q` 全绿（基线 669，随票递增）。没有"看起来对了"——测试不过就是没过。**禁止裸跑 `pytest`**：`safepass` 不在 sys.path（pytest.ini 未配 pythonpath），裸跑必 ModuleNotFoundError；L2 eval 套件同理走 `python -m pytest tests/eval -q`。
+- **唯一判定**：`python -m pytest tests/ -q` 全绿（基线 735，随票递增）。没有"看起来对了"——测试不过就是没过。**禁止裸跑 `pytest`**：`safepass` 不在 sys.path（pytest.ini 未配 pythonpath），裸跑必 ModuleNotFoundError；L2 eval 套件同理走 `python -m pytest tests/eval -q`。
 
 ## Karpathy 宪法
 
