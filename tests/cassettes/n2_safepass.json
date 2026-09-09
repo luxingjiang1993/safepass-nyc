@@ -1,0 +1,256 @@
+{
+  "interactions": [
+    {
+      "fingerprint": "0101131fcdb1c2bfc6fa0957671b95af3ffe621fddcafc00baa84a78439e27cf",
+      "response": {
+        "content": "{\"area\": \"上东区\", \"crowd\": null, \"time\": \"晚上\"}",
+        "model": "qwen-flash"
+      }
+    },
+    {
+      "fingerprint": "31d8c839e1c7e90ca2c6ffe4bca6835d176bfd3d94332641bff405196ea7468d",
+      "response": {
+        "content": "{\"suggestions\": [\"夜间在上东区独行时，应选择照明良好、行人较多的主街道，避免走公园或滨河步道等人流量较少的偏僻路线。\", \"进入公寓楼时，务必核实访客身份，警惕冒充快递或维修人员尾随入楼的作案手法，切勿随意开门。\", \"若接到自称使领馆或公检法人员的电话要求转账，应立即挂断并拨打911或联系警方核实，此类电话多为诈骗。\", \"夜间外出尽量结伴而行，避免单独在街边停留或使用陌生链接，以防遭遇电信诈骗或人身风险。\", \"如遇紧急情况，请直接拨打911，可要求提供中文翻译服务；非紧急事项可拨打311咨询或联系警局非紧急电话。\"], \"suggestion_grounds\": [{\"doc_id\": \"p19_overview\", \"quote\": \"公园与滨河步道夜间人流量减少，独行建议走照明良好、有行人的路线。\"}, {\"doc_id\": \"p19_overview\", \"quote\": \"访客冒充快递/维修人员尾随入楼是常见作案手法，注意核实身份。\"}, {\"doc_id\": \"p19_scam\", \"quote\": \"使领馆不会电话要求转账；涉及\\\"秘密配合调查\\\"的说法可直接挂断并拨打 911 或向警局核实。\"}, {\"doc_id\": \"p19_scam\", \"quote\": \"夜间独行尽量结伴，走主街与照明良好路段。\"}, {\"doc_id\": \"p19_emergency\", \"quote\": \"紧急情况下优先拨 911，不要自行前往警局而延误。\"}]}",
+        "model": "qwen-flash"
+      }
+    },
+    {
+      "fingerprint": "a8882919443c7b1fbbf0ab9fa01929ff605d1676dc9f4586aa49fa31a20a950b",
+      "response": {
+        "content": "{\"area\": \"上东区\", \"crowd\": null, \"time\": null}",
+        "model": "qwen-flash"
+      }
+    },
+    {
+      "fingerprint": "ca835a76f4671ace4e95f728789fea95bfb18f72e4e9137ee39e2973319a7356",
+      "response": {
+        "content": "{\"suggestions\": [\"夜间独行时选择照明良好、行人较多的主街，避免走公园或滨河步道的偏僻小路\", \"进入公寓楼前核实访客身份，不轻易为陌生人开门，防止尾随入楼\", \"接到自称使领馆或公检法的电话时，不转账、不提供账户信息，直接挂断并拨打 911 核实\"], \"suggestion_grounds\": [{\"doc_id\": \"p19_overview\", \"quote\": \"公园与滨河步道夜间人流量减少，独行建议走照明良好、有行人的路线。\"}, {\"doc_id\": \"p19_overview\", \"quote\": \"上东区住宅以公寓楼为主，大堂门禁（doorman）普遍；访客冒充快递/维修人员尾随入楼是常见作案手法，注意核实身份。\"}, {\"doc_id\": \"p19_scam\", \"quote\": \"使领馆不会电话要求转账；涉及\\\"秘密配合调查\\\"的说法可直接挂断并拨打 911 或向警局核实。\"}]}",
+        "model": "qwen-flash"
+      }
+    },
+    {
+      "fingerprint": "7210ef50f3535d21b07792c830ec0dc358b6e5214cfa506580c175d3a1c1d7f1",
+      "response": {
+        "content": "{\"area\": \"法拉盛\", \"crowd\": null, \"time\": \"晚上\"}",
+        "model": "qwen-flash"
+      }
+    },
+    {
+      "fingerprint": "396a641726e1da3ef554233db7ffc79ed0bfcbdd1350a98fb61b02e1a7f0eba1",
+      "response": {
+        "content": "{\"suggestions\": [\"夜间在缅街商业区行走时，将背包前背并避免将手机放在外衣口袋，以防扒窃\", \"深夜在主街-法拉盛7号线地铁站周边独行时，留意周围环境，尽量选择人流较多的路径通行\", \"如遇冒充使领馆或公检法的电话要求转账，立即挂断并拨打官方公开电话核实，不轻信'保密要求'\"], \"suggestion_grounds\": [{\"doc_id\": \"p109_overview\", \"quote\": \"缅街/罗斯福大道一带拥挤，注意背包前背、手机勿放外衣口袋。\"}, {\"doc_id\": \"p109_overview\", \"quote\": \"深夜地铁站（Main St–Flushing 7号线终点）周边人流量骤减，独行注意周边环境。\"}, {\"doc_id\": \"p109_scam\", \"quote\": \"使领馆不会电话要求转账；遇到'保密要求'即高度可疑，挂断后自行拨打官方公开电话核实。\"}]}",
+        "model": "qwen-flash"
+      }
+    },
+    {
+      "fingerprint": "2ddb9141ffb72b53958a719a42146f330804cfda1c7bf32495e3afce4915c622",
+      "response": {
+        "content": "{\"area\": \"法拉盛地铁站\", \"crowd\": null, \"time\": null}",
+        "model": "qwen-flash"
+      }
+    },
+    {
+      "fingerprint": "a979c96fe2075548f0d77f8ce9a0b055ed5bf1a30a3aa1febf3b6e9db4cf4eb6",
+      "response": {
+        "content": "{\"suggestions\": [\"在法拉盛地铁站（Main St–Flushing 7号线终点）夜间出行时，避免独行，注意周边环境与照明情况\", \"在缅街（Main Street）商业区人流密集处，背包应前背，手机勿放外衣口袋以防扒窃\", \"在法拉盛地铁站附近活动时，尽量避开深夜时段，因夜间案件发生率占总案件的36%\"], \"suggestion_grounds\": [{\"doc_id\": \"p109_overview\", \"quote\": \"深夜地铁站（Main St–Flushing 7号线终点）周边人流量骤减，独行注意周边环境。\"}, {\"doc_id\": \"p109_overview\", \"quote\": \"缅街/罗斯福大道一带拥挤，注意背包前背、手机勿放外衣口袋。\"}, {\"doc_id\": \"p109_overview\", \"quote\": \"昼夜分布：白天 58 / 夜间 36\"}]}",
+        "model": "qwen-flash"
+      }
+    },
+    {
+      "fingerprint": "73d4e6f6452828ce8cefa7c7cb193f33f4abc83b830ddd0e4ac95bd5ea80fb88",
+      "response": {
+        "content": "{\"suggestions\": [\"在法拉盛地铁站白天人流密集时，将背包前背以防止扒窃\", \"夜间在法拉盛地铁站周边独行时，注意观察周围环境并选择照明良好的路线\", \"在缅街/罗斯福大道一带购物或出行时，避免将手机放在外衣口袋\"], \"suggestion_grounds\": [{\"doc_id\": \"p109_overview\", \"quote\": \"昼夜分布：白天 58 / 夜间 36\"}]}",
+        "model": "qwen-flash"
+      }
+    },
+    {
+      "fingerprint": "607c320e4b8690ac5a52f63b067240043f730a4f50ed27241a0de339c813b63d",
+      "response": {
+        "content": "{\"suggestions\": [\"夜间在法拉盛地铁站（Main St–Flushing 7号线终点）周边独行时，注意观察周围环境，避免进入照明不足或人少区域\", \"白天在缅街/罗斯福大道一带行走时，将背包前背并避免将手机放在外衣口袋\", \"在法拉盛地铁站附近购物或停留时，避免携带大量现金或显眼贵重物品\"], \"suggestion_grounds\": [{\"doc_id\": \"p109_overview\", \"quote\": \"昼夜分布：白天 58 / 夜间 36\"}]}",
+        "model": "qwen-flash"
+      }
+    },
+    {
+      "fingerprint": "978e2e59e4c9b3bb60af91eb6aef404faca0f6d6e53e592c399408fe6b40b112",
+      "response": {
+        "content": "{\"suggestions\": [\"白天在法拉盛地铁站附近行走时，注意背包前背，避免将手机放在外衣口袋\", \"夜间在法拉盛地铁站周边独行时，留意照明情况和周围环境，尽量选择人流较多的路线\", \"在缅街/罗斯福大道一带人流密集区域，警惕扒窃风险，保持物品随身\"], \"suggestion_grounds\": [{\"doc_id\": \"p109_overview\", \"quote\": \"昼夜分布：白天 58 / 夜间 36\"}]}",
+        "model": "qwen-flash"
+      }
+    },
+    {
+      "fingerprint": "c85c54f55d62d23cd560fd6a3cb1396540c91f04d32d879c30e1bf3afa1f7439",
+      "response": {
+        "content": "{\"area\": \"法拉盛\", \"crowd\": null, \"time\": \"傍晚\"}",
+        "model": "qwen-flash"
+      }
+    },
+    {
+      "fingerprint": "4ae07a0d7145272be7b367b6c50c2dc3c21001ae7d2ad7c3845e6a9b68187dec",
+      "response": {
+        "content": "{\"suggestions\": [\"傍晚在缅街商业区行走时，将背包前背以防扒窃\", \"傍晚在缅街或罗斯福大道一带排队付款时，手机和钱包勿放外衣口袋\", \"遇到正在发生的街头诈骗或扒窃，优先确保自身安全再报警\", \"傍晚独行经过深夜地铁站（Main St–Flushing 7号线终点）周边时，注意观察周围环境\"], \"suggestion_grounds\": [{\"doc_id\": \"p109_overview\", \"quote\": \"缅街/罗斯福大道一带拥挤，注意背包前背、手机勿放外衣口袋。\"}, {\"doc_id\": \"p109_overview\", \"quote\": \"缅街商业区人流密集，扒窃与街头诈骗是该类商业区的常见治安问题（经验性描述）。\"}, {\"doc_id\": \"p109_emergency\", \"quote\": \"缅街商业区遇到正在发生的扒窃/诈骗，先确保人身安全再报警。\"}, {\"doc_id\": \"p109_overview\", \"quote\": \"深夜地铁站（Main St–Flushing 7号线终点）周边人流量骤减，独行注意周边环境。\"}]}",
+        "model": "qwen-flash"
+      }
+    },
+    {
+      "fingerprint": "ce901ae498eca7bdc4f3523810292986723d45962d9843c06a695cddca6ba7c5",
+      "response": {
+        "content": "{\"suggestions\": [\"傍晚在缅街商业区行走时，应将背包前背以防止扒窃\", \"傍晚在缅街餐馆或超市付款时，避免将手机和钱包随意放置于外衣口袋\"], \"suggestion_grounds\": [{\"doc_id\": \"p109_overview\", \"quote\": \"缅街商业区人流密集，扒窃与街头诈骗是该类商业区的常见治安问题（经验性描述）。\"}]}",
+        "model": "qwen-flash"
+      }
+    },
+    {
+      "fingerprint": "ef7fd370e0947a55ab1f4b33c1e5e3d4511fb900fdd38bf30cb0200307b5e33b",
+      "response": {
+        "content": "{\"suggestions\": [\"傍晚在缅街商业区行走时，将背包前背以防扒窃\", \"在缅街/罗斯福大道一带拥挤区域，避免将手机或钱包放于外衣口袋\", \"傍晚独行经过主街-法拉盛7号线地铁站周边时，注意观察周围环境\"], \"suggestion_grounds\": [{\"doc_id\": \"p109_overview\", \"quote\": \"缅街商业区人流密集，扒窃与街头诈骗是该类商业区的常见治安问题（经验性描述）。\"}, {\"doc_id\": \"p109_overview\", \"quote\": \"缅街/罗斯福大道一带拥挤，注意背包前背、手机勿放外衣口袋。\"}, {\"doc_id\": \"p109_overview\", \"quote\": \"深夜地铁站（Main St–Flushing 7号线终点）周边人流量骤减，独行注意周边环境。\"}]}",
+        "model": "qwen-flash"
+      }
+    },
+    {
+      "fingerprint": "517588112bc9ca3d37e53864f8c757972062a79f058290ab89b1e572e315f580",
+      "response": {
+        "content": "{\"suggestions\": [\"傍晚在缅街商业区行走时，将背包前背以防止扒窃\", \"在缅街商业区排队付款时，手机与钱包不要随手放置\", \"遇到正在发生的扒窃或诈骗，先确保人身安全再报警\"], \"suggestion_grounds\": [{\"doc_id\": \"p109_overview\", \"quote\": \"缅街商业区人流密集，扒窃与街头诈骗是该类商业区的常见治安问题（经验性描述）。\"}, {\"doc_id\": \"p109_scam\", \"quote\": \"缅街商业区拥挤，注意背包前背；餐馆/超市排队付款时手机与钱包不要随手放置。\"}, {\"doc_id\": \"p109_emergency\", \"quote\": \"缅街商业区遇到正在发生的扒窃/诈骗，先确保人身安全再报警。\"}]}",
+        "model": "qwen-flash"
+      }
+    },
+    {
+      "fingerprint": "244655df0e4d03b0d559160959ffd532c6bd94797e9b9473ec81ab31fb58e9ad",
+      "response": {
+        "content": "{\"area\": \"唐人街\", \"crowd\": null, \"time\": \"晚上\"}",
+        "model": "qwen-flash"
+      }
+    },
+    {
+      "fingerprint": "798f5909b3d408867b7cbeeee533da288dfd59818080709d1c9d0a47c9aba183",
+      "response": {
+        "content": "{\"suggestions\": [\"夜间在唐人街坚尼路（Canal Street）一带行走时，将背包前背以防止扒窃\", \"长者独自外出就医或购物时，避免携带大量现金，尽量结伴同行并提高对'拾物平分'搭话的警惕\", \"夜间经过包厘街与地铁站周边时，选择照明良好、有行人通行的路线，避免独行于偏僻小巷\"], \"suggestion_grounds\": [{\"doc_id\": \"p5_overview\", \"quote\": \"夜间包厘街与地铁站周边人流量减少，独行注意照明与路线选择。\"}, {\"doc_id\": \"p5_overview\", \"quote\": \"长者独自携带现金就医/购物时尽量结伴；遇到\\\"拾物平分\\\"\\\"算命看相\\\"搭话提高警惕。\"}, {\"doc_id\": \"p5_scam\", \"quote\": \"街头扒窃 市场与拥挤街巷注意背包前背；付款时手机与钱包不要随手放置。\"}]}",
+        "model": "qwen-flash"
+      }
+    },
+    {
+      "fingerprint": "cf823f77f43ec52b5a5daa4f9011e42232cde300d52041c12b3d28f0225f6039",
+      "response": {
+        "content": "{\"suggestions\": [\"夜间在唐人街市场与拥挤街巷行走时，将背包前背以防止扒窃\", \"夜间在唐人街坚尼路（Canal Street）一带付款时，手机与钱包不要随手放置\", \"夜间独自前往包厘街地铁站周边时，选择照明良好、有行人通行的路线\"], \"suggestion_grounds\": [{\"doc_id\": \"p5_scam\", \"quote\": \"街头扒窃 市场与拥挤街巷注意背包前背；付款时手机与钱包不要随手放置。\"}]}",
+        "model": "qwen-flash"
+      }
+    },
+    {
+      "fingerprint": "a79ce8535c7044a9324c88a8056dfb4d65691cea591387532638ec00322eb4b4",
+      "response": {
+        "content": "{\"suggestions\": [\"夜间在唐人街市场与拥挤街巷行走时，将背包前背以防范街头扒窃\", \"夜间在唐人街付款时，避免将手机与钱包随手放置以防止被盗\", \"夜间独行时避开照明不足的包厘街与地铁站周边区域\"], \"suggestion_grounds\": [{\"doc_id\": \"p5_scam\", \"quote\": \"街头扒窃 市场与拥挤街巷注意背包前背；付款时手机与钱包不要随手放置。\"}]}",
+        "model": "qwen-flash"
+      }
+    },
+    {
+      "fingerprint": "6a67b92b3fb0680441af67a740883c3e264350f28ad24c7db4477e64d9426b77",
+      "response": {
+        "content": "{\"suggestions\": [\"夜间在唐人街市场与拥挤街巷行走时，将背包前背以防止扒窃\", \"夜间在唐人街付款时，避免将手机与钱包随手放置\", \"夜间独行时选择照明良好、有行人经过的路线，避开包厘街与地铁站周边偏僻区域\"], \"suggestion_grounds\": [{\"doc_id\": \"p5_scam\", \"quote\": \"街头扒窃 市场与拥挤街巷注意背包前背；付款时手机与钱包不要随手放置。\"}]}",
+        "model": "qwen-flash"
+      }
+    },
+    {
+      "fingerprint": "03cd7413353b91425b48b8a7fc404e005494eed70c50a593c3665ef374ee96ae",
+      "response": {
+        "content": "{\"area\": \"Chinatown\", \"crowd\": null, \"time\": null}",
+        "model": "qwen-flash"
+      }
+    },
+    {
+      "fingerprint": "daae72d026dfa82e2474f0720c7dd5f130363ae68e59d01986bea2b3c3c6ef2a",
+      "response": {
+        "content": "{\"suggestions\": [\"在唐人街的勿街和坚尼路一带，背包应前背以防止扒窃\", \"长者在唐人街独自携带现金就医或购物时，建议结伴同行并警惕'拾物平分'类搭讪诈骗\", \"夜间在包厘街与地铁站周边独行时，选择照明良好、有行人通行的路线\"], \"suggestion_grounds\": [{\"doc_id\": \"p5_overview\", \"quote\": \"勿街（Mott Street）、坚尼路（Canal Street）一带人流密集，注意背包前背与手机保管。\"}, {\"doc_id\": \"p5_overview\", \"quote\": \"长者独自携带现金就医/购物时尽量结伴；遇到\\\"拾物平分\\\"\\\"算命看相\\\"搭话提高警惕。\"}, {\"doc_id\": \"p5_overview\", \"quote\": \"夜间包厘街与地铁站周边人流量减少，独行注意照明与路线选择。\"}]}",
+        "model": "qwen-flash"
+      }
+    },
+    {
+      "fingerprint": "32cd2e7ca6963cda9c58d651724246d4f05c248710ae51c6ff9373d0bf6d5955",
+      "response": {
+        "content": "{\"area\": \"唐人街\", \"crowd\": null, \"time\": \"凌晨两点\"}",
+        "model": "qwen-flash"
+      }
+    },
+    {
+      "fingerprint": "c9c29f1030c6488218dc38853a847a98b3efdc82ce597b709d4800c4d22aa3d0",
+      "response": {
+        "content": "{\"suggestions\": [\"凌晨两点避免独自在坚尼路（Canal Street）一带行走，应选择照明良好、人流较多的主干道如勿街（Mott Street）并保持背包前背\", \"夜间在包厘街与地铁站周边活动时，应避免携带明显现金或贵重物品，付款时手机和钱包不要随手放置\", \"若需独自就医或购物，长者应尽量结伴同行，遇陌生人搭话如'拾物平分'或'算命看相'应提高警惕并立即离开\"], \"suggestion_grounds\": [{\"doc_id\": \"p5_overview\", \"quote\": \"勿街（Mott Street）、坚尼路（Canal Street）一带人流密集，注意背包前背与手机保管。\"}, {\"doc_id\": \"p5_overview\", \"quote\": \"夜间包厘街与地铁站周边人流量减少，独行注意照明与路线选择。\"}, {\"doc_id\": \"p5_scam\", \"quote\": \"长者独自携带现金就医/购物时尽量结伴；遇到\\\"拾物平分\\\"\\\"算命看相\\\"搭话提高警惕。\"}]}",
+        "model": "qwen-flash"
+      }
+    },
+    {
+      "fingerprint": "0ddcefb202f36811a595d4d1e404a98680154892ceca9bb0a1af944f3ae3c40b",
+      "response": {
+        "content": "{\"suggestions\": [\"凌晨两点避免独自携带现金在唐人街就医或购物，应尽量结伴同行\", \"凌晨两点在唐人街坚尼路（Canal Street）一带行走时，注意背包前背，防止扒窃\", \"凌晨两点若遇到陌生人搭话声称'拾物平分'或'算命看相'，应提高警惕并迅速离开\"], \"suggestion_grounds\": [{\"doc_id\": \"p5_overview\", \"quote\": \"长者独自携带现金就医/购物时尽量结伴；遇到\\\"拾物平分\\\"\\\"算命看相\\\"搭话提高警惕。\"}]}",
+        "model": "qwen-flash"
+      }
+    },
+    {
+      "fingerprint": "b026fc2cd993f0caa329a0b7973eb787cf722932a2b3b7a97754e9bd29b649bf",
+      "response": {
+        "content": "{\"area\": \"威廉斯堡\", \"crowd\": null, \"time\": \"晚上\"}",
+        "model": "qwen-flash"
+      }
+    },
+    {
+      "fingerprint": "8ba73c3e3c7134efec3819b7de5461589661f61f5584a472a4c3efa95a61e42e",
+      "response": {
+        "content": "{\"suggestions\": [\"夜间避免单独穿行威廉斯堡工业区与滨水地块，这些区域照明差、人少，存在较高风险\", \"在 Bedford Avenue / Wyckoff Avenue 一带的酒吧或夜生活场所消费时，务必看护好饮品，防止被下药或调包\", \"外出时将自行车使用 U 型锁固定在永久性设施上，防止被盗，因该区域自行车盗窃案件频发\"], \"suggestion_grounds\": [{\"doc_id\": \"p90_overview\", \"quote\": \"自行车盗窃常见，务必使用 U 型锁并锁在固定设施上。\"}, {\"doc_id\": \"p90_overview\", \"quote\": \"工业区与滨水地块夜间照明差、人少，避免穿行。\"}, {\"doc_id\": \"p90_overview\", \"quote\": \"夜间 Bedford Avenue / Wyckoff Avenue 一带人流复杂，独行注意周边环境与饮品看护。\"}]}",
+        "model": "qwen-flash"
+      }
+    },
+    {
+      "fingerprint": "a6ec6ea7e8b43d0ad9d5b369d07800f5941d0e1a9cf374a401a479489e23e7c9",
+      "response": {
+        "content": "{\"area\": \"Williamsburg\", \"crowd\": null, \"time\": null}",
+        "model": "qwen-flash"
+      }
+    },
+    {
+      "fingerprint": "2561af0b5196b8d6f1214cb1993eb1ca3c972404bd0498633ecf9661a424b37d",
+      "response": {
+        "content": "{\"suggestions\": [\"夜间在Bedford Avenue或Wyckoff Avenue一带独行时，注意观察周围环境并看护好个人饮品。\", \"在工业区与滨水地块夜间穿行时，选择照明良好、人流较多的路线，避免单独行动。\", \"骑行时务必使用U型锁并将自行车固定在坚固设施上，防范盗窃风险。\"], \"suggestion_grounds\": [{\"doc_id\": \"p90_overview\", \"quote\": \"夜间 Bedford Avenue / Wyckoff Avenue 一带人流复杂，独行注意周边环境与饮品看护。\"}, {\"doc_id\": \"p90_overview\", \"quote\": \"工业区与滨水地块夜间照明差、人少，避免穿行。\"}, {\"doc_id\": \"p90_overview\", \"quote\": \"自行车盗窃常见，务必使用 U 型锁并锁在固定设施上。\"}]}",
+        "model": "qwen-flash"
+      }
+    },
+    {
+      "fingerprint": "9688781e8cbcedcc09898e6a1e851c9b4e0e19de73aecfcfe1fb8dfbf8027343",
+      "response": {
+        "content": "{\"area\": \"威廉斯堡\", \"crowd\": null, \"time\": \"周末\"}",
+        "model": "qwen-flash"
+      }
+    },
+    {
+      "fingerprint": "af701a9c0c6e4bbbfdf57be496ee01c604c178f220bae2b1508192db78500896",
+      "response": {
+        "content": "{\"suggestions\": [\"夜间在Bedford Avenue或Wyckoff Avenue一带独行时，注意看护饮品并留意周边环境，避免进入照明差的工业区小路\", \"周末在威廉斯堡酒吧或音乐场所聚集区域活动时，避免携带大量现金或贵重物品，谨防扒窃\", \"若需在威廉斯堡租住或交易二手物品，务必核实房东身份并使用正规渠道支付押金，防止租房或换汇诈骗\", \"避免在夜间穿行威廉斯堡滨水工业区等照明不足、人烟稀少的区域，以防遭遇意外\"], \"suggestion_grounds\": [{\"doc_id\": \"p90_overview\", \"quote\": \"夜间 Bedford Avenue / Wyckoff Avenue 一带人流复杂，独行注意周边环境与饮品看护。\"}, {\"doc_id\": \"p90_overview\", \"quote\": \"工业区与滨水地块夜间照明差、人少，避免穿行。\"}, {\"doc_id\": \"p90_scam\", \"quote\": \"威廉斯堡租户流动性大：常见假房源收押金、二房东卷款、假房东钥匙骗局（经验性描述）。\"}, {\"doc_id\": \"p90_scam\", \"quote\": \"私下换汇\\\"先款后逃\\\"、二手交易（家具/电动车）收款不发货在租房社区常见（经验性描述）。\"}]}",
+        "model": "qwen-flash"
+      }
+    },
+    {
+      "fingerprint": "52c7c43b2c00ed8731e2a124727a55b1e50e2f98f561487907fb53489d67cdb8",
+      "response": {
+        "content": "{\"area\": \"布鲁克林高地\", \"crowd\": null, \"time\": null}",
+        "model": "qwen-flash"
+      }
+    },
+    {
+      "fingerprint": "dd6ff127c82a1c27b36194ffb07ed144ca7cf0d944be81aa0b65288216ef27ba",
+      "response": {
+        "content": "{\"suggestions\": [\"在布鲁克林大桥公园游玩时，避免将手机、钱包等物品暴露在外，注意看护随行儿童并约定走散集合点\", \"夜间经过布鲁克林高地的 promenade 或桥下通道时，选择照明良好的路线行走，避免独行\", \"停车时切勿在车内留有可见财物，以防车窗被砸导致盗窃\", \"接到自称使领馆或公检法人员的电话要求转账时，立即挂断并拨打 911 核实，不轻信 '秘密配合调查' 等说法\", \"租房前务必核实房东身份及管理公司信息，押金支付应通过正规渠道并保留凭证\"], \"suggestion_grounds\": [{\"doc_id\": \"p84_overview\", \"quote\": \"布鲁克林大桥公园与桥头观景点游客密集，注意随身物品与儿童看护。\"}, {\"doc_id\": \"p84_overview\", \"quote\": \"promenade 与桥下通道夜间人少，独行注意照明路线。\"}, {\"doc_id\": \"p84_overview\", \"quote\": \"车内勿留任何可见物品，避免车窗被砸（经验性提醒）。\"}, {\"doc_id\": \"p84_scam\", \"quote\": \"使领馆不会电话要求转账；涉及\\\"秘密配合调查\\\"的说法可直接挂断并拨打 911 或向警局核实。\"}, {\"doc_id\": \"p84_scam\", \"quote\": \"签约前核实房东/管理公司身份，押金走正规渠道并留凭证。\"}]}",
+        "model": "qwen-flash"
+      }
+    },
+    {
+      "fingerprint": "bc1a0e4fdde97a002a838f65703e5ea8504246345f59df3b9574ca9fed99fb5b",
+      "response": {
+        "content": "{\"area\": \"布鲁克林 Heights\", \"crowd\": null, \"time\": \"晚上\"}",
+        "model": "qwen-flash"
+      }
+    },
+    {
+      "fingerprint": "7b92d4d5016a3a0b33de7c283b9df1f45dacc4a2ce8d1675ab45a2d3f0c593f0",
+      "response": {
+        "content": "{\"suggestions\": [\"晚上在布鲁克林大桥公园散步时，避免携带明显财物，注意随身物品安全\", \"夜间经过 promenade 或桥下通道时，选择有照明的路线并尽量结伴而行\", \"若独自驾车，切勿在车内留下可见物品，以防车窗被砸盗窃\"], \"suggestion_grounds\": [{\"doc_id\": \"p84_overview\", \"quote\": \"自行车盗窃与汽车内盗窃是滨水景点周边常见问题（经验性描述）\"}, {\"doc_id\": \"p84_overview\", \"quote\": \"promenade 与桥下通道夜间人少，独行注意照明路线\"}, {\"doc_id\": \"p84_overview\", \"quote\": \"车内勿留任何可见物品，避免车窗被砸（经验性提醒）\"}]}",
+        "model": "qwen-flash"
+      }
+    }
+  ]
+}

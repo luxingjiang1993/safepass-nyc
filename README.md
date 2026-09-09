@@ -60,6 +60,7 @@ pip install -r requirements.txt
 - 两路径对照（B1，issue 04）：主指标 = Skill 路径 Skill 覆盖子集（23/24，覆盖数受 config 护栏；模板降级路径 27 条单列 marker、不计入主 groundedness）；对照列 = 同一子集跑确定性模板路径（零管线 LLM）。收口条件 = 主指标 Skill ≥ 模板（hallucination/矛盾率取 ≤），由 `python -m pytest tests/eval -q` 机器断言（工件 `comparison.comparison_ok`）——打不过就迭代到打得过再收，不修 DoD。
 - B2 质量维度（issue 05）：actionability/specificity/矛盾率三维全部确定性实现（规则特征 + 算术核对，LLM 零参与——宪法①⑤ + P6 定案 2），不新增 judge 调用、未重录 cassette（P6 定案 1）；回归门 = config `eval.quality` 的 min_*/max_*，由 `python -m pytest tests/eval -q` 机器断言。
 - L2 套件离线可跑（judge 与 Skill 调用走 cassette 回放，零真实 API）；录制工件 `fixtures/eval/l2_results_v1.json` 由 `python scripts/record_l2_cassette.py` 一次性产出（需真实 `DASHSCOPE_API_KEY`）。
+- N2 基线对照（issue 26）：同一 20 条金标上裸 LLM / 无约束 RAG / SafePass 三列数字与失败样例见 `docs/baseline-vs-safepass.md`（`python -m pytest tests/eval/test_n2_three_column.py -q` 回放；**不进**默认 `tests/` 基线）。
 - 生产与 dev 同源（2026-09-08 起全线统一 DashScope `qwen-flash`，选型原则 = 总 token 成本最低）：L2 套件指标即生产模型指标，无跨供应商兼容性验证尾巴。
 
 ## 审阅者路径（本地 3 命令，Windows 可跑）
@@ -121,14 +122,14 @@ python scripts/demo_queries.py        # N3/E7 审阅者路径：5 条固定 quer
 │   └── eval/               #   L2 eval 套件（LLM-as-judge，cassette 回放；独立运行，不进默认基线）
 ├── scripts/                # 确定性脚本（以实际文件为准）：generate_fixtures（fixture 生成，禁 LLM）、
 │                           #   build_index（检索索引）、fetch_nypd（真实数据 adapter）、
-│                           #   record_l2_cassette（L2 录制）、serve（容器入口）、demo_queries（N3/E7 审阅者路径）、recompute_city_mean 等
+│                           #   record_l2_cassette（L2 录制）、record_n2_cassette（N2 三列录制）、serve（容器入口）、demo_queries（N3/E7 审阅者路径）、recompute_city_mean 等
 ├── fixtures/               # 数据资产，随仓库版本化（spec D11）
 │   ├── nypd/               #   ①模拟 NYPD 数据集（测试世界钉 mock）
 │   ├── nypd_real/          #   ②真实 NYPD 数据入库（scripts/fetch_nypd.py 产出，生产运行时数据集）
 │   ├── safe_places/        #   ③警区安全场所静态表（5 警区 24h 清单 + 通用清单）
 │   ├── knowledge/          #   ④RAG 知识库文档（15 篇预计算安全报告）
 │   ├── index/              #   FAISS 本地索引 + BM25 pickle（可由 fixture 离线重建）
-│   └── eval/               #   金标 golden_set_v1.json + L2 工件 l2_results_v1.json（README 指标的事实源）
+│   └── eval/               #   金标 golden_set_v1.json + L2 工件 l2_results_v1.json + N2 工件 n2_results_v1.json
 ├── frontend/               # 前端薄渲染层（循环外，标准 Implement；消费契约、不承载业务逻辑）
 ├── docs/                   # spec / ADR / 资源清单（产品文档，唯一事实源）
 ├── .scratch/safepass-nyc-mvp/issues/  # ticket 文件（01–12，MVP 过程档案）

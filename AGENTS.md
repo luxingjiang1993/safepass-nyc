@@ -6,7 +6,7 @@ Cursor / Codex / 其他编码 agent 开会话先读宪法，再动手。本文�
 
 ## 当前阶段（先读，避免把已做的票再做一遍）
 
-Phase 3 **波 1 已收口**（2026-09-09）：GitHub `#16`–`#25` 已全部关闭。不要再实现 N1 注入骨架或 N3 一键复现；不要把 demo 钉到 mock 数据集。波 2（N2 等）只在用户明确点名后动手。权威现状：`docs/specs/safepass-v3-spec.md` 文首状态行 + git log + `python -m pytest tests/ -q`。
+Phase 3 **波 1 已收口**；**波 2 第一刀已收口**（2026-09-09）：GitHub `#16`–`#28` 已关（`#26` N2b、`#27` A4、`#28` N2a）。不要再实现 N1 骨架、N3 一键复现、N2 三列对照或 A4 依据槽。不要把 demo 钉到 mock 数据集。波 2 其余票只在用户明确点名后动手。权威现状：`docs/specs/safepass-v3-spec.md` 文首 + `docs/specs/safepass-v3-wave2-n2-a4-spec.md` + git log + `python -m pytest tests/ -q`。
 
 ## 唯一接缝与唯一判定
 
