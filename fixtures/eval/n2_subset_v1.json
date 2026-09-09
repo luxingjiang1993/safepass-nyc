@@ -1,0 +1,28 @@
+{
+  "version": "v1",
+  "description": "N2 基线对照查询子集（issue 28 / N2a）。二十个金标 ID 钉死；改名单必须让 tests/eval/test_n2a_subset_and_scorers.py 变红。覆盖内新查询（含布鲁克林高地低样本）与越界金标；不含追问、紧急、G49–G50，不另扩画像敏感条。",
+  "in_coverage_ids": [
+    "G25",
+    "G27",
+    "G31",
+    "G34",
+    "G35",
+    "G36",
+    "G37",
+    "G40",
+    "G41",
+    "G42",
+    "G44",
+    "G45",
+    "G47"
+  ],
+  "out_of_coverage_ids": [
+    "G01",
+    "G02",
+    "G05",
+    "G07",
+    "G08",
+    "G09",
+    "G10"
+  ]
+}
