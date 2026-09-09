@@ -159,7 +159,8 @@ class TestFirstScreenHierarchy:
 
 
 class TestSuggestionGroundsSlot:
-    """grounds 渲染槽（P6 定案 3）：建议区固定槽位，本票留结构，A4 填 UI 文案。"""
+    """grounds 渲染槽（P6 定案 3 + 票 01 / A4）：建议区固定槽位；有依据小号
+    「建议依据」+ 列表级引文；无依据标「通用建议」、不装成有出处。"""
 
     def test_slot_rendered_when_grounds_present(self):
         result = make_safety(
@@ -177,10 +178,90 @@ class TestSuggestionGroundsSlot:
         # 槽位在建议区块内部（先于紧急资源）
         assert _index_of(html, 'class="suggestion-grounds"') < _index_of(html, "紧急资源")
 
+    def test_grounds_heading_when_present(self):
+        # 有依据 ↔ 无依据在 HTML 上可分：非空加小号标题「建议依据」，
+        # 且与首屏「评级依据」用词分开（CONTEXT 建议依据 ≠ 评级依据）
+        result = make_safety(
+            suggestions_source="skill",
+            suggestion_grounds=[
+                contracts.SuggestionGround(
+                    doc_id="p19_scam", quote="近期冒充公检法诈骗高发"
+                ),
+            ],
+        )
+        html = render.render_result(result, CFG)
+        assert _index_of(html, "建议依据") < _index_of(html, "近期冒充公检法诈骗高发")
+        assert "评级依据" in html
+        assert "通用建议" not in html
+        assert 'class="generic-suggestion-label"' not in html
+        grounds_block = html[
+            _index_of(html, 'class="suggestion-grounds"') :
+            html.index("</div>", _index_of(html, 'class="suggestion-grounds"'))
+        ]
+        assert "建议依据" in grounds_block
+        assert "ground-quote" in grounds_block
+
+    def test_grounds_are_list_level_not_per_suggestion(self):
+        # 契约是整份结果上的列表：一块依据槽，禁止一条建议一条依据
+        result = make_safety(
+            suggestions_source="skill",
+            suggestion_grounds=[
+                contracts.SuggestionGround(doc_id="p19_scam", quote="使领馆不会电话要求转账"),
+                contracts.SuggestionGround(doc_id="p19_overview", quote="夜间独行尽量结伴"),
+            ],
+        )
+        html = render.render_result(result, CFG)
+        assert html.count('class="suggestion-grounds"') == 1
+        assert html.count("建议依据") == 1
+        assert html.count('class="ground-quote"') == 2
+        ul_end = html.index("</ul>", _index_of(html, 'class="suggestions"'))
+        assert ul_end < _index_of(html, 'class="suggestion-grounds"')
+
+    def test_grounds_block_does_not_copy_chart_stats(self):
+        # 不把 Top 罪名/昼夜比抄到建议依据下（图表槽的职责）
+        result = make_safety(
+            suggestions_source="skill",
+            suggestion_grounds=[
+                contracts.SuggestionGround(
+                    doc_id="p19_scam", quote="使领馆不会电话要求转账"
+                ),
+            ],
+        )
+        html = render.render_result(result, CFG)
+        start = _index_of(html, 'class="suggestion-grounds"')
+        block = html[start : html.index("</div>", start)]
+        assert "盗窃" not in block
+        assert "抢劫" not in block
+        assert "200" not in block and "112" not in block
+
+    def test_ground_quote_found_in_knowledge_fixture(self):
+        # DoD：有依据时引文可在夹具文档中找到（页面不是装饰性引用）
+        quote = "使领馆不会电话要求转账"
+        doc = (REPO_ROOT / "fixtures" / "knowledge" / "p19_scam.md").read_text(
+            encoding="utf-8"
+        )
+        assert quote in doc
+        result = make_safety(
+            suggestions_source="skill",
+            suggestion_grounds=[
+                contracts.SuggestionGround(doc_id="p19_scam", quote=quote),
+            ],
+        )
+        html = render.render_result(result, CFG)
+        assert quote in html
+        assert 'data-doc-id="p19_scam"' in html
+
     def test_slot_absent_when_no_grounds(self):
-        # 无依据不装成有依据（S1）；「通用建议」标注由 A4 波 2 填
+        # 无依据不装成有依据（S1）：不渲染引用槽，建议区标明「通用建议」
         html = render.render_result(make_safety(), CFG)
         assert "suggestion-grounds" not in html
+        assert "ground-quote" not in html
+        assert "建议依据" not in html
+        assert _index_of(html, 'class="generic-suggestion-label"') < _index_of(
+            html, "紧急资源"
+        )
+        assert "通用建议" in html
+        assert "评级依据" in html
 
     def test_ground_quote_html_escaped(self):
         result = make_safety(
@@ -196,6 +277,30 @@ class TestSuggestionGroundsSlot:
         assert "&lt;script&gt;" in html
 
 
+class TestDegradedGeneralSuggestionsSemantics:
+    """越界页已有「通用建议」= 无本区数据；A4 不改该语义。"""
+
+    def test_out_of_coverage_keeps_details_summary_label(self):
+        html = render.render_degraded(
+            contracts.DegradedResult(
+                degraded_capability="out_of_coverage",
+                message="该区域不在数据覆盖范围内",
+                alternative_info=None,
+                reselection_invitation="请从覆盖区域中重新选择",
+                general_suggestions=["夜间出行尽量结伴，并提前告知朋友行程"],
+                emergency_resources=[],
+                disclaimer="本分析仅供参考，不替代专业安保建议。",
+                sources=[],
+            ),
+            CFG,
+        )
+        assert '<details class="suggestions" open>' in html
+        assert "<summary>💡 通用建议</summary>" in html
+        assert "suggestion-grounds" not in html
+        assert "建议依据" not in html
+        assert 'class="generic-suggestion-label"' not in html
+
+
 class TestFirstScreenCss:
     """首屏样式结构层：五槽卡片/依据槽样式存在，窄屏媒体查询收紧首屏间距。"""
 
@@ -204,6 +309,8 @@ class TestFirstScreenCss:
         assert ".result-head.hero" in CSS
         assert ".suggestion-grounds" in CSS
         assert ".ground-quote" in CSS
+        assert ".grounds-heading" in CSS
+        assert ".generic-suggestion-label" in CSS
 
     def test_narrow_screen_tightens_first_screen_slots(self):
         block = CSS[CSS.index("@media (max-width: 30rem)") :]

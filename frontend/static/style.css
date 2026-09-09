@@ -86,16 +86,31 @@ body {
 .precinct, .sample, .basis { color: #555; margin: 0.2rem 0; }
 .stars { letter-spacing: 0.1em; }
 
-/* 建议依据渲染槽（票 06 / D1）：建议区固定槽位，A4 波 2 填 UI 文案 */
+/* 建议依据渲染槽（票 06 / D1 + 票 01 / A4）：槽位类名不漂 */
 .suggestion-grounds {
   margin-top: 0.5rem;
   padding-top: 0.5rem;
   border-top: 1px dashed #ddd;
 }
+.grounds-heading,
+.generic-suggestion-label {
+  margin: 0.25rem 0;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #555;
+}
+.generic-suggestion-label {
+  font-weight: 500;
+  color: #666;
+}
 .ground-quote {
   margin: 0.25rem 0;
   font-size: 0.85rem;
   color: #666;
+}
+.ground-doc {
+  font-size: 0.75rem;
+  color: #888;
 }
 
 section, details {

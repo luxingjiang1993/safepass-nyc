@@ -25,8 +25,8 @@ issue 12 追加（纯渲染层职责）：
 票 06 / D1 追加（首屏信息架构，S3 Crisis24 简报槽）：
     首屏五槽 = 评级（result-head 结论卡片）→ 人话解释（one-liner 区块：
     one_liner 数据钩子 + 评级依据，C1 rating_rationale 落地前的确定性拼装
-    占位，波 2 换真 C1）→ 建议（suggestions 常驻区块 + grounds 渲染槽，
-    A4 波 2 填 UI 文案）→ 紧急资源；
+    占位，波 2 换真 C1）→ 建议（suggestions 常驻区块 + grounds 渲染槽：
+    有依据小号「建议依据」，无依据标「通用建议」）→ 紧急资源；
     图表 / community / 来源默认折叠（details 不挂 open）；dimensions /
     unknowns 同样折叠（⚪ 数据不足时 unknowns 例外展开——「为什么没评级」
     本身就是结论）；降级横幅首屏可见（header 之后、建议之前，S3 槽位稳定，
@@ -417,18 +417,24 @@ def _llm_degraded_banner(result: Any, cfg: config_loader.AppConfig) -> str:
 
 
 def _suggestion_grounds_block(result: contracts.SafetyQueryResult) -> str:
-    """建议依据渲染槽（票 06 / D1，P6 定案 3）：建议区固定槽位，本票先留
-    结构与最小渲染——grounds 非空时逐条渲染引文（data-doc-id 供 A8 点击
-    溯源），空时不渲染（无依据不装成有依据，S1）。A4（波 2）负责 UI 文案
-    与「通用建议」标注，槽位与类名不漂。
+    """建议依据渲染槽（票 06 / D1 + 票 01 / A4）：建议区固定槽位与类名不漂。
+
+    非空：小号标题「建议依据」+ 整份结果上的引文列表（可带文档名，无点击
+    打开全文）。空：不渲染本槽（无依据不装成有出处，S1）；空态「通用建议」
+    由建议区标注，不在本函数假装引用。
     """
     if not result.suggestion_grounds:
         return ""
     quotes = "\n".join(
-        f'    <p class="ground-quote" data-doc-id="{_esc(g.doc_id)}">“{_esc(g.quote)}”</p>'
+        f'    <p class="ground-quote" data-doc-id="{_esc(g.doc_id)}">'
+        f'<span class="ground-doc">{_esc(g.doc_id)}</span>'
+        f' “{_esc(g.quote)}”</p>'
         for g in result.suggestion_grounds
     )
-    return f'<div class="suggestion-grounds" role="note">\n{quotes}\n</div>'
+    return (
+        f'<div class="suggestion-grounds" role="note">\n'
+        f'  <p class="grounds-heading">建议依据</p>\n{quotes}\n</div>'
+    )
 
 
 def render_safety(
@@ -480,8 +486,12 @@ def render_safety(
     suggestions = ""
     if result.suggestions:
         items = "\n".join(f"    <li>✅ {_esc(s)}</li>" for s in result.suggestions)
+        empty_label = ""
+        if not result.suggestion_grounds:
+            empty_label = '<p class="generic-suggestion-label">通用建议</p>\n'
         suggestions = (
-            f'<section class="suggestions"><h2>💡 贴心建议</h2>\n  <ul>\n{items}\n  </ul>\n'
+            f'<section class="suggestions"><h2>💡 贴心建议</h2>\n'
+            f'{empty_label}  <ul>\n{items}\n  </ul>\n'
             f'{_suggestion_grounds_block(result)}\n</section>'
         )
 
