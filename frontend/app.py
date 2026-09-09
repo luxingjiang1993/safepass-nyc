@@ -32,6 +32,7 @@ LLM_BASE_URL/LLM_MODEL）构造真实客户端——产出必经票 06 的 Budge
 from __future__ import annotations
 
 import secrets
+import sys
 import threading
 from http import HTTPStatus
 from http.cookies import SimpleCookie
@@ -39,6 +40,11 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from typing import Any
 from urllib.parse import ParseResult, parse_qs, urlparse
+
+# python frontend/app.py 时 sys.path[0] 是 frontend/，根包 safepass 不可见。
+# 与 scripts/demo_queries.py 同款：把仓库根插到最前（pytest / -m 下重复插入无害）。
+_REPO_ROOT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(_REPO_ROOT))
 
 from safepass import config_loader, degraded, llm_wiring, pipeline
 from safepass.llm_client import LLMClient

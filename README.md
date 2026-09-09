@@ -74,6 +74,8 @@ python scripts/demo_queries.py
 python frontend/app.py
 ```
 
+须在仓库根目录执行。`frontend/app.py` 会把根目录加入 `sys.path`（直接跑脚本时默认 path 是 `frontend/`，否则 `safepass` 找不到）。
+
 `python scripts/demo_queries.py --open` 可在摘要打完后于本进程打开本地页（阻塞；Ctrl+C 停止）。与 E7 共用同一入口，无第二套 demo。
 
 ## 常用命令
