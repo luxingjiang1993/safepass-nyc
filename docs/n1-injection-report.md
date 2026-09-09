@@ -53,7 +53,7 @@
 
 ## B3 报表位（预留）
 
-本报表是独立工件：注入拦截率与 L2 质量报表（`fixtures/eval/l2_results_v1.json`）不合并成一锅粥。B3 报表票落地时，在统一报表位**链接**本页与 L2 报表，数据源保持各自独立。
+本报表是独立工件：注入拦截率与 L2 质量报表（`fixtures/eval/l2_results_v1.json`）不合并成一锅粥。B3 对抗金标专表见 [docs/b3-adversarial-report.md](b3-adversarial-report.md)，与本页互相链接、夹具分表（`adversarial_goldens_v1.json` ≠ `injection_attacks_v1.json`）。
 
 ## 攻击分类来源（Craft T1）
 
