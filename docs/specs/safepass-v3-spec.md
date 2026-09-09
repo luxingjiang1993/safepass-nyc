@@ -1,6 +1,6 @@
 # SafePass NYC — Phase 3 Spec v3（波 1：真 AI 建议 + 质量咬合 + 首屏决策 + T2 杀手锏）
 
-> 状态：**波 1 已收口**（2026-09-09）。GitHub `#16`–`#25` 十张票全部关闭；唯一判定 `python -m pytest tests/ -q` = **663** 绿。P4 演示门闩 `#1/#2/#3/#6/#16/#18` 为真；`#17`（N2 基线对照）按计划不阻塞、属波 2。HEAD 收口提交：N1 `1cf5295`、N3 `b0b0f27`。**禁止再开/再做 N1 骨架或 N3 一键复现。** 波 2 起按面试日程滚动决策（P6），未经用户点名不得自行开票。
+> 状态：**波 1 已收口**（2026-09-09）。GitHub `#16`–`#25` 十张票全部关闭；唯一判定 `python -m pytest tests/ -q` = **663** 绿。P4 演示门闩 `#1/#2/#3/#6/#16/#18` 为真；`#17`（N2 基线对照）属波 2。**用户已点名波 2 第一刀**（grilling 2026-09-09）：N2 + A4，权威 spec = `docs/specs/safepass-v3-wave2-n2-a4-spec.md`。HEAD 收口提交：N1 `1cf5295`、N3 `b0b0f27`。**禁止再开/再做 N1 骨架或 N3 一键复现。** 波 2 其余票与后 100 分三模式未经点名不得自行开票。
 > 输入：10 张票（GitHub #16–#25，本地镜像 `.scratch/safepass-phase3-tickets/issues/`）+ `docs/portfolio-100-execution-plan.md`（唯一执行主轴，仅参考；未切票部分以该文为准）文首补丁 P6（Phase 3 开赛定案，grilling 2026-09-07）+ `docs/adr/0003-suggestion-generation-architecture.md`。
 > **权威顺序：票 > 本 spec > 执行计划正文**。切票时逐张经 grill-me-with-docs 复盘，票文 = 派票瞬间的最终裁决；本 spec 只是 10 张票的可读总览与执行投影，不是独立契约——与票冲突处以票为准，票与执行计划冲突处亦以票为准（执行计划 §2/§2.9/§7 原文可能未被切票逐字采纳）。
 > 前身：`docs/specs/safepass-v2-spec.md`（M1–M4 已交付）为历史档案，正文不动；本文件是其 Phase 3 续篇。
@@ -126,7 +126,7 @@ MVP + Phase 2 已把产品推到「数据评级 + eval + 真实运营」的确�
 
 ## Further Notes
 
-- **拆票已完成**：GitHub issues #16–#25（10 张），本地镜像 `.scratch/safepass-phase3-tickets/issues/`（`publish.sh` 同步）；与执行计划 §2/§2.9/§7 原文的对应关系 + P6 四定案见各票「来源」。Craft（S#/T#）已按票绑定（A1/A3→S2、A2/B1→S1、D1→S3、D2→S7、N1→T1），借鉴细则只读执行计划 §1.1/§1.2 对应行，禁止整份 1100+ 行计划塞 agent 上下文（P0）。
-- **现状台账**：波 1 十票均已合并并关 GitHub issue。L2 cassette 已按 qwen-flash 重录（勿再把 `progress.txt` 里 A3 时代的「cassette 失效」当现状）。模型全线 qwen-flash（dev = prod 同源）。唯一判定 663 绿。下一动作 = 用户点名的波 2（N2 等），不是回头补波 1。
+- **拆票已完成**：GitHub issues #16–#25（波 1，本地 `.scratch/safepass-phase3-tickets/`）；波 2 第一刀 #27/#28/#26（本地 `.scratch/safepass-phase4-tickets/`）。与执行计划对应关系见各票「来源」。禁止整份 1100+ 行计划塞 agent 上下文（P0）。
+- **现状台账**：波 1 十票均已合并并关 GitHub issue。L2 cassette 已按 qwen-flash 重录。模型全线 qwen-flash。唯一判定 663 绿。下一动作 = 波 2 第一刀竖切：A4 `#27` 与 N2a `#28` 并行，N2b `#26` 等 `#28`；不是第 4 波或后 100 分三模式。
 - **golden 口径**：B1 修订 golden_set_v1.json 时，优先覆盖现有金标已覆盖的追问形态（细节/对比），不发明新查询类型（D2 芯片文案同源）。
 - **完成承诺对齐**：RALPH.md 登记新任务时，完成承诺引用本 spec 的出口标准与「唯一判定」命令（`python -m pytest tests/ -q`，直跑 `pytest` 会 ModuleNotFoundError）。
