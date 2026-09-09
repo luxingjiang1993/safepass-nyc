@@ -394,6 +394,25 @@ def _profile_time_note(
     return dimensions
 
 
+def _time_bucket_unknowns(
+    time_bucket: contracts.TimeBucketStats | None,
+    cfg: config_loader.AppConfig,
+    *,
+    insufficient: bool,
+) -> list[str]:
+    """诚实缺口：全年 ⚪ 话术 + 该桶低于配置门槛时的时段未知。LLM 不写。"""
+    messages: list[str] = []
+    if insufficient:
+        messages.append(cfg.degraded.insufficient_data_message)
+    if time_bucket is not None and time_bucket.count < cfg.time_buckets.min_sample:
+        messages.append(
+            cfg.time_buckets.unknown_message.format(
+                label=time_bucket.label, n=time_bucket.count
+            )
+        )
+    return messages
+
+
 def _one_liner_hook_text(
     charts: contracts.Charts,
     ratio_to_city_mean: float,
@@ -483,6 +502,12 @@ def _build_safety_result(
     if assessment is None:  # 防御：调用方已做覆盖判定，不可达
         raise ValueError(f"区域 {resolved.area!r} 不在覆盖内，无法产出安全查询契约")
     stats, rated = assessment.stats, assessment.rated
+    clock_hour = data_agent.parse_clock_hour(query_text, cfg)
+    time_bucket: contracts.TimeBucketStats | None = None
+    if clock_hour is not None:
+        bucket_spec = data_agent.bucket_for_hour(clock_hour, cfg)
+        bucket_count = data_agent.count_in_bucket(records, stats.precinct, bucket_spec)
+        time_bucket = contracts.TimeBucketStats(label=bucket_spec.label, count=bucket_count)
     charts_data = data_agent.build_charts(stats, cfg)
     charts = (
         None
@@ -516,6 +541,13 @@ def _build_safety_result(
         extracted_area=None if extracted is None else extracted.area,
         extracted_crowd=None if extracted is None else extracted.crowd,
         extracted_time=None if extracted is None else extracted.time,
+        time_bucket_label=None if time_bucket is None else time_bucket.label,
+        time_bucket_count=None if time_bucket is None else time_bucket.count,
+        time_bucket_sufficient=(
+            None
+            if time_bucket is None
+            else time_bucket.count >= cfg.time_buckets.min_sample
+        ),
     )
     suggestions: list[str] | None = None
     suggestion_grounds: list[contracts.SuggestionGround] = []
@@ -585,7 +617,7 @@ def _build_safety_result(
         suggestions=suggestions,
         suggestion_grounds=suggestion_grounds,
         suggestions_source=suggestions_source,
-        unknowns=[cfg.degraded.insufficient_data_message] if insufficient else [],
+        unknowns=_time_bucket_unknowns(time_bucket, cfg, insufficient=insufficient),
         sources=list(cfg.data_source.sources),
         time_range=cfg.data_source.time_range,
         charts=charts,
@@ -593,6 +625,7 @@ def _build_safety_result(
         emergency_resources=degraded.load_general_venues(),
         profile_notice=cfg.profile.notice,
         disclaimer=cfg.disclaimer,
+        time_bucket=time_bucket,
     )
     # 装配层确定性自检：契约产出即过同一套业务校验器（AC-005/006/010、枚举评级），
     # 配置或模板被破坏时明确失败，绝不带病透出契约；

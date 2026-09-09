@@ -12,6 +12,9 @@
 night = hour ∈ [NIGHT_START_HOUR, 24) ∪ [0, DAY_START_HOUR)，与 fixture 生成脚本的
 is_night 标注规则一致（scripts/generate_fixtures.py）。
 
+四时段桶（C2）：查询文本可解析出钟点时，按 config time_buckets 切桶计数；
+无钟点不切桶。桶样本门槛与边界只活配置。安全评级仍用全年聚合，不按时段重算。
+
 来源分层（spec D8）：sources 为合法来源枚举（模拟数据/真实 NYPD 数据/混合），
 按命中记录的来源标注字段推导——"MOCK" 前缀版本号视为模拟数据标注
 （见 fixtures/nypd/manifest.json 的 dataset_version），模拟与真实并存 → 混合。
@@ -37,6 +40,7 @@ from __future__ import annotations
 import csv
 import json
 import os
+import re
 from collections import Counter
 from dataclasses import dataclass, replace
 from datetime import datetime
@@ -249,6 +253,94 @@ def rating_config(
 def is_night_hour(hour: int) -> bool:
     """由小时确定性判定夜间：[NIGHT_START_HOUR, 24) ∪ [0, DAY_START_HOUR)。"""
     return hour >= NIGHT_START_HOUR or hour < DAY_START_HOUR
+
+
+_CN_HOUR_DIGITS = {
+    "零": 0,
+    "一": 1,
+    "二": 2,
+    "两": 2,
+    "三": 3,
+    "四": 4,
+    "五": 5,
+    "六": 6,
+    "七": 7,
+    "八": 8,
+    "九": 9,
+}
+
+
+def hour_in_bucket(hour: int, bucket: config_loader.TimeBucketSpec) -> bool:
+    """小时是否落入桶区间（含 start 不含 end；start > end 表示跨日）。"""
+    start, end = bucket.start_hour, bucket.end_hour
+    if start < end:
+        return start <= hour < end
+    return hour >= start or hour < end
+
+
+def bucket_for_hour(hour: int, cfg: config_loader.AppConfig) -> config_loader.TimeBucketSpec:
+    """把 0-23 小时映射到配置中恰好一个时段桶。"""
+    for bucket in cfg.time_buckets.buckets:
+        if hour_in_bucket(hour, bucket):
+            return bucket
+    raise config_loader.ConfigError(f"小时 {hour} 未落入任何 time_buckets 桶（配置不变量被破坏）")
+
+
+def count_in_bucket(
+    records: Iterable[CrimeRecord],
+    precinct: int,
+    bucket: config_loader.TimeBucketSpec,
+) -> int:
+    """警区在该时段桶内的命中条数（确定性计数）。"""
+    return sum(
+        1
+        for r in records
+        if r.precinct == precinct and hour_in_bucket(r.occurred_at.hour, bucket)
+    )
+
+
+def _parse_chinese_hour_token(token: str) -> int | None:
+    if token == "十":
+        return 10
+    if token.startswith("十") and len(token) == 2 and token[1] in _CN_HOUR_DIGITS:
+        return 10 + _CN_HOUR_DIGITS[token[1]]
+    if token.endswith("十") and len(token) == 2 and token[0] in _CN_HOUR_DIGITS:
+        return _CN_HOUR_DIGITS[token[0]] * 10
+    if "十" in token:
+        left, right = token.split("十", 1)
+        if left in _CN_HOUR_DIGITS and right in _CN_HOUR_DIGITS:
+            return _CN_HOUR_DIGITS[left] * 10 + _CN_HOUR_DIGITS[right]
+    if token in _CN_HOUR_DIGITS:
+        return _CN_HOUR_DIGITS[token]
+    return None
+
+
+def parse_clock_hour(query_text: str, cfg: config_loader.AppConfig) -> int | None:
+    """从查询文本解析 0-23 钟点；解析不出则 None（仍用昼夜合计）。
+
+    支持阿拉伯数字「10点」「22:00」与中文数字「十点」；
+    12 小时修饰词来自配置（晚上10点 → 22）。
+    """
+    matches: list[tuple[int, int]] = []
+    for match in re.finditer(r"(?<!\d)(\d{1,2})\s*[:：]\s*\d{1,2}", query_text):
+        matches.append((match.start(), int(match.group(1))))
+    for match in re.finditer(r"(?<!\d)(\d{1,2})\s*点", query_text):
+        matches.append((match.start(), int(match.group(1))))
+    for match in re.finditer(r"([零一二两三四五六七八九十]+)\s*点", query_text):
+        parsed = _parse_chinese_hour_token(match.group(1))
+        if parsed is not None:
+            matches.append((match.start(), parsed))
+    if not matches:
+        return None
+    matches.sort(key=lambda item: item[0])
+    hour = matches[0][1]
+    if hour == 12 and any(m in query_text for m in cfg.time_buckets.midnight_12_markers):
+        hour = 0
+    elif 1 <= hour <= 11 and any(m in query_text for m in cfg.time_buckets.hour12_add_12_markers):
+        hour += 12
+    if 0 <= hour <= 23:
+        return hour
+    return None
 
 
 def _derive_sources(source_values: Iterable[str]) -> tuple[str, ...]:

@@ -4,7 +4,7 @@ Skill = 提示词模板 + Pydantic 输出契约 + 业务校验（P6 开赛定案
 output_pipeline 统一运行时执行（解析/修复 → 结构 + 业务校验 → 有限重试 →
 明确失败；instructor「validation retry」模式的改写，plan §1.2.1）。
 
-输入打包（数据定调）：评级摘要、top5 罪名、昼夜分布、三维提取、检索摘要槽位
+输入打包（数据定调）：评级摘要、top5 罪名、昼夜或四时段桶计数、三维提取、检索摘要槽位
 （A2 注入 top-3 chunk；A1 恒空）。六维画像永不进入请求体（ADR-0003 / P6）：
 SuggestionPack 结构上不含画像字段——画像只在本机对产出做确定性排序前置
 （pipeline._personalized_suggestions），隐私页「零上传」口径一字不改。
@@ -85,6 +85,9 @@ class SuggestionPack:
     extracted_area: str | None
     extracted_crowd: str | None
     extracted_time: str | None
+    time_bucket_label: str | None = None
+    time_bucket_count: int | None = None
+    time_bucket_sufficient: bool | None = None
 
 
 class SuggestionSkillOut(BaseModel):
@@ -121,9 +124,19 @@ def build_messages(
     if pack.data_sufficient:
         top5 = "、".join(f"{offense} {count}" for offense, count in pack.top5_types)
         lines.append(f"- 主要案件（按次数）：{top5}")
-        lines.append(f"- 昼夜分布：白天 {pack.day_count} / 夜间 {pack.night_count}")
+        if pack.time_bucket_label is None:
+            lines.append(f"- 昼夜分布：白天 {pack.day_count} / 夜间 {pack.night_count}")
     else:
         lines.append("- 数据提示：样本不足，案件分布不可用，建议保持通用、不做数据性断言")
+    if pack.time_bucket_label is not None:
+        if pack.time_bucket_sufficient:
+            lines.append(
+                f"- 查询时段：{pack.time_bucket_label}（该桶命中 {pack.time_bucket_count} 条）"
+            )
+        else:
+            lines.append(
+                f"- 查询时段：{pack.time_bucket_label}（该桶样本不足，命中 {pack.time_bucket_count} 条，勿对该时段案件分布作断言）"
+            )
     extracted = "、".join(
         f"{label}={value}"
         for label, value in (

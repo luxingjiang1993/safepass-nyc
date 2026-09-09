@@ -77,6 +77,16 @@ class Charts(BaseModel):
     day_night: DayNight
 
 
+class TimeBucketStats(BaseModel):
+    """查询可解析钟点时的四时段桶计数（C2）。无钟点时契约字段为 null。
+
+    只约束建议定调与数据不足说明，不改变安全评级。label 来自配置桶名。
+    """
+
+    label: str
+    count: int
+
+
 class AlternativeInfo(BaseModel):
     """降级响应的替代信息：所在区域的真实评级与时间模式（仅当该区域在覆盖内）。
 
@@ -153,6 +163,7 @@ class SafetyQueryResult(BaseModel):
     判别字段；"template" = 模板/降级，"skill" = 受约束生成通过校验）；
     rating_rationale：覆盖内确定性「评级依据」人话（C1a）；按灯色填配置模板，
     四档必非空；不进 Skill 输出、不进建议依据列表。
+    time_bucket：C2 可解析钟点时的时段桶计数；无钟点为 null。不进用户画像。
     数据不足（⚪）时 unknowns 非空、charts 为 null、不给评级数值与可信度。
     """
 
@@ -174,6 +185,7 @@ class SafetyQueryResult(BaseModel):
     # 首条；该文案是两侧路径的受控常量（两路径对照时同现，不构成区分信号）。
     suggestions_source: Literal["skill", "template"] = "template"
     unknowns: list[str] = Field(default_factory=list)
+    time_bucket: TimeBucketStats | None = None
     llm_degraded: bool = False  # 票 06：LLM 熔断/限流降级明示（不静默；评级/数据字段不受影响）
     degradation_notice: str | None = None  # 降级时非空（config cost_control.degraded_notice）
     sources: list[str]
