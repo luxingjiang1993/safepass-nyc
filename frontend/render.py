@@ -842,7 +842,8 @@ def render_disclaimer_page(
 ) -> str:
     """数据口径与免责声明页（公开，纯渲染）：数据来源/统计口径/免责话术/
     紧急资源。免责话术逐字来自集中配置 disclaimer（与全部响应形态横切字段
-    一致）；数据口径逐字来自 data_source 配置与全市基准，不硬编码字面量；
+    一致）；来源与时间范围逐字来自 data_source.sources / time_range（F1，
+    与覆盖内契约同源）；数据集 ID 与全市基准同样来自配置，不硬编码字面量；
     紧急资源清单来自既有 degraded.load_general_venues（静态表同源），
     此处只做 Venue 逐字段校验（纯函数，渲染前最后一道防线）。
     """
@@ -852,11 +853,16 @@ def render_disclaimer_page(
         f'  <ul>\n{_emergency_venue_list(venues)}\n  </ul>\n</section>'
         if venues else ""
     )
+    source_items = "\n".join(
+        f"    <li>数据来源：{_esc(src)}</li>" for src in cfg.data_source.sources
+    )
     body = f"""{_back_link()}
 <header class="result-head"><h1>📋 数据口径与免责声明</h1></header>
 <section class="legal-section"><h2>数据口径</h2>
   <ul>
-    <li>数据来源：纽约市警察局（NYPD）公开投诉记录，经 NYC 开放数据平台获取（数据集 {_esc(cfg.data_source.nypd_dataset_id)}）。</li>
+{source_items}
+    <li>覆盖时间：{_esc(cfg.data_source.time_range)}</li>
+    <li>数据集：纽约市警察局（NYPD）公开投诉记录，经 NYC 开放数据平台获取（数据集 {_esc(cfg.data_source.nypd_dataset_id)}）。</li>
     <li>统计口径：按警区聚合的犯罪率（每 10 万人），与全市均值比较得出四级评级（ADR-0001）。</li>
     <li>全市基准：每 10 万人 {_esc(cfg.city_mean_per_100k)} 起（随数据快照更新）。</li>
     <li>历史数据不代表未来风险；样本量不足时会明确标注可信度（⚪ 数据不足），绝不硬给结论。</li>

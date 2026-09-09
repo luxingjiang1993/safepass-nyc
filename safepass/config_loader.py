@@ -138,6 +138,26 @@ class SuggestionsConfig:
 
 
 @dataclass(frozen=True)
+class TimeBucketSpec:
+    """单个时段桶：含 start_hour 不含 end_hour；可跨日（start > end）。"""
+
+    label: str
+    start_hour: int
+    end_hour: int
+
+
+@dataclass(frozen=True)
+class TimeBucketsConfig:
+    """四时段桶（C2）：边界与样本门槛只活配置。"""
+
+    buckets: tuple[TimeBucketSpec, ...]
+    min_sample: int
+    unknown_message: str
+    hour12_add_12_markers: tuple[str, ...]
+    midnight_12_markers: tuple[str, ...]
+
+
+@dataclass(frozen=True)
 class EmergencyConfig:
     """紧急检测与静态紧急组装配置（issue 07 / T5，spec D7）。
 
@@ -237,6 +257,8 @@ class DataSourceConfig:
     recorded_response：Socrata 响应录制 fixture（测试离线回放，零真实调用）；
     request_timeout_seconds / page_limit：脚本级请求参数（page_limit 上限
     为 Socrata 单次请求的平台约束，单一事实源 = page_limit_max）。
+    sources / time_range：覆盖内契约与免责页的来源、时间范围（F1），
+    字面量只活在配置，两边必须同读。
     """
 
     socrata_base_url: str
@@ -247,6 +269,8 @@ class DataSourceConfig:
     request_timeout_seconds: int
     page_limit: int
     page_limit_max: int
+    sources: tuple[str, ...]
+    time_range: str
 
 
 @dataclass(frozen=True)
@@ -371,6 +395,7 @@ class AppConfig:
     degraded: DegradedConfig
     suggestions: SuggestionsConfig
     one_liner: OneLinerConfig
+    time_buckets: TimeBucketsConfig
     emergency: EmergencyConfig
     followup: FollowUpConfig
     comparison: ComparisonConfig
@@ -411,6 +436,66 @@ def _parse_tiers(raw: list[dict[str, Any]]) -> tuple[SampleSizeTier, ...]:
     if tiers[0].min != 0:
         raise ConfigError("sample_size_tiers 必须从 0 开始")
     return tiers
+
+
+_REQUIRED_TIME_BUCKET_LABELS = frozenset({"清晨", "日间", "晚间", "深夜"})
+
+
+def _parse_time_buckets(raw: dict[str, Any]) -> TimeBucketsConfig:
+    """四时段桶：恰好四条、覆盖 24 小时、无重叠；门槛与话术只搬运校验。"""
+    buckets_raw = _require(raw, "buckets", "time_buckets")
+    if not isinstance(buckets_raw, list) or len(buckets_raw) != 4:
+        raise ConfigError("time_buckets.buckets 必须恰好 4 条（清晨/日间/晚间/深夜）")
+    buckets: list[TimeBucketSpec] = []
+    for i, item in enumerate(buckets_raw):
+        if not isinstance(item, dict):
+            raise ConfigError(f"time_buckets.buckets[{i}] 必须是映射")
+        label = str(_require(item, "label", f"time_buckets.buckets[{i}]"))
+        start = int(_require(item, "start_hour", f"time_buckets.buckets[{i}]"))
+        end = int(_require(item, "end_hour", f"time_buckets.buckets[{i}]"))
+        if not label.strip():
+            raise ConfigError(f"time_buckets.buckets[{i}].label 不得为空")
+        if start == end or not (0 <= start <= 23) or not (0 <= end <= 23):
+            raise ConfigError(
+                f"time_buckets.buckets[{i}] 的 start_hour/end_hour 须在 0-23 且不相等"
+            )
+        buckets.append(TimeBucketSpec(label=label, start_hour=start, end_hour=end))
+    labels = [b.label for b in buckets]
+    if set(labels) != _REQUIRED_TIME_BUCKET_LABELS:
+        raise ConfigError("time_buckets.buckets 的 label 必须恰好是 清晨/日间/晚间/深夜")
+    if len(set(labels)) != 4:
+        raise ConfigError("time_buckets.buckets 的 label 不得重复")
+    covered: list[str | None] = [None] * 24
+    for bucket in buckets:
+        hour = bucket.start_hour
+        while True:
+            if covered[hour] is not None:
+                raise ConfigError(f"time_buckets 小时 {hour} 被多个桶覆盖")
+            covered[hour] = bucket.label
+            hour = (hour + 1) % 24
+            if hour == bucket.end_hour:
+                break
+    if any(slot is None for slot in covered):
+        raise ConfigError("time_buckets 必须覆盖 0-23 全部小时且无缺口")
+    min_sample = int(_require(raw, "min_sample", "time_buckets"))
+    if min_sample < 0:
+        raise ConfigError("time_buckets.min_sample 不得为负")
+    unknown_message = str(_require(raw, "unknown_message", "time_buckets"))
+    if "{label}" not in unknown_message or "{n}" not in unknown_message:
+        raise ConfigError("time_buckets.unknown_message 必须含 {label} 与 {n} 占位")
+    add12 = tuple(str(m) for m in _require(raw, "hour12_add_12_markers", "time_buckets"))
+    midnight = tuple(str(m) for m in _require(raw, "midnight_12_markers", "time_buckets"))
+    if not add12 or any(not m.strip() for m in add12):
+        raise ConfigError("time_buckets.hour12_add_12_markers 必须是非空词表")
+    if not midnight or any(not m.strip() for m in midnight):
+        raise ConfigError("time_buckets.midnight_12_markers 必须是非空词表")
+    return TimeBucketsConfig(
+        buckets=tuple(buckets),
+        min_sample=min_sample,
+        unknown_message=unknown_message,
+        hour12_add_12_markers=add12,
+        midnight_12_markers=midnight,
+    )
 
 
 def load_config(path: str | Path | None = None) -> AppConfig:
@@ -701,6 +786,15 @@ def load_config(path: str | Path | None = None) -> AppConfig:
         raise ConfigError("intel.unverified_label 不得为空（F7-3 未记载项统一标注）")
 
     data_source_raw = _require(data, "data_source", "root")
+    sources_raw = _require(data_source_raw, "sources", "data_source")
+    if not isinstance(sources_raw, list) or not sources_raw:
+        raise ConfigError("data_source.sources 必须是非空列表（F1 免责与契约同源）")
+    sources = tuple(str(s).strip() for s in sources_raw)
+    if any(not s for s in sources):
+        raise ConfigError("data_source.sources 条目不得为空")
+    time_range = str(_require(data_source_raw, "time_range", "data_source")).strip()
+    if not time_range:
+        raise ConfigError("data_source.time_range 不得为空（F1 免责与契约同源）")
     data_source = DataSourceConfig(
         socrata_base_url=str(_require(data_source_raw, "socrata_base_url", "data_source")),
         nypd_dataset_id=str(_require(data_source_raw, "nypd_dataset_id", "data_source")),
@@ -712,6 +806,8 @@ def load_config(path: str | Path | None = None) -> AppConfig:
         ),
         page_limit=int(_require(data_source_raw, "page_limit", "data_source")),
         page_limit_max=int(_require(data_source_raw, "page_limit_max", "data_source")),
+        sources=sources,
+        time_range=time_range,
     )
     for field_name in (
         "socrata_base_url",
@@ -928,6 +1024,14 @@ def load_config(path: str | Path | None = None) -> AppConfig:
                 raise ConfigError(f"one_liner.type_names[{code!r}] 命中黑名单词 {word!r}（A3 收紧）")
     one_liner = OneLinerConfig(hooks=tuple(hook_specs), type_names=type_names)
 
+    time_buckets_raw = _require(data, "time_buckets", "root")
+    if not isinstance(time_buckets_raw, dict):
+        raise ConfigError("time_buckets 必须是映射")
+    time_buckets = _parse_time_buckets(time_buckets_raw)
+    for word in (*guardrails.panic_blacklist, *suggestions.empty_talk_blacklist):
+        if word in time_buckets.unknown_message:
+            raise ConfigError(f"time_buckets.unknown_message 命中黑名单词 {word!r}")
+
     return AppConfig(
         thresholds=thresholds,
         sample_size_tiers=tiers,
@@ -944,6 +1048,7 @@ def load_config(path: str | Path | None = None) -> AppConfig:
         degraded=degraded,
         suggestions=suggestions,
         one_liner=one_liner,
+        time_buckets=time_buckets,
         emergency=emergency,
         followup=followup,
         comparison=comparison,
