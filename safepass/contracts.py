@@ -9,6 +9,7 @@ guardrail 拒绝形态）：
     GuardrailResult      负例防线拒绝（种族偏见转向 / 武器建议拒绝，issue 09 / T7）
 
 横切字段：disclaimer、sources、sample_size（如有）。评级字段是枚举，不出现自由文本。
+本阶段字段增删与前端兼容策略见 docs/contract-changelog.md（E2）；不做服务型 API 版本号。
 
 当前落地（issue 07 / T5）：四形态契约齐备（评级枚举化，业务校验在
 output_pipeline 内建校验器）；SafetyQueryResult 带结构合规的建议与
