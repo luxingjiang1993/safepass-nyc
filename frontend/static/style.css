@@ -318,6 +318,15 @@ ul, ol { padding-left: 1.3rem; margin: 0.3rem 0; }
 body.theme-emergency {
   background: #2b0507;
   color: #fff;
+  /* 紧急页冻结主题变量：系统深色偏好不得渗进紧急页 */
+  --bg: #2b0507;
+  --fg: #fff;
+  --muted: #f2c4c6;
+  --surface: #3d0a0d;
+  --border: #6b1a1f;
+  --accent: #ffd9db;
+  --accent-soft: #43161a;
+  --accent-ink: #ffd9db;
 }
 body.theme-emergency .page { max-width: 34rem; }
 body.theme-emergency .illustration { color: #f2c4c6; }

@@ -76,23 +76,6 @@ _PROFILE_IDENTITIES = ("留学生", "新移民", "上班族", "游客", "家长"
 _PROFILE_ENGLISH_LEVELS = ("不会英语", "基础日常", "工作流利")
 _PROFILE_DURATIONS = ("刚来（1年以内）", "1-5年", "5年以上")
 
-_PAGE = """<!DOCTYPE html>
-<html lang="zh-CN" class="{html_class}">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>{title}</title>
-<link rel="stylesheet" href="/static/style.css">
-</head>
-<body class="{body_class}">
-<main class="page">
-{theme_nav}
-{body}
-</main>
-</body>
-</html>
-"""
-
 
 def _esc(text: Any) -> str:
     """全部用户可见文本经 HTML 转义（契约字段也不可信，渲染层统一出口）。"""
@@ -127,12 +110,26 @@ def _page(
     theme: str | None = None,
 ) -> str:
     emergency = "theme-emergency" in body_class
-    return _PAGE.format(
-        title=_esc(title),
-        body=body,
-        body_class=_esc(body_class),
-        html_class=_esc(_html_theme_class(theme, emergency=emergency)),
-        theme_nav=_theme_nav(emergency=emergency),
+    html_class = _html_theme_class(theme, emergency=emergency)
+    html_attr = f' class="{_esc(html_class)}"' if html_class else ""
+    body_attr = f' class="{_esc(body_class)}"' if body_class else ""
+    theme_nav = _theme_nav(emergency=emergency)
+    return (
+        "<!DOCTYPE html>\n"
+        f'<html lang="zh-CN"{html_attr}>\n'
+        "<head>\n"
+        '<meta charset="utf-8">\n'
+        '<meta name="viewport" content="width=device-width, initial-scale=1">\n'
+        f"<title>{_esc(title)}</title>\n"
+        '<link rel="stylesheet" href="/static/style.css">\n'
+        "</head>\n"
+        f"<body{body_attr}>\n"
+        '<main class="page">\n'
+        f"{theme_nav}\n"
+        f"{body}\n"
+        "</main>\n"
+        "</body>\n"
+        "</html>\n"
     )
 
 

@@ -114,8 +114,8 @@ class TestThemeCookieRoute:
         assert resp.status in (302, 303)
         set_cookie = resp.getheader("Set-Cookie") or ""
         assert f"{THEME_COOKIE}=dark" in set_cookie
-        # 主题 cookie 不是会话画像载体
-        assert "safepass_sid=" not in set_cookie or THEME_COOKIE in set_cookie
+        # 主题 cookie 不是会话画像载体：本路由不得顺带写 safepass_sid
+        assert "safepass_sid=" not in set_cookie
 
     def test_theme_cookie_applied_on_subsequent_page(self, server):
         get(server, "/theme?set=dark")
@@ -128,6 +128,7 @@ class TestThemeCookieRoute:
         set_cookie = resp.getheader("Set-Cookie") or ""
         assert THEME_COOKIE in set_cookie
         assert "Max-Age=0" in set_cookie or "max-age=0" in set_cookie.lower()
+        assert "safepass_sid=" not in set_cookie
 
 
 class TestTenIllustrationSlots:
@@ -170,10 +171,16 @@ class TestTenIllustrationSlots:
         assert 'data-illustration="legal"' in disclaimer
 
     def test_illustrations_are_monochrome_current_color_not_rating_art(self):
-        # 单色随主题变色：用 currentColor；禁止按灯配犯罪叙事图
-        home = render.render_home(CFG)
-        assert "currentColor" in home
-        assert "rating-green" not in home.split("data-illustration")[1][:400]
+        # 十槽单色随主题变色：全部用 currentColor；禁止按灯配犯罪叙事图
+        from frontend import illustrations as illus
+
+        for slot in ILLUSTRATION_SLOTS:
+            svg = illus._SVGS[slot]
+            assert "currentColor" in svg, f"{slot} 缺 currentColor"
+            assert "rating-green" not in svg and "rating-yellow" not in svg
+            assert "rating-red" not in svg and "rating-orange" not in svg
+            # 不锁 path d；只禁位图与按灯配色类
+            assert "<img" not in svg and ".png" not in svg and ".jpg" not in svg
 
 
 class TestPrivacyThemeCookieDisclosure:
