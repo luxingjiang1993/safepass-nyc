@@ -18,8 +18,6 @@
 from __future__ import annotations
 
 import json
-import math
-import time
 from pathlib import Path
 from typing import Any
 
@@ -527,39 +525,3 @@ def test_routing_exhausts_cassette_then_fails_explicitly():
         routing.route_query(query, client, cfg)
     with pytest.raises(CassetteError):
         routing.route_query("上东区晚上安全吗？", client, cfg)
-
-
-# ---------------------------------------------------------------------------
-# 6. 性能标记：正常查询端到端 P95 < 8s（留 20% 余量 → 6.4s；UX-001）
-# ---------------------------------------------------------------------------
-
-
-@pytest.mark.perf
-def test_query_latency_p95_within_budget():
-    cfg = config_loader.load_config()
-    durations: list[float] = []
-    for _ in range(7):
-        fake = _ScriptedFakeLLM(
-            script=[
-                json.dumps({"route": "area_safety_query"}),
-                json.dumps({"area": "上东区", "crowd": None, "time": "晚上"}),
-                # A1（issue 16）：接缝注入客户端时建议 Skill 消费第 3 次调用
-                json.dumps(
-                    {
-                        "suggestions": [
-                            "夜间出行选择照明好的主干道",
-                            "随身包放在身前视线范围内",
-                            "提前告知朋友行程并保持联系",
-                        ],
-                        "suggestion_grounds": [],
-                    },
-                    ensure_ascii=False,
-                ),
-            ]
-        )
-        start = time.perf_counter()
-        execute_query("上东区晚上安全吗？", llm_client=fake)
-        durations.append(time.perf_counter() - start)
-    durations.sort()
-    p95 = durations[int(math.ceil(0.95 * len(durations))) - 1]
-    assert p95 < 8 * 0.8, f"查询 P95 {p95:.2f}s 超出 UX-001 预算（8s × 0.8 余量）"

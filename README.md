@@ -88,12 +88,26 @@ python frontend/app.py
 
 ```bash
 python -m pytest tests/ -q       # 全部测试（唯一判定命令；裸跑 pytest 会 ModuleNotFoundError——safepass 不在 sys.path）
-python -m pytest tests/ -q -m perf   # 性能断言：查询 P95 < 8s、紧急 P95 < 2s
+python -m pytest tests/ -q -m perf   # 性能信封（E3）：查询/紧急/无 LLM/有 Skill P95 + 索引内存；阈值 = config perf 节
 python -m pytest tests/eval -q   # L2+N2 整目录（judge 走 cassette 离线回放；tests/conftest.py 的 collect_ignore 使其不进默认基线）
 python -m pytest tests/eval -m l2 -q  # B7：改建议提示词或 Skill 必须跑的 L2 子集；不得用 python -m pytest tests/ -m l2 代替
 python scripts/generate_fixtures.py   # 重新生成 fixture 三件套（T0 实现后可用；要求同脚本同参数同输出）
 python scripts/demo_queries.py        # N3/E7 审阅者路径：5 条固定 query 打印契约摘要（无 key 确定性）
 ```
+
+## 性能信封（E3）
+
+本地可测的延迟与索引粗值上界。**单一事实源** = `config/app.yaml` 的 `perf` 节（预算与余量系数）；README 只投影预算数字。计时断言口径 = 预算 × `margin`（默认 0.8，留 20% 防环境噪音）；稳态取样前丢弃一次预热。超阈由 `python -m pytest tests/ -q -m perf` 红。
+
+| 路径 | 预算 | 口径 |
+|------|------|------|
+| 查询 P95 | 8.0 s | UX-001；与「有 Skill」一次实测、分别对两档预算 |
+| 紧急 P95 | 2.0 s | UX-006 静态紧急组装，零 LLM |
+| 无 LLM 路径 P95 | 4.0 s | `llm_client=None`，模板建议 |
+| 有 Skill 路径 P95 | 8.0 s | 同上实测；断言 `suggestions_source=skill` |
+| 索引内存粗值 | 50.0 MB | `fixtures/index` 文件合计（非进程 RSS） |
+
+复算：`python -m pytest tests/ -q -m perf`（改预算须同步本表与 `config/app.yaml`，由 `tests/test_e3_perf_envelope.py` 对账）。
 
 ## Ralph loop
 

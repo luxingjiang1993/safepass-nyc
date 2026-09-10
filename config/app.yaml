@@ -351,6 +351,27 @@ intel:
   unverified_label: "未核实到"
 
 # ============================================================================
+# 性能信封（issue 47 / E3）：阈值只活此处；pytest -m perf 超阈红；
+# README 投影预算数字（单一事实源 = 本节，不另存录制工件）。
+# 计时断言口径 = 预算 × margin（留 20% 余量防环境噪音）；稳态取样前丢弃
+# 一次预热（embedding / 索引冷加载不进信封）。
+# ============================================================================
+perf:
+  margin: 0.8
+  samples:
+    query: 7
+    emergency: 20
+    no_llm: 7
+    skill: 7
+  budgets:
+    query_p95_seconds: 8.0          # UX-001 覆盖内查询（主路径 = Skill+检索）
+    emergency_p95_seconds: 2.0      # UX-006 紧急静态组装
+    no_llm_p95_seconds: 4.0         # llm_client=None 模板建议路径
+    skill_p95_seconds: 8.0          # 注入 Skill 路径（与查询主路径同口径）
+    index_memory_mb_max: 50.0       # fixtures/index 文件合计粗值上界（MB）
+  index_dir: "fixtures/index"
+
+# ============================================================================
 # 真实数据 adapter（issue 05 / M2，spec v2）：Socrata 单向管道配置。
 # 运行方式：手动/月更离线脚本 scripts/fetch_nypd.py；运行时（产品代码）
 # 永不直连外部 API。数据集 ID 以下载前核验的门户页面实际 URL 为准

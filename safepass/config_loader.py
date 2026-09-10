@@ -251,6 +251,41 @@ class IntelConfig:
 
 
 @dataclass(frozen=True)
+class PerfSamplesConfig:
+    """性能信封取样次数（issue 47 / E3）：字面量只活 config/app.yaml。"""
+
+    query: int
+    emergency: int
+    no_llm: int
+    skill: int
+
+
+@dataclass(frozen=True)
+class PerfBudgetsConfig:
+    """性能信封预算（issue 47 / E3）：P95 秒与索引内存 MB 上界。"""
+
+    query_p95_seconds: float
+    emergency_p95_seconds: float
+    no_llm_p95_seconds: float
+    skill_p95_seconds: float
+    index_memory_mb_max: float
+
+
+@dataclass(frozen=True)
+class PerfConfig:
+    """性能信封（issue 47 / E3）：阈值、取样、索引路径；README 投影同源。
+
+    margin：相对预算留余量（计时断言 = 预算 × margin）；index_dir：相对
+    仓库根的索引目录（文件合计粗值，非进程 RSS）。
+    """
+
+    margin: float
+    samples: PerfSamplesConfig
+    budgets: PerfBudgetsConfig
+    index_dir: str
+
+
+@dataclass(frozen=True)
 class DataSourceConfig:
     """真实数据 adapter 配置（issue 05 / M2，spec v2）：Socrata 单向管道。
 
@@ -404,6 +439,7 @@ class AppConfig:
     guardrails: GuardrailsConfig
     profile: ProfileConfig
     intel: IntelConfig
+    perf: PerfConfig
     data_source: DataSourceConfig
     cost_control: CostControlConfig
     synthetic_user: SyntheticUserConfig
@@ -787,6 +823,60 @@ def load_config(path: str | Path | None = None) -> AppConfig:
     if not intel.unverified_label.strip():
         raise ConfigError("intel.unverified_label 不得为空（F7-3 未记载项统一标注）")
 
+    perf_raw = _require(data, "perf", "root")
+    if not isinstance(perf_raw, dict):
+        raise ConfigError("perf 必须是映射（E3 性能信封）")
+    margin = float(_require(perf_raw, "margin", "perf"))
+    if not (0 < margin <= 1.0):
+        raise ConfigError("perf.margin 必须在 (0, 1]（计时余量系数）")
+    samples_raw = _require(perf_raw, "samples", "perf")
+    if not isinstance(samples_raw, dict):
+        raise ConfigError("perf.samples 必须是映射")
+    samples = PerfSamplesConfig(
+        query=int(_require(samples_raw, "query", "perf.samples")),
+        emergency=int(_require(samples_raw, "emergency", "perf.samples")),
+        no_llm=int(_require(samples_raw, "no_llm", "perf.samples")),
+        skill=int(_require(samples_raw, "skill", "perf.samples")),
+    )
+    for field_name in ("query", "emergency", "no_llm", "skill"):
+        if getattr(samples, field_name) < 5:
+            raise ConfigError(f"perf.samples.{field_name} 必须 ≥ 5（P95 取样下限）")
+    budgets_raw = _require(perf_raw, "budgets", "perf")
+    if not isinstance(budgets_raw, dict):
+        raise ConfigError("perf.budgets 必须是映射")
+    budgets = PerfBudgetsConfig(
+        query_p95_seconds=float(
+            _require(budgets_raw, "query_p95_seconds", "perf.budgets")
+        ),
+        emergency_p95_seconds=float(
+            _require(budgets_raw, "emergency_p95_seconds", "perf.budgets")
+        ),
+        no_llm_p95_seconds=float(
+            _require(budgets_raw, "no_llm_p95_seconds", "perf.budgets")
+        ),
+        skill_p95_seconds=float(
+            _require(budgets_raw, "skill_p95_seconds", "perf.budgets")
+        ),
+        index_memory_mb_max=float(
+            _require(budgets_raw, "index_memory_mb_max", "perf.budgets")
+        ),
+    )
+    for field_name in (
+        "query_p95_seconds",
+        "emergency_p95_seconds",
+        "no_llm_p95_seconds",
+        "skill_p95_seconds",
+        "index_memory_mb_max",
+    ):
+        if getattr(budgets, field_name) <= 0:
+            raise ConfigError(f"perf.budgets.{field_name} 必须为正")
+    index_dir = str(_require(perf_raw, "index_dir", "perf")).strip()
+    if not index_dir:
+        raise ConfigError("perf.index_dir 不得为空（索引文件合计粗值路径）")
+    perf = PerfConfig(
+        margin=margin, samples=samples, budgets=budgets, index_dir=index_dir
+    )
+
     data_source_raw = _require(data, "data_source", "root")
     sources_raw = _require(data_source_raw, "sources", "data_source")
     if not isinstance(sources_raw, list) or not sources_raw:
@@ -1066,6 +1156,7 @@ def load_config(path: str | Path | None = None) -> AppConfig:
         guardrails=guardrails,
         profile=profile,
         intel=intel,
+        perf=perf,
         data_source=data_source,
         cost_control=cost_control,
         synthetic_user=synthetic_user,

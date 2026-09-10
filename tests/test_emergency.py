@@ -3,7 +3,7 @@
 对应 .scratch/safepass-nyc-mvp/issues/07-emergency-detection-static-assembly.md 五条勾选：
     1. 关键词直录 + 改写句合计触发率 > 95%（改写句层用 cassette 回放验证）
     2. 静态分支 LLM 调用计数 = 0（第一层关键词命中后路由 LLM 不可达）
-    3. EmergencyResult 组装 < 2s（perf 标记；P95 留 20% 余量 → 1.6s）
+    3. EmergencyResult 组装 P95 预算见 config perf 节（E3；tests/test_e3_perf_envelope.py）
     4. 清单字段与警区静态表逐字段一致；无区域查询历史 → 通用清单且无"最近"类定位词
     5. 字段断言：911 按钮文案、中文报警用语、信息准备清单、安抚话术、311/社区电话非空
 
@@ -15,8 +15,6 @@
 from __future__ import annotations
 
 import json
-import math
-import time
 from pathlib import Path
 from typing import Any
 
@@ -317,20 +315,3 @@ def test_cassette_asset_committed_and_wellformed():
     for entry in interactions:
         assert entry["fingerprint"]
         assert entry["response"]["content"]
-
-
-# ---------------------------------------------------------------------------
-# 勾选 3：性能标记——EmergencyResult 组装 P95 < 2s（留 20% 余量 → 1.6s；UX-006）
-# ---------------------------------------------------------------------------
-
-
-@pytest.mark.perf
-def test_emergency_assembly_latency_p95_within_budget():
-    durations: list[float] = []
-    for _ in range(20):
-        start = time.perf_counter()
-        execute_query("救命，有人持刀！")
-        durations.append(time.perf_counter() - start)
-    durations.sort()
-    p95 = durations[int(math.ceil(0.95 * len(durations))) - 1]
-    assert p95 < 2 * 0.8, f"紧急组装 P95 {p95:.3f}s 超出 UX-006 预算（2s × 0.8 余量）"
