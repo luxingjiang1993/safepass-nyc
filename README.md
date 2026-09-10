@@ -87,7 +87,8 @@ python frontend/app.py
 ```bash
 python -m pytest tests/ -q       # 全部测试（唯一判定命令；裸跑 pytest 会 ModuleNotFoundError——safepass 不在 sys.path）
 python -m pytest tests/ -q -m perf   # 性能断言：查询 P95 < 8s、紧急 P95 < 2s
-python -m pytest tests/eval -q   # L2 eval 套件（judge 走 cassette 离线回放，独立于基线）
+python -m pytest tests/eval -q   # L2+N2 整目录（judge 走 cassette 离线回放；tests/conftest.py 的 collect_ignore 使其不进默认基线）
+python -m pytest tests/eval -m l2 -q  # B7：改建议提示词或 Skill 必须跑的 L2 子集；不得用 python -m pytest tests/ -m l2 代替
 python scripts/generate_fixtures.py   # 重新生成 fixture 三件套（T0 实现后可用；要求同脚本同参数同输出）
 python scripts/demo_queries.py        # N3/E7 审阅者路径：5 条固定 query 打印契约摘要（无 key 确定性）
 ```
@@ -122,7 +123,7 @@ python scripts/demo_queries.py        # N3/E7 审阅者路径：5 条固定 quer
 │   └── skills/             #   建议 Skill（LLM 措辞+数据定调，ADR-0003）：提示词模板 + Pydantic 契约 + grounds 业务校验；画像零接触
 ├── tests/                  # pytest 测试集（每个 Ralph 任务先写红再转绿；数量以实际文件为准）
 │   ├── cassettes/          #   录制回放：固定 LLM 行为，离线可重复
-│   └── eval/               #   L2 eval 套件（LLM-as-judge，cassette 回放；独立运行，不进默认基线）
+│   └── eval/               #   L2 eval 套件（LLM-as-judge，cassette 回放；collect_ignore 不进默认基线；改建议走 python -m pytest tests/eval -m l2 -q）
 ├── scripts/                # 确定性脚本（以实际文件为准）：generate_fixtures（fixture 生成，禁 LLM）、
 │                           #   build_index（检索索引）、fetch_nypd（真实数据 adapter）、
 │                           #   record_l2_cassette（L2 录制）、record_n2_cassette（N2 三列录制）、serve（容器入口）、demo_queries（N3/E7 审阅者路径）、recompute_city_mean 等

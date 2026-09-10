@@ -1,8 +1,10 @@
 """pytest 全局接缝（tests/ 根 conftest）。
 
-1. collect_ignore：L2 评估套件（tests/eval/）刻意不进默认基线（spec v2：
-   单独 marker/命令跑，judge 依赖 cassette 资产）。默认基线保持零 cassette 依赖；
-   运行 L2 套件：pytest tests/eval -q
+1. collect_ignore：tests/eval/ 刻意不进默认基线（spec v2：单独 marker/命令跑，
+   judge 依赖 cassette 资产）。默认基线保持零 cassette 依赖。
+   整目录：python -m pytest tests/eval -q
+   L2 子集（B7 壳，改建议提示词/Skill 强制）：python -m pytest tests/eval -m l2 -q
+   禁止用 python -m pytest tests/ -m l2 代替——collect_ignore 会让该命令收集到 0 条。
 2. SAFEPASS_DATASET_PATH（票 07 / M2）：生产数据路径已切到 fixtures/nypd_real
    （config data_source.runtime_dataset_path），而整个测试世界（金标期望、
    复算集、cassette 指纹）建立在 mock 数据集之上——mock 保留为测试资产。

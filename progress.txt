@@ -5,7 +5,7 @@ Ralph 跨迭代记忆。每次 ./ralph-once.sh 未达标迭代，agent 的承诺
 
 ## 现状（2026-09-10）——下面 A3 段落已过期，不要当待办
 
-Phase 3 波 1 + 波 2 第一刀 + 波 2 第二刀已收口（`#16`–`#34` 关闭）。L2 cassette 已按 qwen-flash 重录（含 C1b）。不要再执行「重录 l2_judge / 做 N3 / 做 C1/B4/N4/D5」这类下文遗留句。下一动作只听用户点名。
+Phase 3 波 1 + 波 2 第一刀 + 波 2 第二刀已收口（`#16`–`#34` 关闭）。L2 cassette 已按 qwen-flash 重录（含 C1b）。B7 壳（`#49`）：改建议提示词/Skill 强制 `python -m pytest tests/eval -m l2 -q`；默认基线仍 `collect_ignore` 不含 L2；不做故意改坏 prompt 满门闩。不要再执行「重录 l2_judge / 做 N3 / 做 C1/B4/N4/D5」这类下文遗留句。下一动作只听用户点名。
 
 ## 票 #18 A3 one_liner 确定性数据钩子化（2026-09-08，人工会话接管完成）
 

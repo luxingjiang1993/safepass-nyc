@@ -22,6 +22,10 @@ _Avoid_: 未知区域、查无此地
 面向用户的四级结论：🟢相对安全 / 🟡需注意 / 🔴高风险 / ⚪数据不足。由该警区过去12个月 per-100k 犯罪率相对 NYC 全市均值计算（<0.7× 市均值 → 🟢；0.7–1.3× → 🟡；>1.3× → 🔴），样本量低于显著性阈值时强制 ⚪ 且不给出评级。不由 LLM 定性判断。
 _Avoid_: 安全分数、危险指数、风险等级
 
+**时段桶（Time-of-day Bucket）**:
+覆盖内查询带可解析钟点时，案件计数切到清晨 / 日间 / 晚间 / 深夜四档（边界只在配置里）。时段桶只约束建议、解释与数据不足说明，不改变安全评级。无钟点时仍用昼夜合计。
+_Avoid_: 小时评分、时段灯色、24 小时热力
+
 ## 用户与画像
 
 **用户画像（User Profile）**:
@@ -39,7 +43,7 @@ _Avoid_: 置信度评分、准确率、可靠指数
 ## 评估与质量
 
 **eval 套件（Eval Suite）**:
-Phase 2 新增的质量门禁，两层架构：L1 确定性输出（评级/越界/结构化字段）走代码断言，进 `pytest tests/` 现有基线；L2 生成质量（建议质量/检索相关性/幻觉）走 LLM-as-judge，改写在 `可用来参考的代码案例/CASE-openevals使用` 的 evaluator，独立 `tests/eval/` 目录，judge 用 dev 模型（DashScope）保证考官考生同源。
+Phase 2 新增的质量门禁，两层架构：L1 确定性输出（评级/越界/结构化字段）走代码断言，进 `python -m pytest tests/` 现有基线（`collect_ignore` 不含 `tests/eval`）；L2 生成质量（建议质量/检索相关性/幻觉）走 LLM-as-judge，独立 `tests/eval/`。改建议提示词或 Skill 必须跑 L2 子集 `python -m pytest tests/eval -m l2 -q`（B7 壳；默认基线仍不收集 L2）。judge 用 dev 模型（DashScope）保证考官考生同源。
 _Avoid_: 测试集、质检系统
 
 **无约束 RAG（Unconstrained RAG）**:

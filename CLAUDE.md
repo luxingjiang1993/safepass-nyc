@@ -9,7 +9,8 @@
 ## 唯一接缝与唯一判定
 
 - **唯一接缝**：`execute_query(查询文本, 会话画像, 会话状态)`（`safepass/pipeline.py`）。后端全部能力经此进入。
-- **唯一判定**：`python -m pytest tests/ -q` 全绿（基线 735，随票递增）。没有"看起来对了"——测试不过就是没过。**禁止裸跑 `pytest`**：`safepass` 不在 sys.path（pytest.ini 未配 pythonpath），裸跑必 ModuleNotFoundError；L2 eval 套件同理走 `python -m pytest tests/eval -q`。
+- **唯一判定**：`python -m pytest tests/ -q` 全绿（基线 735，随票递增）。没有"看起来对了"——测试不过就是没过。**禁止裸跑 `pytest`**：`safepass` 不在 sys.path（pytest.ini 未配 pythonpath），裸跑必 ModuleNotFoundError。
+- **B7 建议变更回归门（壳）**：改建议提示词或 Skill（`safepass/skills/suggestion.py`）时，必须跑 L2 子集 `python -m pytest tests/eval -m l2 -q`。默认行为基线因 `tests/conftest.py` 的 `collect_ignore = ["eval"]` **仍然不收集 L2**；`python -m pytest tests/ -m l2` 会收集到 0 条，不得当回归。本刀不做「故意改坏 prompt → 红」满门闩。整目录（含 N2）仍是 `python -m pytest tests/eval -q`。
 
 ## Karpathy 宪法
 

@@ -4,7 +4,7 @@
 judge 客户端一律注入 fake；cassette 资产完整性沿用既有自检模式
 （tests/test_chinese_address.py::test_extraction_cassette_asset_wellformed）。
 
-运行（独立套件，不进默认基线）：``pytest tests/eval -q``
+运行（独立套件，不进默认基线）：``python -m pytest tests/eval -m l2 -q``
 """
 
 from __future__ import annotations
@@ -17,7 +17,7 @@ import pytest
 from safepass import config_loader, evaluators
 from safepass.llm_client import ChatResponse
 
-pytestmark = pytest.mark.eval
+pytestmark = [pytest.mark.eval, pytest.mark.l2]
 
 _CFG = config_loader.load_config()
 

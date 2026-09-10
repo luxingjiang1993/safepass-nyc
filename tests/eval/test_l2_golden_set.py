@@ -14,7 +14,7 @@ B2（issue 05）质量维度：actionability/specificity/矛盾率三维确定�
 （LLM 零参与），同一 Skill 覆盖子集聚合（主路径 + 模板对照同子集），
 回归门 = config eval.quality 的 min_*/max_*（本套件断言），收口条件扩三维。
 
-运行（独立套件，不进默认基线）：``pytest tests/eval -q``
+运行（独立套件，不进默认基线）：``python -m pytest tests/eval -m l2 -q``
 """
 
 from __future__ import annotations
@@ -29,7 +29,7 @@ from safepass.llm_client import reset_cassette_cursor
 
 import l2_runner  # 同目录共享 runner（pytest rootdir 插入 tests/eval 至 sys.path）
 
-pytestmark = pytest.mark.eval
+pytestmark = [pytest.mark.eval, pytest.mark.l2]
 
 _CFG = config_loader.load_config()
 _CASSETTE = l2_runner.cassette_path(_CFG)

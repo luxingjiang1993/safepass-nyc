@@ -13,10 +13,12 @@ Phase 3 **波 1 已收口**；**波 2 第一刀已收口**；**波 2 第二刀�
 - 唯一接缝：`execute_query(查询文本, 会话画像, 会话状态)`（`safepass/pipeline.py`）。
 - 唯一判定：`python -m pytest tests/ -q` 全绿。禁止裸跑 `pytest`（`safepass` 不在 sys.path）。
 - L2 eval 套件：`python -m pytest tests/eval -q`（`tests/conftest.py` 的 `collect_ignore` 刻意排除出默认基线）。
+- **B7 壳**：改建议提示词或 Skill 必须 `python -m pytest tests/eval -m l2 -q`。默认 `python -m pytest tests/ -q` 仍不收集 L2。不做故意改坏 prompt 满门闩。
 
 ## 高危雷区（操作层）
 
 - **L2 cassette 棘轮**：改影响 judge 请求内容的值（数据世界 / 提示词 / 口径 / 新字段进 `model_dump`）必须重录 `tests/cassettes/l2_judge*.json`，再跑 eval 套件。重录：`set -a && source .env && set +a && python scripts/record_l2_cassette.py`（需网络 + `DASHSCOPE_API_KEY` + 预算）。
+- **B7 建议变更挂钩**：改 `safepass/skills/suggestion.py` 提示词或 Skill 逻辑后，默认行为基线不够；必须 `python -m pytest tests/eval -m l2 -q`。指纹若因提示词漂移失效，先走上面的 cassette 棘轮，再跑该子集。
 - **测试世界钉不要拆**：`tests/conftest.py`、`tests/eval/l2_runner.py`、`tests/injection_report.py` 三处模块级钉 `SAFEPASS_DATASET_PATH` 到 mock 数据集。金标 / 复算 / cassette 指纹建在 mock 世界上；生产数据在 `fixtures/nypd_real`。
 - **`.env` 永不入库、永不读进上下文**。
 - **Git**：push 由用户自己执行（需 VPN）；agent 只 commit。`git add` 用显式路径，禁止 `git add -A`。commit 末尾带 `Co-Authored-By: Claude Code <noreply@anthropic.com>`。
