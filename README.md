@@ -82,6 +82,8 @@ python frontend/app.py
 
 换机器不漂（依赖 `==` 钉、pickle protocol=5、embedding 标识、FAISS ASCII 路径、cassette/judge 指针）见 [`docs/reproducibility.md`](docs/reproducibility.md)。该页不重做上述三命令。
 
+建议路径对照（曾经配置模板建议 → 现在 Skill + 检索；评级 / 可信度 / 越界仍零 LLM；画像只本机加权）见 [docs/suggestion-path.md](docs/suggestion-path.md)。
+
 ## 常用命令
 
 ```bash
