@@ -61,8 +61,15 @@ class Venue(BaseModel):
 
 
 class OffenseCount(BaseModel):
+    """Top5 一条：offense_type 是数据集类型代码；label_zh 是 C3 展示中文。
+
+    装配层按配置映射填写 label_zh；未收录类型填配置 unknown_offense_label，
+    count 原样保留。缺字段时前端沿用 offense_type（E2 兼容）。
+    """
+
     offense_type: str
     count: int
+    label_zh: str | None = None
 
 
 class DayNight(BaseModel):

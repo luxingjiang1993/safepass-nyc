@@ -16,7 +16,7 @@ from __future__ import annotations
 
 from typing import Iterable
 
-from safepass import addressing, config_loader, contracts, data_agent, degraded, output_pipeline
+from safepass import addressing, config_loader, contracts, data_agent, degraded, offense_zh, output_pipeline
 
 # 评级 → 安全性排序（🟢 < 🟡 < 🔴；⚪ 不参与排序，装配层先行剔除）
 _RATING_SAFETY_ORDER = {
@@ -64,7 +64,7 @@ def build_comparison_result(
                 sample_size=a.stats.sample_size,
                 day_night=contracts.DayNight(day=a.stats.day_night.day, night=a.stats.day_night.night),
                 top5_types=[
-                    contracts.OffenseCount(offense_type=t.offense_type, count=t.count)
+                    offense_zh.mapped_offense_count(t.offense_type, t.count, cfg)
                     for t in a.stats.top5_types
                 ],
             )

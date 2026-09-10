@@ -360,7 +360,9 @@ def _bar(label: str, count: int, max_count: int) -> str:
 def _top5_bars(top5: list[contracts.OffenseCount]) -> str:
     """犯罪类型 Top5 横向条形组（数字与契约逐字段一致）。"""
     max_top = max((t.count for t in top5), default=0)
-    return "\n".join(_bar(t.offense_type, t.count, max_top) for t in top5)
+    return "\n".join(
+        _bar(t.label_zh or t.offense_type, t.count, max_top) for t in top5
+    )
 
 
 def _day_night_bars(dn: contracts.DayNight) -> str:

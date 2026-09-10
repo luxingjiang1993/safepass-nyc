@@ -87,6 +87,7 @@ from safepass import (
     followup,
     guardrails,
     intel_agent,
+    offense_zh,
     output_pipeline,
     rating_engine,
     routing,
@@ -519,7 +520,7 @@ def _build_safety_result(
         if charts_data is None
         else contracts.Charts(
             top5_types=[
-                contracts.OffenseCount(offense_type=t.offense_type, count=t.count)
+                offense_zh.mapped_offense_count(t.offense_type, t.count, cfg)
                 for t in charts_data.top5_types
             ],
             day_night=contracts.DayNight(day=charts_data.day_night.day, night=charts_data.day_night.night),
@@ -539,7 +540,8 @@ def _build_safety_result(
         ratio_to_city_mean=rated.ratio_to_city_mean,
         data_sufficient=charts_data is not None,
         top5_types=() if charts_data is None else tuple(
-            (t.offense_type, t.count) for t in charts_data.top5_types
+            (offense_zh.offense_label_zh(t.offense_type, cfg), t.count)
+            for t in charts_data.top5_types
         ),
         day_count=None if charts_data is None else charts_data.day_night.day,
         night_count=None if charts_data is None else charts_data.day_night.night,

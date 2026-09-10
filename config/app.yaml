@@ -100,7 +100,8 @@ one_liner:
     # 钩子命中时优先（真实数据的夜间/类型信号更有行动价值），本钩子垫底
     - id: city_relative
       text: "约为全市均值{ratio}倍"
-  # 犯罪类型代码 → one_liner 中文名（钩子词典的展示词表）
+  # 犯罪类型代码 → 中文名（A3 钩子 + C3 图表/建议共用；未收录外显 unknown_offense_label）
+  unknown_offense_label: 其他
   type_names:
     "GRAND LARCENY": "重大盗窃"
     "ROBBERY": "抢劫"
@@ -108,6 +109,8 @@ one_liner:
     "FELONY ASSAULT": "重伤害"
     "PETIT LARCENY": "轻微盗窃"
     "HARRASSMENT 2": "骚扰"
+    "CRIMINAL MISCHIEF": "刑事毁坏"
+    "MISDEMEANOR ASSAULT": "轻伤害"
 
 # ============================================================================
 # 四时段桶（C2）：查询可解析出钟点时，案件计数切到该桶；无钟点仍用昼夜合计。

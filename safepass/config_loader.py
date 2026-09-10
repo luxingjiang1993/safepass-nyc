@@ -50,11 +50,13 @@ class OneLinerConfig:
     """one_liner 确定性钩子词典（issue 18 / A3）。
 
     hooks：按装配优先级声明的钩子列表（首个命中者胜，30 字上限只放一个）；
-    type_names：犯罪类型代码 → 中文名展示词表（未收录代码不产类型钩子）。
+    type_names：犯罪类型代码 → 中文名（A3 钩子词表；C3 图表与建议共用）。
+    unknown_offense_label：配置未收录类型的外显名（计数仍保留）。
     """
 
     hooks: tuple[OneLinerHookSpec, ...]
     type_names: dict[str, str]
+    unknown_offense_label: str
 
 
 @dataclass(frozen=True)
@@ -1013,6 +1015,9 @@ def load_config(path: str | Path | None = None) -> AppConfig:
     type_names = {str(k): str(v) for k, v in type_names_raw.items()}
     if any(not name.strip() for name in type_names.values()):
         raise ConfigError("one_liner.type_names 的值（中文名）不得为空")
+    unknown_offense_label = str(_require(one_liner_raw, "unknown_offense_label", "one_liner"))
+    if not unknown_offense_label.strip():
+        raise ConfigError("one_liner.unknown_offense_label 不得为空")
     # A3 收紧面：钩子词典话术与展示词表本身不得命中空话/恐慌黑名单
     # （装配层 NEG-006 兜底的是叙事输出；词典层先拦配置，双保险）。
     for word in (*guardrails.panic_blacklist, *suggestions.empty_talk_blacklist):
@@ -1022,7 +1027,13 @@ def load_config(path: str | Path | None = None) -> AppConfig:
         for code, name in type_names.items():
             if word in name:
                 raise ConfigError(f"one_liner.type_names[{code!r}] 命中黑名单词 {word!r}（A3 收紧）")
-    one_liner = OneLinerConfig(hooks=tuple(hook_specs), type_names=type_names)
+        if word in unknown_offense_label:
+            raise ConfigError(f"one_liner.unknown_offense_label 命中黑名单词 {word!r}")
+    one_liner = OneLinerConfig(
+        hooks=tuple(hook_specs),
+        type_names=type_names,
+        unknown_offense_label=unknown_offense_label,
+    )
 
     time_buckets_raw = _require(data, "time_buckets", "root")
     if not isinstance(time_buckets_raw, dict):

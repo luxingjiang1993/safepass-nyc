@@ -15,7 +15,7 @@
       }
     },
     {
-      "fingerprint": "31d8c839e1c7e90ca2c6ffe4bca6835d176bfd3d94332641bff405196ea7468d",
+      "fingerprint": "2bae72a36222d7c658793071db2d0a71c1c0626c6ecac314335696e9a9d05d1a",
       "response": {
         "content": "{\"suggestions\": [\"夜间出行优先选择照明好、人流多的主干道，避开偏僻小巷\", \"随身包放在身前视线范围内，手机不要边走边外露\", \"本区夜间案件少于白天，22 点后仍建议尽量结伴通行\"], \"suggestion_grounds\": []}",
         "model": "scripted"

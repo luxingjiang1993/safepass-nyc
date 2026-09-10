@@ -15,7 +15,7 @@
       }
     },
     {
-      "fingerprint": "dc44241c0625d4126917ba0e3028859aecb9f5eb1cdb1f613576b8947fbee7ec",
+      "fingerprint": "922d77730269b5101651131badaad2c2674731dc1d60f2cb294fbb078790dca1",
       "response": {
         "content": "{\"suggestions\": [\"晚上 10 点从图书馆回家，优先走照明好的主干道\", \"把包放在身前、手机拿在手里，避免边走路边看手机\", \"提前把行程告诉朋友，到家后报个平安\"], \"suggestion_grounds\": []}",
         "model": "scripted"
