@@ -477,15 +477,33 @@ def _suggestion_grounds_block(result: contracts.SafetyQueryResult) -> str:
     )
 
 
+def _profile_compare_block(
+    profile: dict[str, Any] | None,
+    baseline_suggestions: list[str] | None,
+) -> str:
+    """A5：已填画像的覆盖内页，默认折叠只并排无画像建议，不画第二盏灯。"""
+    if not profile or not baseline_suggestions:
+        return ""
+    items = "\n".join(f"    <li>{_esc(s)}</li>" for s in baseline_suggestions)
+    return (
+        '<details class="profile-compare">'
+        "<summary>对比：无画像时的建议</summary>\n"
+        f"  <ul>\n{items}\n  </ul>\n"
+        "</details>"
+    )
+
+
 def render_safety(
     result: contracts.SafetyQueryResult,
     cfg: config_loader.AppConfig,
     profile: dict[str, Any] | None = None,
+    baseline_suggestions: list[str] | None = None,
 ) -> str:
     """覆盖区内查询结果页（PRD §6.2 线框 2），逐区块对应契约字段。
 
     profile = 会话画像：只用于侧边栏回填与固定提示（纯渲染），评级区块
-    与画像零相关（ADR-0002 的渲染侧体现）。
+    与画像零相关（ADR-0002 的渲染侧体现）。baseline_suggestions 仅用于
+    五槽带之后的「对比：无画像时的建议」折叠，不画第二盏灯。
 
     票 06 / D1 首屏信息架构（S3）：窄屏一屏内只装结论与行动——
     评级（result-head 结论卡片）→ 人话解释（one-liner 区块）→ 建议（含
@@ -560,6 +578,7 @@ def render_safety(
             # 票 07 / D2：追问芯片 = 五槽带之后的明显次级行动（S7），
             # 与 pin_hint 同层，不插进槽位序列
             _followup_chips(result, profile, cfg), _pin_hint(result, profile),
+            _profile_compare_block(profile, baseline_suggestions),
             dimensions, charts, community, unknowns, meta,
             _profile_sidebar(profile, cfg),
             _disclaimer(result.disclaimer),
@@ -886,14 +905,19 @@ def render_result(
     contract: contracts.ResponseContract,
     cfg: config_loader.AppConfig,
     profile: dict[str, Any] | None = None,
+    baseline_suggestions: list[str] | None = None,
 ) -> str:
     """判别联合分发（五种形态全覆盖；未知类型明确失败，不静默兜底）。
 
     profile = 会话画像，只传给常规查询视图（侧边栏回填 + 固定提示）；紧急/
     防线页保持极简，不渲染画像表单。
+    baseline_suggestions = 空画像再跑一次唯一接缝得到的建议列表，仅覆盖内页
+    折叠对比使用（A5）；紧急 / 越界 / 防线不消费。
     """
     if isinstance(contract, contracts.SafetyQueryResult):
-        return render_safety(contract, cfg, profile)
+        return render_safety(
+            contract, cfg, profile, baseline_suggestions=baseline_suggestions
+        )
     if isinstance(contract, contracts.ComparisonResult):
         return render_comparison(contract, cfg, profile)
     if isinstance(contract, contracts.DegradedResult):

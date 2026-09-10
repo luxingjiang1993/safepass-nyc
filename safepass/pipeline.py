@@ -377,8 +377,13 @@ def _personalized_suggestions(
     """
     if not profile_text:
         return list(base)
-    picked = [s for tag, s in cfg.profile.crowd_suggestions.items() if tag in profile_text]
-    ordered = picked + [s for s in base if s not in picked]
+    picked: list[str] = []
+    seen: set[str] = set()
+    for tag, suggestion in cfg.profile.crowd_suggestions.items():
+        if tag in profile_text and suggestion not in seen:
+            seen.add(suggestion)
+            picked.append(suggestion)
+    ordered = picked + [s for s in base if s not in seen]
     return ordered[: output_pipeline.SUGGESTIONS_MAX]
 
 

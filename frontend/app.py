@@ -46,7 +46,7 @@ from urllib.parse import ParseResult, parse_qs, urlparse
 _REPO_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(_REPO_ROOT))
 
-from safepass import config_loader, degraded, llm_wiring, pipeline
+from safepass import config_loader, contracts, degraded, llm_wiring, pipeline
 from safepass.llm_client import LLMClient
 from safepass.session_state import SessionState
 from frontend import render
@@ -276,16 +276,32 @@ def make_handler(store: SessionStore | None = None, llm_client: LLMClient | None
                 self.end_headers()
                 return
             sid = self._sid_from_cookie() or _new_sid()
+            profile = sessions.get_profile(sid)
+            prev_state = sessions.get(sid)
             result = pipeline.execute_query(
                 query,
-                profile=sessions.get_profile(sid),
-                session_state=sessions.get(sid),
+                profile=profile,
+                session_state=prev_state,
                 llm_client=llm_client,  # 默认 None = 确定性路径；生产经 env 接线（票 12）
             )
+            baseline_suggestions = None
+            if profile and isinstance(result, contracts.SafetyQueryResult):
+                # A5：空画像再跑一次唯一接缝，只取建议列表；画像仍不进模型。
+                baseline = pipeline.execute_query(
+                    query,
+                    profile=None,
+                    session_state=prev_state,
+                    llm_client=llm_client,
+                )
+                if isinstance(baseline, contracts.SafetyQueryResult):
+                    baseline_suggestions = baseline.suggestions
             sessions.adopt_result(sid, result)
             self._send_html(
                 render.render_result(
-                    result, config_loader.get_config(), sessions.get_profile(sid)
+                    result,
+                    config_loader.get_config(),
+                    profile,
+                    baseline_suggestions=baseline_suggestions,
                 ),
                 set_cookie=self._cookie_for(sid),
             )
