@@ -1,10 +1,11 @@
 """前端 HTTP 薄服务层（issue 11 + issue 12）：stdlib http.server，零新增依赖。
 
-路由只有五条，全部薄胶水、零业务逻辑：
+路由只有若干条，全部薄胶水、零业务逻辑：
     GET  /                   → render.render_home（五个核心警区快速查询按钮 + 画像侧边栏）
     GET  /query?q=...        → safepass.pipeline.execute_query 唯一接缝（spec D1）
                                → render.render_result 渲染判别联合
     GET  /static/style.css   → 静态样式
+    GET  /theme?set=…        → 主题 cookie（light/dark/system），303 回跳（票 09 / D4）
     GET  /privacy            → render.render_privacy（隐私说明，公开页，票 08）
     GET  /disclaimer         → render.render_disclaimer_page（数据口径与免责，票 08）
     POST /profile            → 画像表单写入会话（进程内 SessionStore，PRG 303）
@@ -12,6 +13,7 @@
 
 会话载体（spec D2/D6）：cookie `safepass_sid` + 进程内 SessionStore 保存上轮
 结构化结果（SessionState，不存对话历史）与会话画像（spec D5，六维表单字典）。
+主题偏好（票 09 / D4）：独立 cookie `safepass_theme`（非画像、不含查询）。
 响应后可承接（Safety/Comparison）→ from_result 重建；降级/紧急 → from_result
 抛 TypeError → 清空。会话随服务进程消失，零持久化（画像/会话数据的落盘防线
 不变：tests/test_frontend_app.py 有目录逐字节快照断言）。
@@ -53,6 +55,8 @@ from frontend import render
 
 _STATIC_DIR = Path(__file__).resolve().parent / "static"
 _COOKIE_NAME = "safepass_sid"
+_THEME_COOKIE = "safepass_theme"
+_THEME_VALUES = frozenset({"light", "dark"})
 
 # 画像表单的普通维度（单值下拉）；scene 为标签多选，单独处理
 _PROFILE_FIELDS = ("gender", "age", "identity", "english", "duration")
@@ -149,17 +153,33 @@ def make_handler(store: SessionStore | None = None, llm_client: LLMClient | None
             content_type: str,
             status: HTTPStatus = HTTPStatus.OK,
             set_cookie: str | None = None,
+            set_cookies: list[str] | None = None,
         ) -> None:
             self.send_response(status)
             self.send_header("Content-Type", content_type)
             self.send_header("Content-Length", str(len(payload)))
+            cookies = list(set_cookies or [])
             if set_cookie:
-                self.send_header("Set-Cookie", set_cookie)
+                cookies.append(set_cookie)
+            for cookie in cookies:
+                self.send_header("Set-Cookie", cookie)
             self.end_headers()
             self.wfile.write(payload)
 
-        def _send_html(self, body: str, status: HTTPStatus = HTTPStatus.OK, set_cookie: str | None = None) -> None:
-            self._send(body.encode("utf-8"), "text/html; charset=utf-8", status, set_cookie)
+        def _send_html(
+            self,
+            body: str,
+            status: HTTPStatus = HTTPStatus.OK,
+            set_cookie: str | None = None,
+            set_cookies: list[str] | None = None,
+        ) -> None:
+            self._send(
+                body.encode("utf-8"),
+                "text/html; charset=utf-8",
+                status,
+                set_cookie,
+                set_cookies,
+            )
 
         def _send_css(self) -> None:
             self._send((_STATIC_DIR / "style.css").read_bytes(), "text/css; charset=utf-8")
@@ -167,15 +187,26 @@ def make_handler(store: SessionStore | None = None, llm_client: LLMClient | None
         def _send_not_found(self) -> None:
             """404 错误态（票 09）：渲染层完整页面（文案 + 视觉 + 回家路径）。"""
             self._send_html(
-                render.render_not_found(config_loader.get_config()), HTTPStatus.NOT_FOUND
+                render.render_not_found(
+                    config_loader.get_config(), theme=self._theme_from_cookie()
+                ),
+                HTTPStatus.NOT_FOUND,
             )
 
-        def _send_redirect(self, location: str, set_cookie: str | None = None) -> None:
+        def _send_redirect(
+            self,
+            location: str,
+            set_cookie: str | None = None,
+            set_cookies: list[str] | None = None,
+        ) -> None:
             """PRG：303 See Other 重定向，表单提交后回到页面视图。"""
             self.send_response(HTTPStatus.SEE_OTHER)
             self.send_header("Location", location)
+            cookies = list(set_cookies or [])
             if set_cookie:
-                self.send_header("Set-Cookie", set_cookie)
+                cookies.append(set_cookie)
+            for cookie in cookies:
+                self.send_header("Set-Cookie", cookie)
             self.send_header("Content-Length", "0")
             self.end_headers()
 
@@ -187,8 +218,25 @@ def make_handler(store: SessionStore | None = None, llm_client: LLMClient | None
             morsel = cookie.get(_COOKIE_NAME)
             return morsel.value if morsel else None
 
+        def _theme_from_cookie(self) -> str | None:
+            """主题偏好 cookie（票 09 / D4）：仅 light/dark；非法值视同未设置。"""
+            raw = self.headers.get("Cookie")
+            if not raw:
+                return None
+            cookie = SimpleCookie(raw)
+            morsel = cookie.get(_THEME_COOKIE)
+            if not morsel:
+                return None
+            value = morsel.value.strip().lower()
+            return value if value in _THEME_VALUES else None
+
         def _cookie_for(self, sid: str) -> str:
             return f"{_COOKIE_NAME}={sid}; Path=/; HttpOnly; SameSite=Lax"
+
+        def _theme_cookie_for(self, value: str) -> str:
+            if value == "system":
+                return f"{_THEME_COOKIE}=; Path=/; Max-Age=0; SameSite=Lax"
+            return f"{_THEME_COOKIE}={value}; Path=/; Max-Age=31536000; SameSite=Lax"
 
         def _read_form(self) -> dict[str, list[str]]:
             """读取 urlencoded 表单体（长度受限，防御异常请求）。"""
@@ -202,21 +250,31 @@ def make_handler(store: SessionStore | None = None, llm_client: LLMClient | None
         # -- 路由 ------------------------------------------------------
         def do_GET(self) -> None:  # noqa: N802（stdlib 命名）
             parsed = urlparse(self.path)
+            theme = self._theme_from_cookie()
             if parsed.path == "/":
                 sid = self._sid_from_cookie()
                 profile = sessions.get_profile(sid) if sid else None
-                self._send_html(render.render_home(config_loader.get_config(), profile))
+                self._send_html(
+                    render.render_home(config_loader.get_config(), profile, theme=theme)
+                )
                 return
             if parsed.path == "/static/style.css":
                 self._send_css()
                 return
+            if parsed.path == "/theme":
+                self._handle_theme(parsed)
+                return
             if parsed.path == "/privacy":
-                self._send_html(render.render_privacy(config_loader.get_config()))
+                self._send_html(
+                    render.render_privacy(config_loader.get_config(), theme=theme)
+                )
                 return
             if parsed.path == "/disclaimer":
                 self._send_html(
                     render.render_disclaimer_page(
-                        config_loader.get_config(), degraded.load_general_venues()
+                        config_loader.get_config(),
+                        degraded.load_general_venues(),
+                        theme=theme,
                     )
                 )
                 return
@@ -234,6 +292,17 @@ def make_handler(store: SessionStore | None = None, llm_client: LLMClient | None
                 self._handle_profile_clear()
                 return
             self._send_not_found()
+
+        def _handle_theme(self, parsed: ParseResult) -> None:
+            """页内主题开关（票 09 / D4）：写独立主题 cookie，再回到来源页。"""
+            value = parse_qs(parsed.query).get("set", [""])[0].strip().lower()
+            if value not in _THEME_VALUES and value != "system":
+                self._send_not_found()
+                return
+            self._send_redirect(
+                self._redirect_target(),
+                set_cookies=[self._theme_cookie_for(value)],
+            )
 
         def _redirect_target(self) -> str:
             """PRG 回跳目标：优先回到来源页（同主机、站内路径），否则首页。
@@ -302,6 +371,7 @@ def make_handler(store: SessionStore | None = None, llm_client: LLMClient | None
                     config_loader.get_config(),
                     profile,
                     baseline_suggestions=baseline_suggestions,
+                    theme=self._theme_from_cookie(),
                 ),
                 set_cookie=self._cookie_for(sid),
             )

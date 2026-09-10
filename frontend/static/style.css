@@ -1,48 +1,158 @@
-/* SafePass NYC 前端样式（issue 11，结构层）。
+/* SafePass NYC 前端样式（issue 11 结构层 + 票 09 / D4 简报网格与主题）。
 
 窄屏目标（PRD UX-007 结构层）：单列、max-width 自适应、按钮自动换行、
 条形图用百分比宽度——任何视口下无横向滚动。安全评级不靠颜色传达：
 图标 + 文字并存（色盲可区分，UX-008 结构层）；图表数值永远以文字呈现。
+
+票 09 / D4：字号阶梯与冷静简报网格；浅/深随系统偏好，显式 html.theme-*
+覆盖；紧急页 body.theme-emergency 独立高对比，忽略深色主题。
 */
 
 * { box-sizing: border-box; }
 
+:root {
+  --fs-0: 0.8rem;
+  --fs-1: 0.9rem;
+  --fs-2: 1rem;
+  --fs-3: 1.15rem;
+  --fs-4: 1.4rem;
+  --fs-5: 1.75rem;
+  --bg: #f4f5f7;
+  --fg: #1a1d21;
+  --muted: #5c6570;
+  --surface: #ffffff;
+  --border: #d5dae0;
+  --accent: #2b5ea7;
+  --accent-soft: #e8f0fb;
+  --accent-ink: #1a3a66;
+  --banner-bg: #fdf3d8;
+  --banner-border: #e0c56b;
+  --banner-fg: #6b5416;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not(.theme-light):not(.theme-dark) {
+    --bg: #121417;
+    --fg: #e8eaed;
+    --muted: #9aa3ad;
+    --surface: #1c1f24;
+    --border: #3a4048;
+    --accent: #6b9bd1;
+    --accent-soft: #1e2a3a;
+    --accent-ink: #c5d8ef;
+    --banner-bg: #3a3218;
+    --banner-border: #8a7640;
+    --banner-fg: #f0e2a8;
+  }
+}
+
+html.theme-dark {
+  --bg: #121417;
+  --fg: #e8eaed;
+  --muted: #9aa3ad;
+  --surface: #1c1f24;
+  --border: #3a4048;
+  --accent: #6b9bd1;
+  --accent-soft: #1e2a3a;
+  --accent-ink: #c5d8ef;
+  --banner-bg: #3a3218;
+  --banner-border: #8a7640;
+  --banner-fg: #f0e2a8;
+}
+
+html.theme-light {
+  --bg: #f4f5f7;
+  --fg: #1a1d21;
+  --muted: #5c6570;
+  --surface: #ffffff;
+  --border: #d5dae0;
+  --accent: #2b5ea7;
+  --accent-soft: #e8f0fb;
+  --accent-ink: #1a3a66;
+  --banner-bg: #fdf3d8;
+  --banner-border: #e0c56b;
+  --banner-fg: #6b5416;
+}
+
 body {
   margin: 0;
-  font-family: -apple-system, "PingFang SC", "Microsoft YaHei", "Noto Sans CJK SC", sans-serif;
+  font-family: "Source Han Sans SC", "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+  font-size: var(--fs-2);
   line-height: 1.6;
-  color: #222;
-  background: #fafafa;
+  color: var(--fg);
+  background: var(--bg);
 }
 
 .page {
-  max-width: 40rem;
+  max-width: 42rem;
   margin: 0 auto;
   padding: 1rem 1rem 2rem;
 }
 
+/* 主题开关（非紧急页） */
+.theme-switch {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 0 0 0.75rem;
+  font-size: var(--fs-0);
+}
+.theme-switch a {
+  color: var(--muted);
+  text-decoration: none;
+  border: 1px solid var(--border);
+  border-radius: 0.35rem;
+  padding: 0.2rem 0.55rem;
+  background: var(--surface);
+}
+.theme-switch a:hover { color: var(--accent-ink); }
+
+/* 自制单色插画：随 currentColor / 主题变色 */
+.illustration {
+  color: var(--muted);
+  margin: 0.25rem 0 0.5rem;
+  line-height: 0;
+}
+.illustration svg { display: block; }
+
+/* 冷静简报网格（覆盖内首屏五槽） */
+.briefing-grid {
+  display: grid;
+  gap: 0.75rem;
+  margin: 0.5rem 0 1rem;
+}
+.briefing-grid > .result-head.hero,
+.briefing-grid > section,
+.briefing-grid > .llm-degraded-banner {
+  margin: 0;
+}
+
+h1 { font-size: var(--fs-5); }
+h2 { font-size: var(--fs-3); }
+.tagline { font-size: var(--fs-1); }
+
 /* --- 首页 --- */
 .hero h1 { margin-bottom: 0; }
-.tagline { margin-top: 0.25rem; color: #666; }
-.coverage-honesty p { margin: 0.4rem 0; color: #444; }
-.coverage-scope { margin: 0.75rem 0; color: #444; font-size: 0.95rem; }
+.tagline { margin-top: 0.25rem; color: var(--muted); }
+.coverage-honesty p { margin: 0.4rem 0; color: var(--fg); }
+.coverage-scope { margin: 0.75rem 0; color: var(--fg); font-size: var(--fs-1); }
 .in-coverage-structure {
-  background: #fff;
-  border: 1px dashed #ccc;
+  background: var(--surface);
+  border: 1px dashed var(--border);
   border-radius: 0.5rem;
   padding: 0.75rem 1rem;
   margin: 1rem 0;
 }
-.in-coverage-structure h2 { font-size: 1rem; margin: 0 0 0.4rem; }
+.in-coverage-structure h2 { font-size: var(--fs-2); margin: 0 0 0.4rem; }
 .structure-slots { list-style: none; padding: 0; margin: 0.5rem 0 0; }
 .structure-slots li {
   display: flex;
   justify-content: space-between;
   gap: 0.75rem;
   padding: 0.35rem 0;
-  border-top: 1px solid #eee;
+  border-top: 1px solid var(--border);
 }
-.slot-empty { color: #888; }
+.slot-empty { color: var(--muted); }
 
 .query-form {
   display: flex;
@@ -53,21 +163,23 @@ body {
   flex: 1 1 auto;
   min-width: 0; /* 窄屏下输入框可收缩，不撑出横向滚动 */
   padding: 0.6rem;
-  border: 1px solid #bbb;
+  border: 1px solid var(--border);
   border-radius: 0.5rem;
-  font-size: 1rem;
+  font-size: var(--fs-2);
+  background: var(--surface);
+  color: var(--fg);
 }
 .query-form button {
   flex: 0 0 auto;
   padding: 0.6rem 1.2rem;
   border: none;
   border-radius: 0.5rem;
-  background: #2b5ea7;
+  background: var(--accent);
   color: #fff;
-  font-size: 1rem;
+  font-size: var(--fs-2);
 }
 
-.quick h2 { font-size: 1rem; color: #555; }
+.quick h2 { font-size: var(--fs-2); color: var(--muted); }
 .quick-grid {
   display: flex;
   flex-wrap: wrap;
@@ -79,66 +191,65 @@ body {
   padding: 0.7rem 0.5rem;
   text-align: center;
   text-decoration: none;
-  color: #1a3a66;
-  background: #e8f0fb;
-  border: 1px solid #b9cdec;
+  color: var(--accent-ink);
+  background: var(--accent-soft);
+  border: 1px solid var(--border);
   border-radius: 0.6rem;
 }
 
 /* --- 结果页通用 --- */
-.back { display: inline-block; margin-bottom: 0.5rem; color: #2b5ea7; text-decoration: none; }
+.back { display: inline-block; margin-bottom: 0.5rem; color: var(--accent); text-decoration: none; }
 
 /* 首屏信息架构（票 06 / D1，S3）：评级槽 = 结论卡片——先结论档与行动，
    细节后置。hero 修饰类只在安全结果页首屏头使用，其余页面的 result-head
    （对比/降级/防线/法律页/紧急主题）保持原有极简形态 */
 .result-head.hero {
-  background: #fff;
-  border: 1px solid #e2e2e2;
+  background: var(--surface);
+  border: 1px solid var(--border);
   border-radius: 0.6rem;
   padding: 0.75rem 1rem;
   margin: 0.5rem 0;
 }
 .result-head h1 { margin: 0.2rem 0; }
-.result-head.hero .rating { font-size: 1.3rem; }
-.rating { font-size: 1.15rem; font-weight: 700; margin: 0.2rem 0; }
-.precinct, .sample, .basis { color: #555; margin: 0.2rem 0; }
+.result-head.hero .rating { font-size: var(--fs-4); }
+.rating { font-size: var(--fs-3); font-weight: 700; margin: 0.2rem 0; }
+.precinct, .sample, .basis { color: var(--muted); margin: 0.2rem 0; }
 .stars { letter-spacing: 0.1em; }
 
 /* 建议依据渲染槽（票 06 / D1 + 票 01 / A4）：槽位类名不漂 */
 .suggestion-grounds {
   margin-top: 0.5rem;
   padding-top: 0.5rem;
-  border-top: 1px dashed #ddd;
+  border-top: 1px dashed var(--border);
 }
 .grounds-heading,
 .generic-suggestion-label {
   margin: 0.25rem 0;
-  font-size: 0.8rem;
+  font-size: var(--fs-0);
   font-weight: 600;
-  color: #555;
+  color: var(--muted);
 }
 .generic-suggestion-label {
   font-weight: 500;
-  color: #666;
 }
 .ground-quote {
   margin: 0.25rem 0;
-  font-size: 0.85rem;
-  color: #666;
+  font-size: var(--fs-1);
+  color: var(--muted);
 }
 .ground-doc {
   font-size: 0.75rem;
-  color: #888;
+  color: var(--muted);
 }
 
 section, details {
   margin: 1rem 0;
   padding: 0.75rem 1rem;
-  background: #fff;
-  border: 1px solid #e2e2e2;
+  background: var(--surface);
+  border: 1px solid var(--border);
   border-radius: 0.6rem;
 }
-section h2, details summary { font-size: 1.05rem; margin: 0.2rem 0 0.5rem; }
+section h2, details summary { font-size: var(--fs-3); margin: 0.2rem 0 0.5rem; }
 details summary { cursor: pointer; font-weight: 600; }
 ul, ol { padding-left: 1.3rem; margin: 0.3rem 0; }
 
@@ -153,13 +264,13 @@ ul, ol { padding-left: 1.3rem; margin: 0.3rem 0; }
 .bar-label {
   flex: 0 0 5.5rem;
   text-align: right;
-  font-size: 0.9rem;
-  color: #444;
+  font-size: var(--fs-1);
+  color: var(--muted);
 }
 .bar-track {
   flex: 1 1 auto;
   height: 1rem;
-  background: #eee;
+  background: var(--border);
   border-radius: 0.3rem;
   overflow: hidden;
 }
@@ -188,21 +299,28 @@ ul, ol { padding-left: 1.3rem; margin: 0.3rem 0; }
 /* LLM 降级明示横幅（票 06 / spec v2 用户故事 18）：降级建议 vs AI 建议可区分；
    语义靠文字（⚠️ + 完整话术），颜色只是强调——与全站"不靠颜色传达"一致 */
 .llm-degraded-banner {
-  background: #fdf3d8;
-  border: 1px solid #e0c56b;
+  background: var(--banner-bg);
+  border: 1px solid var(--banner-border);
   border-radius: 0.5rem;
-  color: #6b5416;
+  color: var(--banner-fg);
   margin: 0.6rem 0;
   padding: 0.5rem 0.75rem;
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
 }
+.llm-degraded-banner .illustration { margin: 0; color: var(--banner-fg); }
+.llm-degraded-banner p { margin: 0; }
 
 /* --- 紧急模式（issue 12，PRD §6.2 紧急线框）：红色极简整页 --- */
-/* 红色主题由 body.theme-emergency 承载；语义信息仍靠文字（图标+文字并存）。 */
+/* 红色主题由 body.theme-emergency 承载；语义信息仍靠文字（图标+文字并存）。
+   票 09 / D4：紧急页不跟浅/深主题走——固定高对比，忽略 html.theme-dark。 */
 body.theme-emergency {
   background: #2b0507;
   color: #fff;
 }
 body.theme-emergency .page { max-width: 34rem; }
+body.theme-emergency .illustration { color: #f2c4c6; }
 body.theme-emergency section,
 body.theme-emergency details,
 body.theme-emergency .result-head {
@@ -254,31 +372,32 @@ body.theme-emergency .emergency-contacts small { color: #e0a9ac; }
 .profile-aside {
   margin: 1rem 0;
   padding: 0.75rem 1rem;
-  background: #f4f7ee;
-  border: 1px solid #d4ddc2;
+  background: var(--accent-soft);
+  border: 1px solid var(--border);
   border-radius: 0.6rem;
 }
-.profile-aside h2 { font-size: 1.05rem; margin: 0.2rem 0 0.5rem; }
-.profile-notice { color: #4a5a2a; font-size: 0.9rem; margin: 0.3rem 0 0.6rem; }
+.profile-aside h2 { font-size: var(--fs-3); margin: 0.2rem 0 0.5rem; }
+.profile-notice { color: var(--muted); font-size: var(--fs-1); margin: 0.3rem 0 0.6rem; }
 .profile-form { display: grid; gap: 0.5rem; }
-.profile-field { display: grid; font-size: 0.9rem; color: #444; }
+.profile-field { display: grid; font-size: var(--fs-1); color: var(--muted); }
 .profile-field select {
   padding: 0.45rem;
-  border: 1px solid #bbb;
+  border: 1px solid var(--border);
   border-radius: 0.4rem;
-  font-size: 0.95rem;
-  background: #fff;
+  font-size: var(--fs-1);
+  background: var(--surface);
+  color: var(--fg);
 }
 .profile-scene {
   margin: 0;
   padding: 0.5rem 0.75rem;
-  border: 1px dashed #c3cfa8;
+  border: 1px dashed var(--border);
   border-radius: 0.4rem;
   display: flex;
   flex-wrap: wrap;
   gap: 0.4rem 0.9rem;
 }
-.profile-scene legend { font-size: 0.9rem; color: #444; padding: 0 0.3rem; }
+.profile-scene legend { font-size: var(--fs-1); color: var(--muted); padding: 0 0.3rem; }
 .profile-form > button,
 .profile-clear button {
   padding: 0.55rem 1rem;
@@ -286,7 +405,7 @@ body.theme-emergency .emergency-contacts small { color: #e0a9ac; }
   border-radius: 0.5rem;
   background: #5a7a2a;
   color: #fff;
-  font-size: 0.95rem;
+  font-size: var(--fs-1);
 }
 .profile-clear { margin-top: 0.5rem; }
 .profile-clear button { background: #8a8a8a; }
@@ -294,46 +413,46 @@ body.theme-emergency .emergency-contacts small { color: #e0a9ac; }
 /* --- 追问芯片（票 07 / D2，S7）：结果页五槽带之后的次级行动 ---
    胶囊形预填追问链接；语义靠文字（芯片文案本身），不靠颜色传达。
    窄屏可换行（flex-wrap），与全站"无横向滚动"约束一致。 */
-.chips h2 { font-size: 1rem; color: #555; }
+.chips h2 { font-size: var(--fs-2); color: var(--muted); }
 .chip-row { display: flex; flex-wrap: wrap; gap: 0.5rem; }
 .chip {
   padding: 0.45rem 0.9rem;
-  border: 1px solid #b9cdec;
+  border: 1px solid var(--border);
   border-radius: 999px;
-  background: #e8f0fb;
-  color: #1a3a66;
+  background: var(--accent-soft);
+  color: var(--accent-ink);
   text-decoration: none;
-  font-size: 0.95rem;
+  font-size: var(--fs-1);
 }
 
 /* --- 固定提示（issue 12）：查询内人群信息的当次作用域提示 --- */
 .pin-hint {
-  background: #fff8e6;
-  border: 1px solid #e8d48a;
+  background: var(--banner-bg);
+  border: 1px solid var(--banner-border);
   border-radius: 0.6rem;
 }
 .pin-hint form { margin: 0.3rem 0 0; }
 .pin-hint button {
   padding: 0.4rem 0.9rem;
-  border: 1px solid #c8a832;
+  border: 1px solid var(--banner-border);
   border-radius: 0.4rem;
-  background: #fff;
-  color: #7a6410;
-  font-size: 0.9rem;
+  background: var(--surface);
+  color: var(--banner-fg);
+  font-size: var(--fs-1);
 }
 
 /* --- 错误页 404（票 09）：错误态不打断成裸文本，语气与降级页一致 --- */
 .error-head { text-align: center; }
-.error-code { font-size: 3rem; font-weight: 800; color: #bbb; margin: 0.2rem 0; }
-.error-copy { color: #555; margin: 0.3rem 0; }
+.error-code { font-size: 3rem; font-weight: 800; color: var(--muted); margin: 0.2rem 0; }
+.error-copy { color: var(--muted); margin: 0.3rem 0; }
 .error-home { text-align: center; }
 .error-home a {
   display: block;
   padding: 0.8rem 0.5rem;
   text-decoration: none;
-  color: #1a3a66;
-  background: #e8f0fb;
-  border: 1px solid #b9cdec;
+  color: var(--accent-ink);
+  background: var(--accent-soft);
+  border: 1px solid var(--border);
   border-radius: 0.6rem;
 }
 
@@ -348,6 +467,8 @@ body.theme-emergency .emergency-contacts small { color: #e0a9ac; }
   .call-911-big a { padding: 1rem 0.5rem; font-size: 1.4rem; }
   .error-code { font-size: 2.2rem; }
   .result-head.hero, section, details { padding: 0.6rem 0.75rem; margin: 0.6rem 0; }
+  .briefing-grid > .result-head.hero,
+  .briefing-grid > section { margin: 0; }
   .result-head.hero h1 { font-size: 1.35rem; }
   .result-head.hero .rating { font-size: 1.15rem; }
   .suggestions li { margin: 0.15rem 0; }
@@ -361,15 +482,15 @@ p, li { text-wrap: pretty; }
 .disclaimer {
   margin-top: 1.5rem;
   padding-top: 0.75rem;
-  border-top: 1px dashed #ccc;
-  color: #777;
-  font-size: 0.9rem;
+  border-top: 1px dashed var(--border);
+  color: var(--muted);
+  font-size: var(--fs-1);
 }
 .legal-links {
   margin-top: 0.35rem;
 }
 .legal-links a {
-  color: #777;
+  color: var(--muted);
 }
 .legal-section {
   margin-bottom: 1.25rem;

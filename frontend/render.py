@@ -49,6 +49,7 @@ from __future__ import annotations
 import html
 from typing import Any
 
+from frontend import illustrations
 from safepass import addressing, config_loader, contracts
 from safepass.degraded import RATING_LABELS
 
@@ -76,7 +77,7 @@ _PROFILE_ENGLISH_LEVELS = ("不会英语", "基础日常", "工作流利")
 _PROFILE_DURATIONS = ("刚来（1年以内）", "1-5年", "5年以上")
 
 _PAGE = """<!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="zh-CN" class="{html_class}">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -85,6 +86,7 @@ _PAGE = """<!DOCTYPE html>
 </head>
 <body class="{body_class}">
 <main class="page">
+{theme_nav}
 {body}
 </main>
 </body>
@@ -97,8 +99,41 @@ def _esc(text: Any) -> str:
     return html.escape(str(text), quote=True)
 
 
-def _page(title: str, body: str, body_class: str = "") -> str:
-    return _PAGE.format(title=_esc(title), body=body, body_class=_esc(body_class))
+def _theme_nav(*, emergency: bool) -> str:
+    """页内浅/深开关（票 09 / D4）：紧急页不渲染，保持极简。"""
+    if emergency:
+        return ""
+    return (
+        '<nav class="theme-switch" aria-label="显示主题">'
+        '<a href="/theme?set=light">浅色</a>'
+        '<a href="/theme?set=dark">深色</a>'
+        '<a href="/theme?set=system">跟随系统</a>'
+        "</nav>"
+    )
+
+
+def _html_theme_class(theme: str | None, *, emergency: bool) -> str:
+    """显式主题 cookie → html class；紧急页永不挂深色主题 class。"""
+    if emergency or theme not in ("light", "dark"):
+        return ""
+    return f"theme-{theme}"
+
+
+def _page(
+    title: str,
+    body: str,
+    body_class: str = "",
+    *,
+    theme: str | None = None,
+) -> str:
+    emergency = "theme-emergency" in body_class
+    return _PAGE.format(
+        title=_esc(title),
+        body=body,
+        body_class=_esc(body_class),
+        html_class=_esc(_html_theme_class(theme, emergency=emergency)),
+        theme_nav=_theme_nav(emergency=emergency),
+    )
 
 
 def _disclaimer(text: str) -> str:
@@ -309,7 +344,12 @@ def _in_coverage_structure_sketch(cfg: config_loader.AppConfig) -> str:
 
 # ---------------------------------------------------------------- 首页
 
-def render_home(cfg: config_loader.AppConfig, profile: dict[str, Any] | None = None) -> str:
+def render_home(
+    cfg: config_loader.AppConfig,
+    profile: dict[str, Any] | None = None,
+    *,
+    theme: str | None = None,
+) -> str:
     """首页（PRD §6.2 线框 1）：价值主张 + 查询输入 + 五个核心警区一键快速查询
     + 覆盖诚实 + 画像侧边栏（会话级，可选）。
 
@@ -322,7 +362,8 @@ def render_home(cfg: config_loader.AppConfig, profile: dict[str, Any] | None = N
         for name in names.values()
     )
     coverage_list = _esc(_coverage_names_joined(cfg))
-    body = f"""<header class="hero">
+    body = f"""{illustrations.mark("home")}
+<header class="hero">
   <h1>SafePass NYC</h1>
   <p class="tagline">中文安全情报；数据评级，AI 只建议</p>
 </header>
@@ -342,7 +383,7 @@ def render_home(cfg: config_loader.AppConfig, profile: dict[str, Any] | None = N
 </section>
 {_profile_sidebar(profile, cfg)}
 {_disclaimer(cfg.disclaimer)}"""
-    return _page("SafePass NYC", body)
+    return _page("SafePass NYC", body, theme=theme)
 
 
 # ---------------------------------------------------------------- 图表
@@ -451,11 +492,18 @@ def _venues_block(title: str, venues: list[contracts.Venue]) -> str:
 def _llm_degraded_banner(result: Any, cfg: config_loader.AppConfig) -> str:
     """票 06 降级明示的渲染侧落地（spec v2 用户故事 18）：llm_degraded 时首屏
     横幅展示契约里的 degradation_notice——用户可明确区分模板降级建议与
-    AI 生成的建议（契约层保证降级时 notice 非空，缺失时回退配置话术兜底）。"""
+    AI 生成的建议（契约层保证降级时 notice 非空，缺失时回退配置话术兜底）。
+
+    票 09 / D4：熔断槽挂自制单色插画（fuse），不按灯配图。
+    """
     if not result.llm_degraded:
         return ""
     notice = result.degradation_notice or cfg.cost_control.degraded_notice
-    return f'<p class="llm-degraded-banner" role="status">⚠️ {_esc(notice)}</p>'
+    return (
+        f'<div class="llm-degraded-banner" role="status">'
+        f'{illustrations.mark("fuse")}'
+        f"<p>⚠️ {_esc(notice)}</p></div>"
+    )
 
 
 def _suggestion_grounds_block(result: contracts.SafetyQueryResult) -> str:
@@ -500,6 +548,8 @@ def render_safety(
     cfg: config_loader.AppConfig,
     profile: dict[str, Any] | None = None,
     baseline_suggestions: list[str] | None = None,
+    *,
+    theme: str | None = None,
 ) -> str:
     """覆盖区内查询结果页（PRD §6.2 线框 2），逐区块对应契约字段。
 
@@ -513,9 +563,13 @@ def render_safety(
     建议之前）；追问芯片（票 07 / D2）与 pin_hint、折叠细节排在五槽带之后；
     图表 / community / 来源与 dimensions / unknowns 默认折叠（⚪ 时 unknowns
     例外展开）。
+
+    票 09 / D4：首屏五槽包进冷静简报网格；页眉挂 safety-header 插画；
+    主题 class 由 cookie 传入，槽序不变。
     """
     header = (
         f'<header class="result-head hero rating-{_esc(result.rating)}">\n'
+        f'{illustrations.mark("safety-header")}\n'
         f'  <p class="rating">{_esc(RATING_LABELS[result.rating])}</p>\n'
         f'  <h1>{_esc(result.area)}</h1>\n'
         f'  <p class="precinct">警区 {_esc(result.precinct)} · 基于本次查询命中的 {_esc(result.sample_size)} 条记录</p>\n'
@@ -566,15 +620,25 @@ def render_safety(
         f'  <p>覆盖时间：{_esc(result.time_range)}</p>\n  <ul>\n{sources_items}\n  </ul>\n</details>'
     )
 
+    # 冷静简报网格：只包首屏结论与行动（五槽 + 降级横幅），折叠细节仍后置
+    briefing = "\n".join(
+        part
+        for part in (
+            header,
+            _llm_degraded_banner(result, cfg),
+            one_liner,
+            suggestions,
+            venues,
+        )
+        if part
+    )
+    briefing = f'<div class="briefing-grid">\n{briefing}\n</div>'
+
     body = "\n".join(
         part
         for part in (
-            # 首屏五槽（S3，槽位稳定不靠聊天流）：评级（header）→ 人话解释
-            # （one-liner）→ 建议 → 紧急资源；降级横幅首屏可见（header 之后、
-            # 建议之前）；pin_hint 是查询语境提示，放五槽带之后、折叠细节之前
-            # （不插进槽位序列）；其余细节默认折叠（details 不挂 open）
-            _back_link(), header, _llm_degraded_banner(result, cfg), one_liner,
-            suggestions, venues,
+            _back_link(),
+            briefing,
             # 票 05 / C6：覆盖清单与命中警区，排在五槽带之后（不插进首屏槽位）
             _coverage_scope_block(cfg, result.area, result.precinct),
             # 票 07 / D2：追问芯片 = 五槽带之后的明显次级行动（S7），
@@ -587,7 +651,7 @@ def render_safety(
         )
         if part
     )
-    return _page(f"{result.area} — SafePass NYC", body)
+    return _page(f"{result.area} — SafePass NYC", body, theme=theme)
 
 
 # ---------------------------------------------------------------- 对比
@@ -615,6 +679,8 @@ def render_comparison(
     result: contracts.ComparisonResult,
     cfg: config_loader.AppConfig,
     profile: dict[str, Any] | None = None,
+    *,
+    theme: str | None = None,
 ) -> str:
     """双区对比视图（ComparisonResult 契约；F3-2 维度表 + F3-4 决策辅助）。"""
     cards = "\n".join(_area_card(a) for a in result.areas)
@@ -626,6 +692,7 @@ def render_comparison(
     decision = f'<p class="decision-aid">{_esc(result.decision_aid)}</p>' if result.decision_aid else ""
     sources_items = "\n".join(f"    <li>{_esc(s)}</li>" for s in result.sources)
     body = f"""{_back_link()}
+{illustrations.mark("comparison")}
 <header class="result-head"><h1>🔀 区域对比</h1></header>
 {_llm_degraded_banner(result, cfg)}
 <section class="compare-grid">
@@ -644,7 +711,7 @@ def render_comparison(
 </section>
 {_profile_sidebar(profile, cfg)}
 {_disclaimer(result.disclaimer)}"""
-    return _page("区域对比 — SafePass NYC", body)
+    return _page("区域对比 — SafePass NYC", body, theme=theme)
 
 
 # ---------------------------------------------------------------- 降级
@@ -653,6 +720,8 @@ def render_degraded(
     result: contracts.DegradedResult,
     cfg: config_loader.AppConfig,
     profile: dict[str, Any] | None = None,
+    *,
+    theme: str | None = None,
 ) -> str:
     """诚实降级视图（DegradedResult 契约）：说明 + 替代信息 + 重新选择邀请。
 
@@ -705,6 +774,7 @@ def render_degraded(
         part
         for part in (
             _back_link(),
+            illustrations.mark("out-of-coverage"),
             f'<header class="result-head degraded"><h1>🛠️ 暂时无法给出完整分析</h1></header>',
             f'<section class="degraded-message"><p>{_esc(result.message)}</p></section>',
             _llm_degraded_banner(result, cfg),
@@ -715,7 +785,7 @@ def render_degraded(
         )
         if part
     )
-    return _page("SafePass NYC", body)
+    return _page("SafePass NYC", body, theme=theme)
 
 
 # ---------------------------------------------------------------- 紧急（issue 12 完整版）
@@ -739,14 +809,21 @@ def _emergency_venue_list(venues: list[contracts.Venue]) -> str:
     return "\n".join(items)
 
 
-def render_emergency(result: contracts.EmergencyResult) -> str:
+def render_emergency(
+    result: contracts.EmergencyResult,
+    *,
+    theme: str | None = None,
+) -> str:
     """紧急模式页（issue 12，PRD §6.2 紧急线框）：红色极简整页（body.theme-
     emergency，样式层），恐慌场景下大按钮优先、信息分层最少。
 
     逐字段对应 EmergencyResult 契约：911 引导 / 中文报警用语（附中文释义）/
     信息准备清单（有序）/ 安抚话术 / 按警区或通用安全场所清单 / 311 与社区
     协助电话。不渲染画像侧边栏与返回链接——极简不被复杂界面拖慢（AC-013）。
+
+    票 09 / D4：紧急页独立高对比；theme 参数忽略，html 不挂深色主题 class。
     """
+    del theme  # 紧急页不跟浅/深 cookie 走
     checklist = "\n".join(f"    <li>{_esc(item)}</li>" for item in result.info_checklist)
     venues = (
         f'<section class="emergency-venues" id="safe-places"><h2>🏪 可以前往的安全场所</h2>\n'
@@ -766,7 +843,8 @@ def render_emergency(result: contracts.EmergencyResult) -> str:
     if result.sources:
         items = "\n".join(f"    <li>{_esc(s)}</li>" for s in result.sources)
         sources = f'<section class="sources"><h2>数据来源</h2>\n  <ul>\n{items}\n  </ul>\n</section>'
-    body = f"""<header class="result-head emergency">
+    body = f"""{illustrations.mark("emergency")}
+<header class="result-head emergency">
   <h1>🚨 紧急模式</h1>
   <p class="emergency-lead">如果你现在处于危险中，请立即拨打 911。保持冷静，你正在做正确的事。</p>
 </header>
@@ -790,7 +868,11 @@ def render_emergency(result: contracts.EmergencyResult) -> str:
     return _page("🚨 紧急模式 — SafePass NYC", body, body_class="theme-emergency")
 
 
-def render_guardrail(result: contracts.GuardrailResult) -> str:
+def render_guardrail(
+    result: contracts.GuardrailResult,
+    *,
+    theme: str | None = None,
+) -> str:
     """负例防线拒绝视图（GuardrailResult 契约：拒绝 + 转向，绝不边拒绝边分析）。"""
     alternatives = "\n".join(f"    <li>{_esc(a)}</li>" for a in result.alternatives)
     alt_block = (
@@ -798,22 +880,30 @@ def render_guardrail(result: contracts.GuardrailResult) -> str:
         if result.alternatives else ""
     )
     body = f"""{_back_link()}
+{illustrations.mark("guardrail")}
 <header class="result-head"><h1>🛡️ SafePass NYC</h1></header>
 <section class="guardrail-message"><p>{_esc(result.message)}</p></section>
 {alt_block}
 {_disclaimer(result.disclaimer)}"""
-    return _page("SafePass NYC", body)
+    return _page("SafePass NYC", body, theme=theme)
 
 
 # ---------------------------------------------------------------- 错误态（404，票 09）
 
-def render_not_found(cfg: config_loader.AppConfig) -> str:
+def render_not_found(
+    cfg: config_loader.AppConfig,
+    *,
+    theme: str | None = None,
+) -> str:
     """404 错误页（票 09）：完整页面——明确状态码 + 友好文案 + 回家路径。
 
     错误态不打断成裸文本：与全站同一样式体系（style.css），共享页脚免责
     与返回导航（与全部既有页面同一骨架），语气跟问候/降级页一致。
+
+    票 09 / D4：无法解析槽挂 unparseable 插画。
     """
     body = f"""{_back_link()}
+{illustrations.mark("unparseable")}
 <header class="error-head">
   <p class="error-code">404</p>
   <h1>咦，这里好像没有页面 🧭</h1>
@@ -821,19 +911,45 @@ def render_not_found(cfg: config_loader.AppConfig) -> str:
 </header>
 <p class="error-home"><a href="/">🏠 回到首页</a></p>
 {_disclaimer(cfg.disclaimer)}"""
-    return _page("页面不存在 — SafePass NYC", body)
+    return _page("页面不存在 — SafePass NYC", body, theme=theme)
+
+
+def render_empty_state(
+    cfg: config_loader.AppConfig,
+    *,
+    theme: str | None = None,
+) -> str:
+    """空态页壳（票 09 / D4 插画槽；D3 将接线加载/无结果等态）。
+
+    仅提供可测的空态插画与简报文案骨架，不引入前端框架。
+    """
+    body = f"""{_back_link()}
+{illustrations.mark("empty")}
+<header class="result-head"><h1>暂无结果</h1>
+  <p class="error-copy">这一次没有可展示的安全情报。可以换个覆盖区内的地点再试。</p>
+</header>
+<p class="error-home"><a href="/">回到首页</a></p>
+{_disclaimer(cfg.disclaimer)}"""
+    return _page("暂无结果 — SafePass NYC", body, theme=theme)
 
 
 # ---------------------------------------------------------------- 隐私页 + 免责页（票 08）
 
-def render_privacy(cfg: config_loader.AppConfig) -> str:
+def render_privacy(
+    cfg: config_loader.AppConfig,
+    *,
+    theme: str | None = None,
+) -> str:
     """隐私说明页（公开，纯渲染，不采集画像）。
 
     口径与既有画像防线逐字一致：profile.notice（会话级、关闭即删除）、
     零持久化（只写进程内存，不落盘）、零上传、会话随服务进程消失；
     ADR-0002 如实披露——画像只用于建议排序与时间提示，永不参与评级。
+
+    票 09 / D4：写明主题 cookie（safepass_theme）不是画像、不含查询。
     """
     body = f"""{_back_link()}
+{illustrations.mark("legal")}
 <header class="result-head"><h1>🔒 隐私说明</h1></header>
 <section class="legal-section"><h2>你的画像存在哪里</h2>
   <ul>
@@ -851,15 +967,20 @@ def render_privacy(cfg: config_loader.AppConfig) -> str:
   </ul>
 </section>
 <section class="legal-section"><h2>Cookie</h2>
-  <p>本站唯一的 cookie 是一个随机会话标识（HttpOnly），只用于关联你的会话画像与上轮查询结果，不含其他个人信息。</p>
+  <ul>
+    <li>会话 cookie（safepass_sid，HttpOnly）：随机会话标识，只用于关联你的会话画像与上轮查询结果，不含其他个人信息。</li>
+    <li>主题 cookie（safepass_theme）：仅记录浅色 / 深色显示偏好，不是画像，不含查询内容；可随时改为「跟随系统」清除。</li>
+  </ul>
 </section>
 {_disclaimer(cfg.disclaimer)}"""
-    return _page("隐私说明 — SafePass NYC", body)
+    return _page("隐私说明 — SafePass NYC", body, theme=theme)
 
 
 def render_disclaimer_page(
     cfg: config_loader.AppConfig,
     venue_dicts: list[dict[str, Any]],
+    *,
+    theme: str | None = None,
 ) -> str:
     """数据口径与免责声明页（公开，纯渲染）：数据来源/统计口径/免责话术/
     紧急资源。免责话术逐字来自集中配置 disclaimer（与全部响应形态横切字段
@@ -878,6 +999,7 @@ def render_disclaimer_page(
         f"    <li>数据来源：{_esc(src)}</li>" for src in cfg.data_source.sources
     )
     body = f"""{_back_link()}
+{illustrations.mark("legal")}
 <header class="result-head"><h1>📋 数据口径与免责声明</h1></header>
 <section class="legal-section"><h2>数据口径</h2>
   <ul>
@@ -898,7 +1020,7 @@ def render_disclaimer_page(
 </section>
 {venue_list}
 {_disclaimer(cfg.disclaimer)}"""
-    return _page("数据口径与免责声明 — SafePass NYC", body)
+    return _page("数据口径与免责声明 — SafePass NYC", body, theme=theme)
 
 
 # ---------------------------------------------------------------- 判别联合分发
@@ -908,6 +1030,8 @@ def render_result(
     cfg: config_loader.AppConfig,
     profile: dict[str, Any] | None = None,
     baseline_suggestions: list[str] | None = None,
+    *,
+    theme: str | None = None,
 ) -> str:
     """判别联合分发（五种形态全覆盖；未知类型明确失败，不静默兜底）。
 
@@ -915,19 +1039,24 @@ def render_result(
     防线页保持极简，不渲染画像表单。
     baseline_suggestions = 空画像再跑一次唯一接缝得到的建议列表，仅覆盖内页
     折叠对比使用（A5）；紧急 / 越界 / 防线不消费。
+    theme = 主题 cookie 浅/深（票 09 / D4）；紧急页忽略。
     """
     if isinstance(contract, contracts.SafetyQueryResult):
         return render_safety(
-            contract, cfg, profile, baseline_suggestions=baseline_suggestions
+            contract,
+            cfg,
+            profile,
+            baseline_suggestions=baseline_suggestions,
+            theme=theme,
         )
     if isinstance(contract, contracts.ComparisonResult):
-        return render_comparison(contract, cfg, profile)
+        return render_comparison(contract, cfg, profile, theme=theme)
     if isinstance(contract, contracts.DegradedResult):
-        return render_degraded(contract, cfg, profile)
+        return render_degraded(contract, cfg, profile, theme=theme)
     if isinstance(contract, contracts.EmergencyResult):
-        return render_emergency(contract)
+        return render_emergency(contract, theme=theme)
     if isinstance(contract, contracts.GuardrailResult):
-        return render_guardrail(contract)
+        return render_guardrail(contract, theme=theme)
     raise TypeError(
         f"未知响应契约形态：{type(contract).__name__}（渲染层只消费 contracts.ResponseContract 判别联合）"
     )

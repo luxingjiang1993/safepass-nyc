@@ -4,7 +4,7 @@
 
 **Blocked by:** 07 — A5 画像本机可感知；08 — E4 熔断演示态
 
-**Status:** ready-for-agent
+**Status:** done
 
 ## Parent
 
@@ -14,8 +14,8 @@ https://github.com/luxingjiang1993/safepass-nyc/issues/35
 
 https://github.com/luxingjiang1993/safepass-nyc/issues/44 （原生 blocked by #42、#43）
 
-- [ ] 新网格与字号阶梯；无新前端栈、无位图包、无 emoji
-- [ ] 系统偏好 + 页内开关 + 主题 cookie；紧急页不跟深色走
-- [ ] 十槽 SVG：首页、覆盖内页眉、越界、紧急、空态、熔断、防线、对比、隐私/法律、无法解析；不按灯配犯罪图
-- [ ] 隐私页写明主题 cookie（不是画像）
-- [ ] D1 槽序结构锁仍绿；`python -m pytest tests/ -q` 全绿
+- [x] 新网格与字号阶梯；无新前端栈、无位图包、无 emoji
+- [x] 系统偏好 + 页内开关 + 主题 cookie；紧急页不跟深色走
+- [x] 十槽 SVG：首页、覆盖内页眉、越界、紧急、空态、熔断、防线、对比、隐私/法律、无法解析；不按灯配犯罪图
+- [x] 隐私页写明主题 cookie（不是画像）
+- [x] D1 槽序结构锁仍绿；`python -m pytest tests/ -q` 全绿
